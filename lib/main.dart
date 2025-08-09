@@ -172,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Icon(Icons.local_pizza, color: Colors.red),
             ),
             SizedBox(width: 10),
-            Text('PIZZA', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+            Text('PIZZA FABICHELO', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.red,
