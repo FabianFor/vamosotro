@@ -7,14 +7,14 @@ class DialogUtils {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.location_off, color: Colors.red),
             SizedBox(width: 10),
             Text('GPS Desactivado'),
           ],
         ),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -29,15 +29,15 @@ class DialogUtils {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancelar'),
+            child: const Text('Cancelar'),
           ),
           ElevatedButton.icon(
             onPressed: () async {
               Navigator.pop(context);
               await UbicacionService.openLocationSettings();
             },
-            icon: Icon(Icons.settings),
-            label: Text('Ir a Configuración'),
+            icon: const Icon(Icons.settings),
+            label: const Text('Ir a Configuración'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,
@@ -53,14 +53,14 @@ class DialogUtils {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.location_disabled, color: Colors.orange),
             SizedBox(width: 10),
             Text('Permisos Requeridos'),
           ],
         ),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -75,15 +75,15 @@ class DialogUtils {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancelar'),
+            child: const Text('Cancelar'),
           ),
           ElevatedButton.icon(
             onPressed: () async {
               Navigator.pop(context);
               await UbicacionService.openAppSettings();
             },
-            icon: Icon(Icons.settings_applications),
-            label: Text('Configuración App'),
+            icon: const Icon(Icons.settings_applications),
+            label: const Text('Configuración App'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
@@ -105,8 +105,8 @@ class DialogUtils {
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Icon(Icons.refresh, color: Colors.blue),
-            SizedBox(width: 10),
+            const Icon(Icons.refresh, color: Colors.blue),
+            const SizedBox(width: 10),
             Text(titulo),
           ],
         ),
@@ -114,15 +114,15 @@ class DialogUtils {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancelar'),
+            child: const Text('Cancelar'),
           ),
           ElevatedButton.icon(
             onPressed: () {
               Navigator.pop(context);
               onReintentar();
             },
-            icon: Icon(Icons.refresh),
-            label: Text('Reintentar'),
+            icon: const Icon(Icons.refresh),
+            label: const Text('Reintentar'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,
@@ -148,15 +148,15 @@ class DialogUtils {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Para completar el pago:', style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
+            const Text('Para completar el pago:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
             Text('1. Abre tu app de $metodo'),
             Text('2. Busca el número: $numero'),
             Text('3. Envía: S/ ${monto.toStringAsFixed(2)}'),
             Text('4. Concepto: Pedido #$numeroPedido'),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             Container(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: Colors.blue[50],
                 borderRadius: BorderRadius.circular(8),
@@ -165,7 +165,7 @@ class DialogUtils {
               child: Column(
                 children: [
                   Text('Datos para copiar:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue[800])),
-                  SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   SelectableText('Número: $numero'),
                   SelectableText('Monto: S/ ${monto.toStringAsFixed(2)}'),
                   SelectableText('Concepto: Pedido #$numeroPedido'),
@@ -177,7 +177,7 @@ class DialogUtils {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Entendido'),
+            child: const Text('Entendido'),
           ),
         ],
       ),

@@ -9,18 +9,18 @@ class PagoScreen extends StatefulWidget {
   final List<ItemPedido> carrito;
   final double total;
 
-  PagoScreen({required this.carrito, required this.total});
+  const PagoScreen({super.key, required this.carrito, required this.total});
 
   @override
-  _PagoScreenState createState() => _PagoScreenState();
+  State<PagoScreen> createState() => _PagoScreenState();
 }
 
 class _PagoScreenState extends State<PagoScreen> {
   String metodoPago = '';
   String tipoEntrega = '';
-  TextEditingController nombreController = TextEditingController();
-  TextEditingController telefonoController = TextEditingController();
-  TextEditingController pagoConCuantoController = TextEditingController();
+  final TextEditingController nombreController = TextEditingController();
+  final TextEditingController telefonoController = TextEditingController();
+  final TextEditingController pagoConCuantoController = TextEditingController();
   Position? ubicacionActual;
   bool cargandoUbicacion = false;
   double? vuelto;
@@ -72,26 +72,26 @@ class _PagoScreenState extends State<PagoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Finalizar Pedido', style: TextStyle(color: Colors.white)),
+        title: const Text('Finalizar Pedido', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Resumen del pedido
             Card(
               child: Padding(
-                padding: EdgeInsets.all(15),
+                padding: const EdgeInsets.all(15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Resumen del Pedido', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 10),
+                    const Text('Resumen del Pedido', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
                     ...widget.carrito.map((item) => Padding(
-                      padding: EdgeInsets.symmetric(vertical: 2),
+                      padding: const EdgeInsets.symmetric(vertical: 2),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -99,13 +99,13 @@ class _PagoScreenState extends State<PagoScreen> {
                           Text('S/ ${(item.precio * item.cantidad).toStringAsFixed(2)}'),
                         ],
                       ),
-                    )).toList(),
-                    Divider(),
+                    )),
+                    const Divider(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Total:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        Text('S/ ${widget.total.toStringAsFixed(2)}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.red)),
+                        const Text('Total:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text('S/ ${widget.total.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.red)),
                       ],
                     ),
                   ],
@@ -113,34 +113,34 @@ class _PagoScreenState extends State<PagoScreen> {
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Datos del cliente
-            Text('Datos del Cliente', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
+            const Text('Datos del Cliente', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
             TextField(
               controller: nombreController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Nombre completo',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             TextField(
               controller: telefonoController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Teléfono',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.phone,
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Tipo de entrega
-            Text('Tipo de Entrega', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Tipo de Entrega', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             RadioListTile(
-              title: Text('Delivery'),
+              title: const Text('Delivery'),
               value: 'delivery',
               groupValue: tipoEntrega,
               onChanged: (value) {
@@ -151,7 +151,7 @@ class _PagoScreenState extends State<PagoScreen> {
               },
             ),
             RadioListTile(
-              title: Text('Recojo en tienda'),
+              title: const Text('Recojo en tienda'),
               value: 'recojo',
               groupValue: tipoEntrega,
               onChanged: (value) {
@@ -164,9 +164,9 @@ class _PagoScreenState extends State<PagoScreen> {
 
             // Ubicación para delivery
             if (tipoEntrega == 'delivery') ...[
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Container(
-                padding: EdgeInsets.all(15),
+                padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.orange),
                   borderRadius: BorderRadius.circular(8),
@@ -175,24 +175,24 @@ class _PagoScreenState extends State<PagoScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    const Row(
                       children: [
                         Icon(Icons.info, color: Colors.orange),
                         SizedBox(width: 10),
                         Text('Ubicación para Delivery', style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     if (ubicacionActual == null) ...[
-                      Text('Necesitamos tu ubicación exacta para el delivery'),
-                      SizedBox(height: 10),
+                      const Text('Necesitamos tu ubicación exacta para el delivery'),
+                      const SizedBox(height: 10),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           onPressed: cargandoUbicacion ? null : _obtenerUbicacion,
                           icon: cargandoUbicacion 
-                              ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                              : Icon(Icons.location_on),
+                              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                              : const Icon(Icons.location_on),
                           label: Text(cargandoUbicacion ? 'Obteniendo ubicación...' : 'Obtener mi ubicación'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
@@ -201,14 +201,14 @@ class _PagoScreenState extends State<PagoScreen> {
                         ),
                       ),
                     ] else ...[
-                      Row(
+                      const Row(
                         children: [
                           Icon(Icons.check_circle, color: Colors.green),
                           SizedBox(width: 10),
                           Text('Ubicación obtenida ✅', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
                         ],
                       ),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text(
                         'Lat: ${ubicacionActual!.latitude.toStringAsFixed(6)}',
                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
@@ -217,11 +217,11 @@ class _PagoScreenState extends State<PagoScreen> {
                         'Lng: ${ubicacionActual!.longitude.toStringAsFixed(6)}',
                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       ElevatedButton.icon(
                         onPressed: () => UbicacionService.abrirEnMaps(ubicacionActual!.latitude, ubicacionActual!.longitude),
-                        icon: Icon(Icons.map),
-                        label: Text('Ver en Maps'),
+                        icon: const Icon(Icons.map),
+                        label: const Text('Ver en Maps'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           foregroundColor: Colors.white,
@@ -233,12 +233,12 @@ class _PagoScreenState extends State<PagoScreen> {
               ),
             ],
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Método de pago
-            Text('Método de Pago', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Método de Pago', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             RadioListTile(
-              title: Text('Efectivo'),
+              title: const Text('Efectivo'),
               value: 'efectivo',
               groupValue: metodoPago,
               onChanged: (value) {
@@ -251,15 +251,15 @@ class _PagoScreenState extends State<PagoScreen> {
               title: Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.purple,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: Text('Yape', style: TextStyle(color: Colors.white, fontSize: 12)),
+                    child: const Text('Yape', style: TextStyle(color: Colors.white, fontSize: 12)),
                   ),
-                  SizedBox(width: 10),
-                  Text('Yape'),
+                  const SizedBox(width: 10),
+                  const Text('Yape'),
                 ],
               ),
               value: 'yape',
@@ -275,15 +275,15 @@ class _PagoScreenState extends State<PagoScreen> {
               title: Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.teal,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: Text('Plin', style: TextStyle(color: Colors.white, fontSize: 12)),
+                    child: const Text('Plin', style: TextStyle(color: Colors.white, fontSize: 12)),
                   ),
-                  SizedBox(width: 10),
-                  Text('Plin'),
+                  const SizedBox(width: 10),
+                  const Text('Plin'),
                 ],
               ),
               value: 'plin',
@@ -298,9 +298,9 @@ class _PagoScreenState extends State<PagoScreen> {
 
             // Campo para pago en efectivo
             if (metodoPago == 'efectivo') ...[
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Container(
-                padding: EdgeInsets.all(15),
+                padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.green),
                   borderRadius: BorderRadius.circular(8),
@@ -309,23 +309,23 @@ class _PagoScreenState extends State<PagoScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Pago en Efectivo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    SizedBox(height: 10),
+                    const Text('Pago en Efectivo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: pagoConCuantoController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: '¿Con cuánto va a pagar?',
                         prefixText: 'S/ ',
                         border: OutlineInputBorder(),
                         hintText: 'Ingrese el monto',
                       ),
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) => _calcularVuelto(),
                     ),
                     if (vuelto != null) ...[
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Container(
-                        padding: EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: PagoService.esPagoExacto(widget.total, double.parse(pagoConCuantoController.text)) 
                               ? Colors.green[100] 
@@ -347,7 +347,7 @@ class _PagoScreenState extends State<PagoScreen> {
                                   ? Colors.green 
                                   : Colors.blue,
                             ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 PagoService.esPagoExacto(widget.total, double.parse(pagoConCuantoController.text))
@@ -368,9 +368,9 @@ class _PagoScreenState extends State<PagoScreen> {
                     if (pagoConCuantoController.text.isNotEmpty && 
                         double.tryParse(pagoConCuantoController.text) != null &&
                         double.parse(pagoConCuantoController.text) < widget.total) ...[
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Container(
-                        padding: EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.red[100],
                           borderRadius: BorderRadius.circular(8),
@@ -378,8 +378,8 @@ class _PagoScreenState extends State<PagoScreen> {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.error, color: Colors.red),
-                            SizedBox(width: 10),
+                            const Icon(Icons.error, color: Colors.red),
+                            const SizedBox(width: 10),
                             Text(
                               'El monto debe ser mayor o igual al total',
                               style: TextStyle(color: Colors.red[800], fontWeight: FontWeight.bold),
@@ -393,20 +393,20 @@ class _PagoScreenState extends State<PagoScreen> {
               ),
             ],
 
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Botón confirmar pedido
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _puedeConfirmarPedido() ? _confirmarPedido : null,
-                child: Text('CONFIRMAR PEDIDO', style: TextStyle(fontSize: 16)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 15),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
                   disabledBackgroundColor: Colors.grey,
                 ),
+                child: const Text('CONFIRMAR PEDIDO', style: TextStyle(fontSize: 16)),
               ),
             ),
           ],

@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
 import 'dart:convert';
 import '../models/models.dart';
 
@@ -51,7 +52,7 @@ class UbicacionService {
   static Future<Position> getCurrentPosition() async {
     return await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
-      timeLimit: Duration(seconds: 10),
+      timeLimit: const Duration(seconds: 10),
     );
   }
 
@@ -63,6 +64,18 @@ class UbicacionService {
   // Abrir configuración de la app
   static Future<void> openAppSettings() async {
     await Geolocator.openAppSettings();
+  }
+
+  // Abrir en Google Maps
+  static Future<void> abrirEnMaps(double lat, double lng) async {
+    final Uri mapsUrl = Uri.parse('https://www.google.com/maps?q=$lat,$lng');
+    try {
+      if (await canLaunchUrl(mapsUrl)) {
+        await launchUrl(mapsUrl, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      print('Error al abrir Google Maps: $e');
+    }
   }
 }
 
@@ -84,32 +97,52 @@ class PagoService {
 
   // Abrir Yape con datos prellenados
   static Future<bool> abrirYape(double monto, String numeroPedido) async {
-    final concepto = Uri.encodeComponent('Pedido #$numeroPedido');
-    final url = Uri.parse('yape://');
+    // Intentar abrir con datos prellenados usando diferentes esquemas
+    final List<String> yapeSchemss = [
+      'yape://sendmoney?phone=$numeroYape&amount=${monto.toStringAsFixed(2)}&message=Pedido%20$numeroPedido',
+      'yape://payment?phone=$numeroYape&amount=${monto.toStringAsFixed(2)}&concept=Pedido%20$numeroPedido',
+      'yape://transfer?recipient=$numeroYape&amount=${monto.toStringAsFixed(2)}&note=Pedido%20$numeroPedido',
+      'yape://pay?number=$numeroYape&amount=${monto.toStringAsFixed(2)}&description=Pedido%20$numeroPedido',
+      'yape://',
+    ];
     
-    try {
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-        return true;
+    for (String scheme in yapeSchemss) {
+      try {
+        final url = Uri.parse(scheme);
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+          return true;
+        }
+      } catch (e) {
+        print('Error al intentar esquema $scheme: $e');
+        continue;
       }
-    } catch (e) {
-      print('Error al abrir Yape: $e');
     }
     return false;
   }
 
   // Abrir Plin con datos prellenados
   static Future<bool> abrirPlin(double monto, String numeroPedido) async {
-    final concepto = Uri.encodeComponent('Pedido #$numeroPedido');
-    final url = Uri.parse('plin://');
+    // Intentar abrir con datos prellenados usando diferentes esquemas
+    final List<String> plinSchemes = [
+      'plin://sendmoney?phone=$numeroPlin&amount=${monto.toStringAsFixed(2)}&message=Pedido%20$numeroPedido',
+      'plin://payment?phone=$numeroPlin&amount=${monto.toStringAsFixed(2)}&concept=Pedido%20$numeroPedido',
+      'plin://transfer?recipient=$numeroPlin&amount=${monto.toStringAsFixed(2)}&note=Pedido%20$numeroPedido',
+      'plin://pay?number=$numeroPlin&amount=${monto.toStringAsFixed(2)}&description=Pedido%20$numeroPedido',
+      'plin://',
+    ];
     
-    try {
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-        return true;
+    for (String scheme in plinSchemes) {
+      try {
+        final url = Uri.parse(scheme);
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+          return true;
+        }
+      } catch (e) {
+        print('Error al intentar esquema $scheme: $e');
+        continue;
       }
-    } catch (e) {
-      print('Error al abrir Plin: $e');
     }
     return false;
   }
@@ -153,6 +186,16 @@ class PagoService {
   // Calcular vuelto
   static double calcularVuelto(double total, double pagoConCuanto) {
     return pagoConCuanto - total;
+  }
+
+  // Copiar datos de pago al portapapeles
+  static Future<void> copiarDatosPago(String metodo, String numero, double monto, String numeroPedido) async {
+    final datos = '''Datos para $metodo:
+Número: $numero
+Monto: S/ ${monto.toStringAsFixed(2)}
+Concepto: Pedido #$numeroPedido''';
+    
+    await Clipboard.setData(ClipboardData(text: datos));
   }
 
   // Verificar si es pago exacto

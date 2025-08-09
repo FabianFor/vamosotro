@@ -6,10 +6,10 @@ class CarritoScreen extends StatefulWidget {
   final List<ItemPedido> carrito;
   final Function(List<ItemPedido>) onActualizar;
 
-  CarritoScreen({required this.carrito, required this.onActualizar});
+  const CarritoScreen({super.key, required this.carrito, required this.onActualizar});
 
   @override
-  _CarritoScreenState createState() => _CarritoScreenState();
+  State<CarritoScreen> createState() => _CarritoScreenState();
 }
 
 class _CarritoScreenState extends State<CarritoScreen> {
@@ -41,12 +41,12 @@ class _CarritoScreenState extends State<CarritoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mi Carrito', style: TextStyle(color: Colors.white)),
+        title: const Text('Mi Carrito', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: carritoLocal.isEmpty
-          ? Center(
+          ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -63,7 +63,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                     itemBuilder: (context, index) {
                       final item = carritoLocal[index];
                       return Card(
-                        margin: EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(8),
                         child: ListTile(
                           title: Text(item.nombre),
                           subtitle: Text('${item.tamano} - S/ ${item.precio.toStringAsFixed(0)}'),
@@ -71,7 +71,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: Icon(Icons.remove_circle, color: Colors.red),
+                                icon: const Icon(Icons.remove_circle, color: Colors.red),
                                 onPressed: () {
                                   setState(() {
                                     if (item.cantidad > 1) {
@@ -88,9 +88,9 @@ class _CarritoScreenState extends State<CarritoScreen> {
                                   });
                                 },
                               ),
-                              Text('${item.cantidad}', style: TextStyle(fontSize: 16)),
+                              Text('${item.cantidad}', style: const TextStyle(fontSize: 16)),
                               IconButton(
-                                icon: Icon(Icons.add_circle, color: Colors.green),
+                                icon: const Icon(Icons.add_circle, color: Colors.green),
                                 onPressed: () {
                                   setState(() {
                                     carritoLocal[index] = ItemPedido(
@@ -111,10 +111,10 @@ class _CarritoScreenState extends State<CarritoScreen> {
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.grey[100],
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20),
                     ),
@@ -124,22 +124,22 @@ class _CarritoScreenState extends State<CarritoScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Total:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                          const Text('Total:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                           Text('S/ ${total.toStringAsFixed(2)}',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red)),
+                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red)),
                         ],
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: carritoLocal.isEmpty ? null : () => _procederAlPago(context),
-                          child: Text('PROCEDER AL PAGO', style: TextStyle(fontSize: 16)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: 15),
+                            padding: const EdgeInsets.symmetric(vertical: 15),
                           ),
+                          child: const Text('PROCEDER AL PAGO', style: TextStyle(fontSize: 16)),
                         ),
                       ),
                     ],

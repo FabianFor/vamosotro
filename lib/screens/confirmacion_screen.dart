@@ -4,6 +4,7 @@ import '../models/models.dart';
 import '../services/services.dart';
 import '../widgets/dialogs.dart';
 import 'home_screen.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ConfirmacionScreen extends StatefulWidget {
   final String numeroPedido;
@@ -17,7 +18,8 @@ class ConfirmacionScreen extends StatefulWidget {
   final double? vuelto;
   final double? pagoConCuanto;
 
-  ConfirmacionScreen({
+  const ConfirmacionScreen({
+    super.key,
     required this.numeroPedido,
     required this.carrito,
     required this.total,
@@ -31,7 +33,7 @@ class ConfirmacionScreen extends StatefulWidget {
   });
 
   @override
-  _ConfirmacionScreenState createState() => _ConfirmacionScreenState();
+  State<ConfirmacionScreen> createState() => _ConfirmacionScreenState();
 }
 
 class _ConfirmacionScreenState extends State<ConfirmacionScreen> 
@@ -54,7 +56,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
   void _setupAnimaciones() {
     // Animación de pulso para el ícono
     _pulseController = AnimationController(
-      duration: Duration(seconds: 1),
+      duration: const Duration(seconds: 1),
       vsync: this,
     );
     _pulseAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
@@ -64,11 +66,11 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
 
     // Animación de deslizamiento para las tarjetas
     _slideController = AnimationController(
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
     _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.3),
+      begin: const Offset(0, 0.3),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _slideController, curve: Curves.easeOut));
     
@@ -84,7 +86,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
 
   void _simularProcesoPedido() {
     // Simular confirmación de pago después de 3 segundos
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         setState(() {
           estadoPago = widget.metodoPago == 'efectivo' ? 'pendiente_entrega' : 'confirmado';
@@ -93,7 +95,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
     });
 
     // Simular estados del pedido
-    Future.delayed(Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
         setState(() {
           estadoPedido = 'preparando';
@@ -102,7 +104,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
       }
     });
 
-    Future.delayed(Duration(seconds: 15), () {
+    Future.delayed(const Duration(seconds: 15), () {
       if (mounted) {
         setState(() {
           estadoPedido = 'listo';
@@ -111,7 +113,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
     });
 
     if (widget.tipoEntrega == 'delivery') {
-      Future.delayed(Duration(seconds: 20), () {
+      Future.delayed(const Duration(seconds: 20), () {
         if (mounted) {
           setState(() {
             estadoPedido = 'en_camino';
@@ -191,13 +193,13 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text('Confirmación de Pedido', style: TextStyle(color: Colors.white)),
+        title: const Text('Confirmación de Pedido', style: TextStyle(color: Colors.white)),
         backgroundColor: _obtenerColorEstado(),
         automaticallyImplyLeading: false,
         elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: SlideTransition(
           position: _slideAnimation,
           child: Column(
@@ -216,12 +218,12 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                     BoxShadow(
                       color: _obtenerColorEstado().withOpacity(0.3),
                       blurRadius: 10,
-                      offset: Offset(0, 5),
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(30),
+                  padding: const EdgeInsets.all(30),
                   child: Column(
                     children: [
                       AnimatedBuilder(
@@ -230,7 +232,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                           return Transform.scale(
                             scale: estadoPedido == 'confirmado' ? _pulseAnimation.value : 1.0,
                             child: Container(
-                              padding: EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.2),
                                 shape: BoxShape.circle,
@@ -244,26 +246,26 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                           );
                         },
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Text(
                         _obtenerEstadoTexto(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           'Pedido #${widget.numeroPedido}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -271,15 +273,15 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                         ),
                       ),
                       if (_obtenerTiempoEstimado().isNotEmpty) ...[
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.access_time, color: Colors.white, size: 20),
-                            SizedBox(width: 8),
+                            const Icon(Icons.access_time, color: Colors.white, size: 20),
+                            const SizedBox(width: 8),
                             Text(
                               'Tiempo estimado: ${_obtenerTiempoEstimado()}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
                               ),
@@ -292,7 +294,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                 ),
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Información de pago mejorada
               if (widget.metodoPago != 'efectivo')
@@ -301,27 +303,27 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
               if (widget.metodoPago == 'efectivo')
                 _buildTarjetaEfectivo(),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
               // Detalles del pedido
               _buildTarjetaResumen(),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
               // Información de entrega
               _buildTarjetaEntrega(),
 
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
 
               // Botones de acción
               _buildBotonesAccion(),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Botón opcional de WhatsApp
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(15),
+                padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
                   color: Colors.green[50],
                   borderRadius: BorderRadius.circular(12),
@@ -329,22 +331,22 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                 ),
                 child: Column(
                   children: [
-                    Icon(Icons.chat, color: Colors.green, size: 30),
-                    SizedBox(height: 10),
+                    const Icon(Icons.chat, color: Colors.green, size: 30),
+                    const SizedBox(height: 10),
                     Text(
                       '¿Necesitas hacer algún cambio o tienes alguna pregunta?',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 14, color: Colors.green[800]),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     ElevatedButton.icon(
                       onPressed: _enviarWhatsAppPedido,
-                      icon: Icon(Icons.whatsapp),
-                      label: Text('Contactar por WhatsApp (Opcional)'),
+                    icon: FaIcon(FontAwesomeIcons.whatsapp),
+                      label: const Text('Contactar por WhatsApp (Opcional)'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                       ),
                     ),
                   ],
@@ -362,30 +364,30 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: widget.metodoPago == 'yape' ? Colors.purple : Colors.teal,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.payment, color: Colors.white),
+                  child: const Icon(Icons.payment, color: Colors.white),
                 ),
-                SizedBox(width: 15),
+                const SizedBox(width: 15),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Información de Pago',
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                       ),
                       Text(
-                        'Toca el botón para abrir ${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'}',
+                        'Toca el botón para abrir ${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'} con datos prellenados',
                         style: TextStyle(color: Colors.grey[600], fontSize: 14),
                       ),
                     ],
@@ -393,10 +395,10 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Container(
               width: double.infinity,
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
                 color: widget.metodoPago == 'yape' ? Colors.purple[50] : Colors.teal[50],
                 borderRadius: BorderRadius.circular(12),
@@ -409,41 +411,56 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                   Row(
                     children: [
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: widget.metodoPago == 'yape' ? Colors.purple : Colors.teal,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           widget.metodoPago == 'yape' ? 'Yape' : 'Plin',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      SizedBox(width: 15),
-                      Text('Realizar pago a:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(width: 15),
+                      const Text('Datos del pago:', style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
-                  SizedBox(height: 15),
+                  const SizedBox(height: 15),
                   _buildInfoPago('Número:', widget.metodoPago == 'yape' ? PagoService.numeroYape : PagoService.numeroPlin),
                   _buildInfoPago('Monto:', 'S/ ${widget.total.toStringAsFixed(2)}'),
                   _buildInfoPago('Concepto:', 'Pedido #${widget.numeroPedido}'),
                 ],
               ),
             ),
-            SizedBox(height: 15),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () => _abrirAppPago(),
-                icon: Icon(Icons.open_in_new),
-                label: Text('Abrir ${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'}'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: widget.metodoPago == 'yape' ? Colors.purple : Colors.teal,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            const SizedBox(height: 15),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _abrirAppPago(),
+                    icon: const Icon(Icons.open_in_new),
+                    label: Text('Abrir ${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'}'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: widget.metodoPago == 'yape' ? Colors.purple : Colors.teal,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 10),
+                ElevatedButton.icon(
+                  onPressed: () => _copiarDatos(),
+                  icon: const Icon(Icons.copy),
+                  label: const Text('Copiar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[600],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -456,30 +473,30 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
+                  padding: const EdgeInsets.all(10),
+                  decoration: const BoxDecoration(
                     color: Colors.green,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.monetization_on, color: Colors.white),
+                  child: const Icon(Icons.monetization_on, color: Colors.white),
                 ),
-                SizedBox(width: 15),
-                Text(
+                const SizedBox(width: 15),
+                const Text(
                   'Pago en Efectivo',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ],
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             Container(
               width: double.infinity,
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
                 color: widget.vuelto != null && widget.vuelto! > 0 
                     ? Colors.blue[50] 
@@ -497,11 +514,11 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                   if (widget.pagoConCuanto != null) 
                     _buildInfoPago('Paga con:', 'S/ ${widget.pagoConCuanto!.toStringAsFixed(2)}'),
                   
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   
                   if (widget.vuelto != null && widget.vuelto! > 0) ...[
                     Container(
-                      padding: EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.blue[100],
                         borderRadius: BorderRadius.circular(8),
@@ -509,12 +526,12 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                       child: Row(
                         children: [
                           Icon(Icons.monetization_on, color: Colors.blue[800]),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Su vuelto será:',
                                   style: TextStyle(fontSize: 14),
                                 ),
@@ -534,7 +551,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                     ),
                   ] else if (widget.vuelto != null) ...[
                     Container(
-                      padding: EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.green[100],
                         borderRadius: BorderRadius.circular(8),
@@ -542,7 +559,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                       child: Row(
                         children: [
                           Icon(Icons.check_circle, color: Colors.green[800]),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Text(
                             'Pago exacto ✅',
                             style: TextStyle(
@@ -566,14 +583,14 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
 
   Widget _buildInfoPago(String label, String value) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontWeight: FontWeight.w500)),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
           SelectableText(
             value,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -585,44 +602,44 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
                 Icon(Icons.receipt_long, color: Colors.blue),
                 SizedBox(width: 10),
                 Text('Resumen del Pedido', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             ...widget.carrito.map((item) => Padding(
-              padding: EdgeInsets.symmetric(vertical: 3),
+              padding: const EdgeInsets.symmetric(vertical: 3),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
                     child: Text(
                       '${item.cantidad}x ${item.nombre} (${item.tamano})',
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                     ),
                   ),
                   Text(
                     'S/ ${(item.precio * item.cantidad).toStringAsFixed(2)}',
-                    style: TextStyle(fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
-            )).toList(),
-            Divider(thickness: 2),
+            )),
+            const Divider(thickness: 2),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Total:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const Text('Total:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 Text(
                   'S/ ${widget.total.toStringAsFixed(2)}',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.red),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.red),
                 ),
               ],
             ),
@@ -637,7 +654,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -647,11 +664,11 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                   widget.tipoEntrega == 'delivery' ? Icons.delivery_dining : Icons.store,
                   color: Colors.orange,
                 ),
-                SizedBox(width: 10),
-                Text('Información de Entrega', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const SizedBox(width: 10),
+                const Text('Información de Entrega', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             _buildInfoEntrega(Icons.person, widget.nombre),
             _buildInfoEntrega(Icons.phone, widget.telefono),
             _buildInfoEntrega(
@@ -659,9 +676,9 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
               widget.tipoEntrega == 'delivery' ? 'Delivery a domicilio' : 'Recojo en tienda',
             ),
             if (widget.tipoEntrega == 'delivery' && widget.ubicacion != null) ...[
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.blue[50],
                   borderRadius: BorderRadius.circular(8),
@@ -670,14 +687,14 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    const Row(
                       children: [
                         Icon(Icons.location_on, color: Colors.red, size: 20),
                         SizedBox(width: 8),
                         Text('Ubicación de entrega:', style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     Text(
                       'Lat: ${widget.ubicacion!.latitude.toStringAsFixed(6)}',
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
@@ -686,18 +703,18 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                       'Lng: ${widget.ubicacion!.longitude.toStringAsFixed(6)}',
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     ElevatedButton.icon(
                       onPressed: () => PagoService.abrirEnMaps(
                         widget.ubicacion!.latitude,
                         widget.ubicacion!.longitude,
                       ),
-                      icon: Icon(Icons.map),
-                      label: Text('Ver en Google Maps'),
+                      icon: const Icon(Icons.map),
+                      label: const Text('Ver en Google Maps'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                       ),
                     ),
                   ],
@@ -710,114 +727,157 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
     );
   }
 
-  Widget _buildInfoEntrega(IconData icon, String text) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.grey[600], size: 20),
-          SizedBox(width: 12),
-          Expanded(child: Text(text, style: TextStyle(fontSize: 15))),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBotonesAccion() {
-    return Column(
+Widget _buildInfoEntrega(IconData icon, String text) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 5),
+    child: Row(
       children: [
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: () => PagoService.realizarLlamada(PagoService.numeroWhatsApp),
-            icon: Icon(Icons.phone),
-            label: Text('Llamar a la pizzería'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(vertical: 15),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-          ),
-        ),
-        SizedBox(height: 10),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => HomeScreen()),
-              (route) => false,
-            ),
-            icon: Icon(Icons.restaurant_menu),
-            label: Text('Volver al menú'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.red,
-              padding: EdgeInsets.symmetric(vertical: 15),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-          ),
-        ),
+        Icon(icon, color: Colors.grey[600], size: 20),
+        const SizedBox(width: 12),
+        Expanded(child: Text(text, style: const TextStyle(fontSize: 15))),
       ],
-    );
+    ),
+  );
+}
+
+Widget _buildBotonesAccion() {
+  return Column(
+    children: [
+      SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: () => PagoService.realizarLlamada(PagoService.numeroWhatsApp),
+          icon: const Icon(Icons.phone),
+          label: const Text('Llamar a la pizzería'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        ),
+      ),
+      const SizedBox(height: 10),
+      SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            (route) => false,
+          ),
+          icon: const Icon(Icons.restaurant_menu),
+          label: const Text('Volver al menú'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.red,
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+void _abrirAppPago() async {
+  bool exito = false;
+
+  if (widget.metodoPago == 'yape') {
+    exito = await PagoService.abrirYape(widget.total, widget.numeroPedido);
+  } else if (widget.metodoPago == 'plin') {
+    exito = await PagoService.abrirPlin(widget.total, widget.numeroPedido);
   }
 
-  void _abrirAppPago() async {
-    bool exito = false;
-    
-    if (widget.metodoPago == 'yape') {
-      exito = await PagoService.abrirYape(widget.total, widget.numeroPedido);
-    } else if (widget.metodoPago == 'plin') {
-      exito = await PagoService.abrirPlin(widget.total, widget.numeroPedido);
+  if (!exito) {
+    // Si no se pudo abrir la app, mostrar instrucciones
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No se pudo abrir ${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'}. Datos copiados al portapapeles.'),
+          backgroundColor: Colors.orange,
+          action: SnackBarAction(
+            label: 'Ver datos',
+            onPressed: () => DialogUtils.mostrarInstruccionesPago(
+              context,
+              widget.metodoPago == 'yape' ? 'Yape' : 'Plin',
+              widget.metodoPago == 'yape' ? PagoService.numeroYape : PagoService.numeroPlin,
+              widget.total,
+              widget.numeroPedido,
+            ),
+          ),
+        ),
+      );
     }
-    
-    if (!exito) {
-      DialogUtils.mostrarInstruccionesPago(
-        context,
-        widget.metodoPago == 'yape' ? 'Yape' : 'Plin',
-        widget.metodoPago == 'yape' ? PagoService.numeroYape : PagoService.numeroPlin,
-        widget.total,
-        widget.numeroPedido,
+    await _copiarDatos();
+  } else {
+    // Si se abrió exitosamente, mostrar confirmación
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'} abierto con datos prellenados ✅'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
       );
     }
   }
+}
 
-  void _enviarWhatsAppPedido() {
-    String mensaje = '''
+Future<void> _copiarDatos() async {
+  await PagoService.copiarDatosPago(
+    widget.metodoPago == 'yape' ? 'Yape' : 'Plin',
+    widget.metodoPago == 'yape' ? PagoService.numeroYape : PagoService.numeroPlin,
+    widget.total,
+    widget.numeroPedido,
+  );
+
+  if (mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Datos copiados al portapapeles ✅'),
+        backgroundColor: Colors.blue,
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+}
+
+void _enviarWhatsAppPedido() {
+  String mensaje = '''
 🍕 *PEDIDO REALIZADO* 🍕
-
+  
 *Pedido #:* ${widget.numeroPedido}
 *Cliente:* ${widget.nombre}
 *Teléfono:* ${widget.telefono}
-
+  
 *PRODUCTOS:*
 ${widget.carrito.map((item) => '• ${item.cantidad}x ${item.nombre} (${item.tamano}) - S/ ${(item.precio * item.cantidad).toStringAsFixed(2)}').join('\n')}
-
+  
 *Total:* S/ ${widget.total.toStringAsFixed(2)}
-
+  
 *Entrega:* ${widget.tipoEntrega == 'delivery' ? 'Delivery' : 'Recojo en tienda'}
 ${widget.tipoEntrega == 'delivery' && widget.ubicacion != null ? '*Coordenadas:* ${widget.ubicacion!.latitude}, ${widget.ubicacion!.longitude}' : ''}
-
+  
 *Método de pago:* ${_obtenerNombreMetodoPago()}
 ${widget.metodoPago == 'efectivo' && widget.vuelto != null ? (widget.vuelto! > 0 ? '*Vuelto:* S/ ${widget.vuelto!.toStringAsFixed(2)}' : '*Pago exacto*') : ''}
-
+  
 ${widget.metodoPago == 'efectivo' && widget.pagoConCuanto != null ? '*Paga con:* S/ ${widget.pagoConCuanto!.toStringAsFixed(2)}' : ''}
-
+  
 ¡Gracias por su pedido! 😊
-    ''';
+  ''';
 
-    PagoService.enviarWhatsApp(PagoService.numeroWhatsApp, mensaje);
-  }
+  PagoService.enviarWhatsApp(PagoService.numeroWhatsApp, mensaje);
+}
 
-  String _obtenerNombreMetodoPago() {
-    switch (widget.metodoPago) {
-      case 'efectivo':
-        return 'Efectivo';
-      case 'yape':
-        return 'Yape - ${PagoService.numeroYape}';
-      case 'plin':
-        return 'Plin - ${PagoService.numeroPlin}';
-      default:
-        return widget.metodoPago;
-    }
+String _obtenerNombreMetodoPago() {
+  switch (widget.metodoPago) {
+    case 'efectivo':
+      return 'Efectivo';
+    case 'yape':
+      return 'Yape - ${PagoService.numeroYape}';
+    case 'plin':
+      return 'Plin - ${PagoService.numeroPlin}';
+    default:
+      return widget.metodoPago;
   }
+}
 }

@@ -5,8 +5,10 @@ import '../widgets/pizza_card.dart';
 import 'carrito_screen.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -44,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$nombre ($tamano) agregado al carrito'),
-        duration: Duration(seconds: 1),
+        duration: const Duration(seconds: 1),
       ),
     );
   }
@@ -58,14 +60,14 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.local_pizza, color: Colors.red),
+              child: const Icon(Icons.local_pizza, color: Colors.red),
             ),
-            SizedBox(width: 10),
-            Text('PIZZA FABICHELO', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+            const SizedBox(width: 10),
+            const Text('PIZZA FABICHELO', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
           ],
         ),
         backgroundColor: Colors.red,
@@ -73,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Stack(
             children: [
               IconButton(
-                icon: Icon(Icons.shopping_cart, color: Colors.white),
+                icon: const Icon(Icons.shopping_cart, color: Colors.white),
                 onPressed: () => _mostrarCarrito(context),
               ),
               if (carrito.isNotEmpty)
@@ -81,18 +83,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   right: 8,
                   top: 8,
                   child: Container(
-                    padding: EdgeInsets.all(2),
+                    padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
                       color: Colors.orange,
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    constraints: BoxConstraints(
+                    constraints: const BoxConstraints(
                       minWidth: 14,
                       minHeight: 14,
                     ),
                     child: Text(
                       '${carrito.fold(0, (sum, item) => sum + item.cantidad)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 8,
                       ),
@@ -110,14 +112,14 @@ class _HomeScreenState extends State<HomeScreen> {
             // Header con logo
             Container(
               height: 100,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Colors.red, Colors.orange],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
               ),
-              child: Center(
+              child: const Center(
                 child: Text(
                   'LISTA DE SABORES',
                   style: TextStyle(
@@ -132,8 +134,8 @@ class _HomeScreenState extends State<HomeScreen> {
             // Información de tamaños
             Container(
               color: Colors.green,
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Row(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Column(
@@ -143,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text('8 tajadas', style: TextStyle(color: Colors.white)),
                     ],
                   ),
-                  Container(width: 2, height: 40, color: Colors.white),
+                  SizedBox(width: 2, height: 40, child: ColoredBox(color: Colors.white)),
                   Column(
                     children: [
                       Icon(Icons.local_pizza, color: Colors.white, size: 20),
@@ -168,18 +170,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // Combo Estrella
             Container(
-              margin: EdgeInsets.all(10),
-              decoration: BoxDecoration(
+              margin: const EdgeInsets.all(10),
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Colors.orange, Colors.red],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.all(Radius.circular(15)),
               ),
               child: Column(
                 children: [
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.all(15),
                     child: Text(
                       'Combo Estrella',
@@ -191,8 +193,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.all(10),
-                    padding: EdgeInsets.all(15),
+                    margin: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(15),
                     decoration: BoxDecoration(
                       color: Colors.amber[100],
                       borderRadius: BorderRadius.circular(10),
@@ -201,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Row(
                           children: [
-                            Expanded(
+                            const Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -213,12 +215,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                             Container(
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 color: Colors.black,
                                 shape: BoxShape.circle,
                               ),
-                              padding: EdgeInsets.all(15),
-                              child: Text(
+                              padding: const EdgeInsets.all(15),
+                              child: const Text(
                                 '42',
                                 style: TextStyle(
                                   color: Colors.white,
@@ -229,14 +231,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         ElevatedButton(
                           onPressed: () => agregarAlCarrito('Combo Estrella', 42.0, 'Combo'),
-                          child: Text('Agregar Combo'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
                           ),
+                          child: const Text('Agregar Combo'),
                         ),
                       ],
                     ),
@@ -248,33 +250,33 @@ class _HomeScreenState extends State<HomeScreen> {
             // Información de contacto
             Container(
               color: Colors.red,
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  Row(
+                  const Row(
                     children: [
                       Icon(Icons.delivery_dining, color: Colors.white),
                       SizedBox(width: 10),
                       Text('DELIVERY', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     ],
                   ),
-                  SizedBox(height: 10),
-                  Row(
+                  const SizedBox(height: 10),
+                  const Row(
                     children: [
                       Icon(Icons.phone, color: Colors.green),
                       SizedBox(width: 10),
                       Text('933 214 908', style: TextStyle(color: Colors.white)),
                     ],
                   ),
-                  Row(
+                  const Row(
                     children: [
                       Icon(Icons.phone, color: Colors.blue),
                       SizedBox(width: 10),
                       Text('01 6723 711', style: TextStyle(color: Colors.white)),
                     ],
                   ),
-                  SizedBox(height: 10),
-                  Row(
+                  const SizedBox(height: 10),
+                  const Row(
                     children: [
                       Icon(Icons.location_on, color: Colors.white),
                       SizedBox(width: 10),
@@ -286,26 +288,26 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 15),
+                  const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: Colors.purple,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text('Yape', style: TextStyle(color: Colors.white)),
+                        child: const Text('Yape', style: TextStyle(color: Colors.white)),
                       ),
-                      SizedBox(width: 20),
+                      const SizedBox(width: 20),
                       Container(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: Colors.teal,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text('Plin', style: TextStyle(color: Colors.white)),
+                        child: const Text('Plin', style: TextStyle(color: Colors.white)),
                       ),
                     ],
                   ),
@@ -323,7 +325,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       isScrollControlled: true,
       builder: (BuildContext context) {
-        return Container(
+        return SizedBox(
           height: MediaQuery.of(context).size.height * 0.8,
           child: CarritoScreen(
             carrito: carrito,

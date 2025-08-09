@@ -5,7 +5,8 @@ class PizzaCard extends StatelessWidget {
   final Pizza pizza;
   final Function(String, double, String) onAgregarAlCarrito;
 
-  PizzaCard({
+  const PizzaCard({
+    super.key,
     required this.pizza,
     required this.onAgregarAlCarrito,
   });
@@ -13,8 +14,8 @@ class PizzaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      padding: EdgeInsets.all(15),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: Colors.amber[50],
         borderRadius: BorderRadius.circular(10),
@@ -25,7 +26,7 @@ class PizzaCard extends StatelessWidget {
         children: [
           Text(
             pizza.nombre,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               fontStyle: FontStyle.italic,
@@ -33,29 +34,30 @@ class PizzaCard extends StatelessWidget {
           ),
           Text(
             pizza.ingredientes,
-            style: TextStyle(fontSize: 12, color: Colors.black87),
+            style: const TextStyle(fontSize: 12, color: Colors.black87),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               // Botón Familiar
               Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(right: 5),
+                  margin: const EdgeInsets.only(right: 5),
                   child: ElevatedButton(
                     onPressed: () => onAgregarAlCarrito(pizza.nombre, pizza.precioFamiliar, 'Familiar'),
-                    child: Column(
-                      children: [
-                        Text('Familiar'),
-                        Text('S/ ${pizza.precioFamiliar.toStringAsFixed(0)}', 
-                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      ],
-                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('Familiar'),
+                        Text('S/ ${pizza.precioFamiliar.toStringAsFixed(0)}', 
+                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      ],
                     ),
                   ),
                 ),
@@ -63,20 +65,21 @@ class PizzaCard extends StatelessWidget {
               // Botón Personal
               Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(left: 5),
+                  margin: const EdgeInsets.only(left: 5),
                   child: ElevatedButton(
                     onPressed: () => onAgregarAlCarrito(pizza.nombre, pizza.precioPersonal, 'Personal'),
-                    child: Column(
-                      children: [
-                        Text('Personal'),
-                        Text('S/ ${pizza.precioPersonal.toStringAsFixed(0)}', 
-                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      ],
-                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('Personal'),
+                        Text('S/ ${pizza.precioPersonal.toStringAsFixed(0)}', 
+                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      ],
                     ),
                   ),
                 ),

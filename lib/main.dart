@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 
 void main() {
-  runApp(PizzeriaApp());
+  runApp(const PizzeriaApp());
 }
 
 class PizzeriaApp extends StatelessWidget {
+  const PizzeriaApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -13,9 +15,6 @@ class PizzeriaApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        cardTheme: const CardTheme(
-          elevation: 4,
-        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
