@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/models.dart';
 import '../services/services.dart';
-import '../widgets/dialogs.dart';
 import 'home_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -178,11 +178,9 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
     switch (estadoPedido) {
       case 'confirmado':
       case 'preparando':
-        return widget.tipoEntrega == 'delivery' ? '25-35 minutos' : '15-20 minutos';
       case 'listo':
-        return widget.tipoEntrega == 'delivery' ? '5-10 minutos' : 'Ya está listo';
       case 'en_camino':
-        return '5-10 minutos';
+        return '25-35 minutos'; // 🔥 CAMBIADO: Siempre 25-35 minutos para todos los estados
       default:
         return '';
     }
@@ -296,113 +294,114 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
 
               const SizedBox(height: 20),
 
-              // 🔥 RECORDATORIO IMPORTANTE - NO PAGAR
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.orange[600]!, Colors.red[600]!],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.orange.withOpacity(0.4),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
+              // 🔥 RECORDATORIO IMPORTANTE - SOLO PARA DELIVERY
+              if (widget.tipoEntrega == 'delivery') ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.orange[600]!, Colors.red[600]!],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.warning,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                        ),
-                        const SizedBox(width: 15),
-                        const Expanded(
-                          child: Text(
-                            '¡IMPORTANTE!',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    Container(
-                      padding: const EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.orange.withOpacity(0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
                       ),
-                      child: Column(
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
                         children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.block, color: Colors.white, size: 24),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  'NO REALICES EL PAGO TODAVÍA',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            'Espera a que nuestro personal confirme si podemos llegar a tu dirección. Te contactaremos para confirmar antes del pago.',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              height: 1.4,
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              shape: BoxShape.circle,
                             ),
-                            textAlign: TextAlign.center,
+                            child: const Icon(
+                              Icons.warning,
+                              color: Colors.white,
+                              size: 30,
+                            ),
                           ),
-                          const SizedBox(height: 15),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.access_time, color: Colors.white, size: 20),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Tiempo de respuesta: 2-5 minutos',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                          const SizedBox(width: 15),
+                          const Expanded(
+                            child: Text(
+                              '¡IMPORTANTE!',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 15),
+                      Container(
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(Icons.block, color: Colors.white, size: 24),
+                                SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    'NO REALICES EL PAGO TODAVÍA',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              'Espera a que nuestro personal confirme si podemos llegar a tu dirección. Te contactaremos para confirmar antes del pago.',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                height: 1.4,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 15),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.access_time, color: Colors.white, size: 20),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Tiempo de respuesta: 2-5 minutos',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.9),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
+              ],
 
               // Información de pago mejorada
               if (widget.metodoPago != 'efectivo')
@@ -442,13 +441,13 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                     const Icon(Icons.chat, color: Colors.green, size: 30),
                     const SizedBox(height: 10),
                     Text(
-                      '¿Necesitas hacer algún cambio o tienes alguna pregunta?',
+                      '¿Tienes alguna consulta adicional o quieres hacer algún cambio?',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 14, color: Colors.green[800]),
                     ),
                     const SizedBox(height: 10),
                     ElevatedButton.icon(
-                      onPressed: _enviarWhatsAppPedido,
+                      onPressed: _contactarPorWhatsApp, // 🔥 CAMBIADO: nuevo método
                     icon: FaIcon(FontAwesomeIcons.whatsapp),
                       label: const Text('Contactar por WhatsApp (Opcional)'),
                       style: ElevatedButton.styleFrom(
@@ -467,7 +466,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
     );
   }
 
-  // 🔥 TARJETA DE PAGO MEJORADA CON NOMBRES
+  // 🔥 TARJETA DE PAGO SIN BOTÓN DE ABRIR APP - SOLO INFORMACIÓN
   Widget _buildTarjetaPago() {
     return Card(
       elevation: 4,
@@ -496,7 +495,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                       ),
                       Text(
-                        'Toca el botón para abrir ${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'}',
+                        'Datos para realizar el pago con ${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'}',
                         style: TextStyle(color: Colors.grey[600], fontSize: 14),
                       ),
                     ],
@@ -543,34 +542,20 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
               ),
             ),
             const SizedBox(height: 15),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _abrirAppPago(),
-                    icon: const Icon(Icons.open_in_new),
-                    label: Text('Abrir ${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'}'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: widget.metodoPago == 'yape' ? Colors.purple : Colors.teal,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                  ),
+            // 🔥 SOLO BOTÓN DE COPIAR NÚMERO - SIMPLIFICADO
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => _copiarNumero(),
+                icon: const Icon(Icons.copy),
+                label: const Text('Copiar Número de Teléfono'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: widget.metodoPago == 'yape' ? Colors.purple : Colors.teal,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
-                const SizedBox(width: 10),
-                ElevatedButton.icon(
-                  onPressed: () => _copiarDatos(),
-                  icon: const Icon(Icons.copy),
-                  label: const Text('Copiar'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[600],
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                ),
-              ],
+              ),
             ),
           ],
         ),
@@ -888,107 +873,33 @@ Widget _buildBotonesAccion() {
   );
 }
 
-// 🔥 MÉTODO MEJORADO PARA ABRIR APPS DE PAGO
-void _abrirAppPago() async {
-  bool exito = false;
-
-  if (widget.metodoPago == 'yape') {
-    exito = await PagoService.abrirYape(widget.total, widget.numeroPedido);
-  } else if (widget.metodoPago == 'plin') {
-    exito = await PagoService.abrirPlin(widget.total, widget.numeroPedido);
-  }
-
-  if (!exito) {
-    // Si no se pudo abrir la app, mostrar mensaje
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('No se pudo abrir ${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'}. Datos copiados al portapapeles.'),
-          backgroundColor: Colors.orange,
-          action: SnackBarAction(
-            label: 'Ver datos',
-            onPressed: () => DialogUtils.mostrarInstruccionesPago(
-              context,
-              widget.metodoPago == 'yape' ? 'Yape' : 'Plin',
-              widget.metodoPago == 'yape' ? PagoService.numeroYape : PagoService.numeroPlin,
-              widget.total,
-              widget.numeroPedido,
-            ),
-          ),
-        ),
-      );
-    }
-    await _copiarDatos();
-  } else {
-    // Si se abrió exitosamente, mostrar confirmación
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'} abierto correctamente ✅'),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-}
-
-Future<void> _copiarDatos() async {
-  await PagoService.copiarDatosPago(
-    widget.metodoPago == 'yape' ? 'Yape' : 'Plin',
-    widget.metodoPago == 'yape' ? PagoService.numeroYape : PagoService.numeroPlin,
-    widget.total,
-    widget.numeroPedido,
-  );
+// 🔥 NUEVO MÉTODO - SOLO COPIA EL NÚMERO DE TELÉFONO
+Future<void> _copiarNumero() async {
+  String numero = widget.metodoPago == 'yape' ? PagoService.numeroYape : PagoService.numeroPlin;
+  
+  await Clipboard.setData(ClipboardData(text: numero));
 
   if (mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Datos copiados al portapapeles ✅'),
+      SnackBar(
+        content: Text('Número copiado: $numero ✅'),
         backgroundColor: Colors.blue,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
 }
 
-void _enviarWhatsAppPedido() {
-  String mensaje = '''
-🍕 *PEDIDO REALIZADO* 🍕
-  
-*Pedido #:* ${widget.numeroPedido}
-*Cliente:* ${widget.nombre}
-*Teléfono:* ${widget.telefono}
-  
-*PRODUCTOS:*
-${widget.carrito.map((item) => '• ${item.cantidad}x ${item.nombre} (${item.tamano}) - S/ ${(item.precio * item.cantidad).toStringAsFixed(2)}').join('\n')}
-  
-*Total:* S/ ${widget.total.toStringAsFixed(2)}
-  
-*Entrega:* ${widget.tipoEntrega == 'delivery' ? 'Delivery' : 'Recojo en tienda'}
-${widget.tipoEntrega == 'delivery' && widget.ubicacion != null ? '*Coordenadas:* ${widget.ubicacion!.latitude}, ${widget.ubicacion!.longitude}' : ''}
-  
-*Método de pago:* ${_obtenerNombreMetodoPago()}
-${widget.metodoPago == 'efectivo' && widget.vuelto != null ? (widget.vuelto! > 0 ? '*Vuelto:* S/ ${widget.vuelto!.toStringAsFixed(2)}' : '*Pago exacto*') : ''}
-  
-${widget.metodoPago == 'efectivo' && widget.pagoConCuanto != null ? '*Paga con:* S/ ${widget.pagoConCuanto!.toStringAsFixed(2)}' : ''}
-  
-¡Gracias por su pedido! 😊
-  ''';
+// 🔥 NUEVO MÉTODO - SOLO PARA CONSULTAS GENERALES (sin enviar pedido)
+void _contactarPorWhatsApp() {
+  String mensaje = '''Hola 👋
+
+Tengo una consulta sobre mi pedido #${widget.numeroPedido}.
+
+¿Podrían ayudarme por favor?
+
+Gracias 😊''';
 
   PagoService.enviarWhatsApp(PagoService.numeroWhatsApp, mensaje);
-}
-
-String _obtenerNombreMetodoPago() {
-  switch (widget.metodoPago) {
-    case 'efectivo':
-      return 'Efectivo';
-    case 'yape':
-      return 'Yape - ${PagoService.numeroYape}';
-    case 'plin':
-      return 'Plin - ${PagoService.numeroPlin}';
-    default:
-      return widget.metodoPago;
-  }
 }
 }
