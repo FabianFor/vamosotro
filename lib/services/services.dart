@@ -85,64 +85,30 @@ class PagoService {
   static const String numeroPlin = '924802760';
   static const String numeroWhatsApp = '933214908';
 
-  // Generar URL para Yape
-  static String generateYapeUrl(double monto, String concepto) {
-    return 'yape://payment?amount=$monto&message=$concepto';
-  }
-
-  // Generar URL para Plin
-  static String generatePlinUrl(double monto, String concepto) {
-    return 'plin://payment?amount=$monto&message=$concepto';
-  }
-
-  // Abrir Yape con datos prellenados
+  // 🔥 MÉTODO SIMPLIFICADO - Solo abrir Yape (sin datos)
   static Future<bool> abrirYape(double monto, String numeroPedido) async {
-    // Intentar abrir con datos prellenados usando diferentes esquemas
-    final List<String> yapeSchemss = [
-      'yape://sendmoney?phone=$numeroYape&amount=${monto.toStringAsFixed(2)}&message=Pedido%20$numeroPedido',
-      'yape://payment?phone=$numeroYape&amount=${monto.toStringAsFixed(2)}&concept=Pedido%20$numeroPedido',
-      'yape://transfer?recipient=$numeroYape&amount=${monto.toStringAsFixed(2)}&note=Pedido%20$numeroPedido',
-      'yape://pay?number=$numeroYape&amount=${monto.toStringAsFixed(2)}&description=Pedido%20$numeroPedido',
-      'yape://',
-    ];
-    
-    for (String scheme in yapeSchemss) {
-      try {
-        final url = Uri.parse(scheme);
-        if (await canLaunchUrl(url)) {
-          await launchUrl(url, mode: LaunchMode.externalApplication);
-          return true;
-        }
-      } catch (e) {
-        print('Error al intentar esquema $scheme: $e');
-        continue;
+    try {
+      final url = Uri.parse('yape://');
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+        return true;
       }
+    } catch (e) {
+      print('Error al abrir Yape: $e');
     }
     return false;
   }
 
-  // Abrir Plin con datos prellenados
+  // 🔥 MÉTODO SIMPLIFICADO - Solo abrir Plin (sin datos)
   static Future<bool> abrirPlin(double monto, String numeroPedido) async {
-    // Intentar abrir con datos prellenados usando diferentes esquemas
-    final List<String> plinSchemes = [
-      'plin://sendmoney?phone=$numeroPlin&amount=${monto.toStringAsFixed(2)}&message=Pedido%20$numeroPedido',
-      'plin://payment?phone=$numeroPlin&amount=${monto.toStringAsFixed(2)}&concept=Pedido%20$numeroPedido',
-      'plin://transfer?recipient=$numeroPlin&amount=${monto.toStringAsFixed(2)}&note=Pedido%20$numeroPedido',
-      'plin://pay?number=$numeroPlin&amount=${monto.toStringAsFixed(2)}&description=Pedido%20$numeroPedido',
-      'plin://',
-    ];
-    
-    for (String scheme in plinSchemes) {
-      try {
-        final url = Uri.parse(scheme);
-        if (await canLaunchUrl(url)) {
-          await launchUrl(url, mode: LaunchMode.externalApplication);
-          return true;
-        }
-      } catch (e) {
-        print('Error al intentar esquema $scheme: $e');
-        continue;
+    try {
+      final url = Uri.parse('plin://');
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+        return true;
       }
+    } catch (e) {
+      print('Error al abrir Plin: $e');
     }
     return false;
   }
@@ -188,10 +154,18 @@ class PagoService {
     return pagoConCuanto - total;
   }
 
-  // Copiar datos de pago al portapapeles
+  // 🔥 COPIAR DATOS SIMPLIFICADO - Con nombres incluidos
   static Future<void> copiarDatosPago(String metodo, String numero, double monto, String numeroPedido) async {
+    String nombreTitular = '';
+    if (metodo == 'Yape') {
+      nombreTitular = 'Carlos Alberto Huaytalla Quispe';
+    } else if (metodo == 'Plin') {
+      nombreTitular = 'Fabian Hector Huaytalla Guevara';
+    }
+
     final datos = '''Datos para $metodo:
 Número: $numero
+Nombre: $nombreTitular
 Monto: S/ ${monto.toStringAsFixed(2)}
 Concepto: Pedido #$numeroPedido''';
     

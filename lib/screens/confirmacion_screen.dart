@@ -296,6 +296,114 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
 
               const SizedBox(height: 20),
 
+              // 🔥 RECORDATORIO IMPORTANTE - NO PAGAR
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.orange[600]!, Colors.red[600]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.orange.withOpacity(0.4),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.warning,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        const Expanded(
+                          child: Text(
+                            '¡IMPORTANTE!',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    Container(
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.block, color: Colors.white, size: 24),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'NO REALICES EL PAGO TODAVÍA',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            'Espera a que nuestro personal confirme si podemos llegar a tu dirección. Te contactaremos para confirmar antes del pago.',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              height: 1.4,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 15),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.access_time, color: Colors.white, size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Tiempo de respuesta: 2-5 minutos',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
               // Información de pago mejorada
               if (widget.metodoPago != 'efectivo')
                 _buildTarjetaPago(),
@@ -359,6 +467,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
     );
   }
 
+  // 🔥 TARJETA DE PAGO MEJORADA CON NOMBRES
   Widget _buildTarjetaPago() {
     return Card(
       elevation: 4,
@@ -387,7 +496,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                       ),
                       Text(
-                        'Toca el botón para abrir ${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'} con datos prellenados',
+                        'Toca el botón para abrir ${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'}',
                         style: TextStyle(color: Colors.grey[600], fontSize: 14),
                       ),
                     ],
@@ -427,6 +536,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                   ),
                   const SizedBox(height: 15),
                   _buildInfoPago('Número:', widget.metodoPago == 'yape' ? PagoService.numeroYape : PagoService.numeroPlin),
+                  _buildInfoPago('Nombre:', widget.metodoPago == 'yape' ? 'Carlos Alberto Huaytalla Quispe' : 'Fabian Hector Huaytalla Guevara'),
                   _buildInfoPago('Monto:', 'S/ ${widget.total.toStringAsFixed(2)}'),
                   _buildInfoPago('Concepto:', 'Pedido #${widget.numeroPedido}'),
                 ],
@@ -778,6 +888,7 @@ Widget _buildBotonesAccion() {
   );
 }
 
+// 🔥 MÉTODO MEJORADO PARA ABRIR APPS DE PAGO
 void _abrirAppPago() async {
   bool exito = false;
 
@@ -788,7 +899,7 @@ void _abrirAppPago() async {
   }
 
   if (!exito) {
-    // Si no se pudo abrir la app, mostrar instrucciones
+    // Si no se pudo abrir la app, mostrar mensaje
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -813,7 +924,7 @@ void _abrirAppPago() async {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'} abierto con datos prellenados ✅'),
+          content: Text('${widget.metodoPago == 'yape' ? 'Yape' : 'Plin'} abierto correctamente ✅'),
           backgroundColor: Colors.green,
           duration: const Duration(seconds: 2),
         ),

@@ -493,31 +493,138 @@ class _PagoScreenState extends State<PagoScreen> {
     }
   }
 
+  // 🔥 MÉTODO MEJORADO PARA CONFIRMAR PEDIDO CON WHATSAPP AUTOMÁTICO
   void _confirmarPedido() async {
-    // Guardar datos del cliente
-    await ClienteService.guardarDatosCliente(
-      DatosCliente(nombre: nombreController.text, telefono: telefonoController.text)
-    );
-
-    // Generar número de pedido único
-    String numeroPedido = DateTime.now().millisecondsSinceEpoch.toString().substring(7);
-    
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ConfirmacionScreen(
-          numeroPedido: numeroPedido,
-          carrito: widget.carrito,
-          total: widget.total,
-          metodoPago: metodoPago,
-          tipoEntrega: tipoEntrega,
-          nombre: nombreController.text,
-          telefono: telefonoController.text,
-          ubicacion: ubicacionActual,
-          vuelto: vuelto,
-          pagoConCuanto: metodoPago == 'efectivo' ? double.tryParse(pagoConCuantoController.text) : null,
-        ),
+    // Mostrar loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
       ),
     );
+
+    try {
+      // Guardar datos del cliente
+      await ClienteService.guardarDatosCliente(
+        DatosCliente(nombre: nombreController.text, telefono: telefonoController.text)
+      );
+
+      // Generar número de pedido único
+      String numeroPedido = DateTime.now().millisecondsSinceEpoch.toString().substring(7);
+      
+      // 🔥 ENVIAR PEDIDO AUTOMÁTICAMENTE POR WHATSAPP
+      await _enviarPedidoPorWhatsApp(numeroPedido);
+      
+      // Cerrar loading
+      Navigator.pop(context);
+      
+      // Mostrar confirmación de envío
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 10),
+              Text('¡Pedido enviado por WhatsApp! 🎉'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      
+      // Ir a pantalla de confirmación
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ConfirmacionScreen(
+            numeroPedido: numeroPedido,
+            carrito: widget.carrito,
+            total: widget.total,
+            metodoPago: metodoPago,
+            tipoEntrega: tipoEntrega,
+            nombre: nombreController.text,
+            telefono: telefonoController.text,
+            ubicacion: ubicacionActual,
+            vuelto: vuelto,
+            pagoConCuanto: metodoPago == 'efectivo' ? double.tryParse(pagoConCuantoController.text) : null,
+          ),
+        ),
+      );
+    } catch (e) {
+      // Cerrar loading
+      Navigator.pop(context);
+      
+      // Mostrar error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al enviar pedido: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // 🔥 NUEVO MÉTODO PARA ENVIAR PEDIDO AUTOMÁTICAMENTE
+  Future<void> _enviarPedidoPorWhatsApp(String numeroPedido) async {
+    // Crear link de Google Maps si hay ubicación
+    String linkUbicacion = '';
+    if (tipoEntrega == 'delivery' && ubicacionActual != null) {
+      linkUbicacion = 'https://www.google.com/maps?q=${ubicacionActual!.latitude},${ubicacionActual!.longitude}';
+    }
+
+    String mensaje = '''🍕 *NUEVO PEDIDO FABICHELO* 🍕
+
+📋 *PEDIDO #${numeroPedido}*
+
+👤 *DATOS DEL CLIENTE:*
+• *Nombre:* ${nombreController.text}
+• *Teléfono:* ${telefonoController.text}
+
+🛒 *PRODUCTOS:*
+${widget.carrito.map((item) => '• ${item.cantidad}x ${item.nombre} (${item.tamano}) - S/${(item.precio * item.cantidad).toStringAsFixed(2)}').join('\n')}
+
+💰 *TOTAL: S/${widget.total.toStringAsFixed(2)}*
+
+🚚 *TIPO DE ENTREGA:*
+${tipoEntrega == 'delivery' ? '🏠 *DELIVERY*' : '🏪 *RECOJO EN TIENDA*'}
+
+${tipoEntrega == 'delivery' && ubicacionActual != null ? '📍 *UBICACIÓN DEL DELIVERY:*\n$linkUbicacion' : ''}
+
+💳 *MÉTODO DE PAGO:*
+${_obtenerTextoPago()}
+
+⏰ *Hora del pedido:* ${DateTime.now().toString().substring(0, 16)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ *IMPORTANTE:* Por favor confirmar si pueden llegar a esta dirección antes de que el cliente realice el pago.
+
+¡Gracias! 🍕❤️''';
+
+    // Enviar por WhatsApp
+    await PagoService.enviarWhatsApp(PagoService.numeroWhatsApp, mensaje);
+  }
+
+  String _obtenerTextoPago() {
+    switch (metodoPago) {
+      case 'efectivo':
+        if (pagoConCuantoController.text.isNotEmpty) {
+          double pagoConCuanto = double.parse(pagoConCuantoController.text);
+          if (vuelto != null && vuelto! > 0) {
+            return '💵 *EFECTIVO*\n   • Paga con: S/${pagoConCuanto.toStringAsFixed(2)}\n   • Vuelto: S/${vuelto!.toStringAsFixed(2)}';
+          } else {
+            return '💵 *EFECTIVO* - Pago exacto: S/${widget.total.toStringAsFixed(2)}';
+          }
+        }
+        return '💵 *EFECTIVO*';
+      case 'yape':
+        return '🟣 *YAPE*\n   • Número: ${PagoService.numeroYape}\n   • Nombre: Carlos Alberto Huaytalla Quispe';
+      case 'plin':
+        return '🔵 *PLIN*\n   • Número: ${PagoService.numeroPlin}\n   • Nombre: Fabian Hector Huaytalla Guevara';
+      default:
+        return metodoPago.toUpperCase();
+    }
   }
 }

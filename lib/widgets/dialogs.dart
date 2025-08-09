@@ -133,6 +133,7 @@ class DialogUtils {
     );
   }
 
+  // 🔥 MÉTODO ACTUALIZADO CON NOMBRES INCLUIDOS
   static void mostrarInstruccionesPago(
     BuildContext context,
     String metodo,
@@ -140,6 +141,14 @@ class DialogUtils {
     double monto,
     String numeroPedido,
   ) {
+    // Obtener nombre según el método
+    String nombreTitular = '';
+    if (metodo == 'Yape') {
+      nombreTitular = 'Carlos Alberto Huaytalla Quispe';
+    } else if (metodo == 'Plin') {
+      nombreTitular = 'Fabian Hector Huaytalla Guevara';
+    }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -152,8 +161,9 @@ class DialogUtils {
             const SizedBox(height: 10),
             Text('1. Abre tu app de $metodo'),
             Text('2. Busca el número: $numero'),
-            Text('3. Envía: S/ ${monto.toStringAsFixed(2)}'),
-            Text('4. Concepto: Pedido #$numeroPedido'),
+            if (nombreTitular.isNotEmpty) Text('3. Nombre: $nombreTitular'),
+            Text('${nombreTitular.isNotEmpty ? '4' : '3'}. Envía: S/ ${monto.toStringAsFixed(2)}'),
+            Text('${nombreTitular.isNotEmpty ? '5' : '4'}. Concepto: Pedido #$numeroPedido'),
             const SizedBox(height: 15),
             Container(
               padding: const EdgeInsets.all(10),
@@ -163,10 +173,12 @@ class DialogUtils {
                 border: Border.all(color: Colors.blue),
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Datos para copiar:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue[800])),
                   const SizedBox(height: 5),
                   SelectableText('Número: $numero'),
+                  if (nombreTitular.isNotEmpty) SelectableText('Nombre: $nombreTitular'),
                   SelectableText('Monto: S/ ${monto.toStringAsFixed(2)}'),
                   SelectableText('Concepto: Pedido #$numeroPedido'),
                 ],
