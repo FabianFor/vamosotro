@@ -1,4 +1,3 @@
-
 name: pizzeria_app
 description: App de pizzería con delivery y pagos
 
@@ -27,6 +26,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
   
 flutter_icons:
   android: true     

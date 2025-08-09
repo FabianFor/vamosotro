@@ -81,7 +81,7 @@ class _PagoScreenState extends State<PagoScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Resumen del pedido
+            // 🔥 RESUMEN DEL PEDIDO ACTUALIZADO CON ADICIONALES
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(15),
@@ -91,12 +91,37 @@ class _PagoScreenState extends State<PagoScreen> {
                     const Text('Resumen del Pedido', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
                     ...widget.carrito.map((item) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: Text('${item.cantidad}x ${item.nombre} (${item.tamano})')),
-                          Text('S/ ${(item.precio * item.cantidad).toStringAsFixed(2)}'),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '${item.cantidad}x ${item.nombre} (${item.tamano})',
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                              Text('S/ ${(item.precioTotal * item.cantidad).toStringAsFixed(2)}'),
+                            ],
+                          ),
+                          // 🔥 MOSTRAR ADICIONALES SI LOS TIENE
+                          if (item.adicionales.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 16),
+                              child: Text(
+                                '+ ${item.adicionales.map((a) => '${a.icono} ${a.nombre}').join(', ')}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.green[700],
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     )),
@@ -146,7 +171,7 @@ class _PagoScreenState extends State<PagoScreen> {
               onChanged: (value) {
                 setState(() {
                   tipoEntrega = value!;
-                  ubicacionActual = null; // Resetear ubicación al cambiar tipo
+                  ubicacionActual = null;
                 });
               },
             ),
@@ -157,7 +182,7 @@ class _PagoScreenState extends State<PagoScreen> {
               onChanged: (value) {
                 setState(() {
                   tipoEntrega = value!;
-                  ubicacionActual = null; // No necesaria para recojo
+                  ubicacionActual = null;
                 });
               },
             ),
@@ -267,7 +292,7 @@ class _PagoScreenState extends State<PagoScreen> {
               onChanged: (value) {
                 setState(() {
                   metodoPago = value!;
-                  vuelto = null; // Resetear vuelto
+                  vuelto = null;
                 });
               },
             ),
@@ -291,7 +316,7 @@ class _PagoScreenState extends State<PagoScreen> {
               onChanged: (value) {
                 setState(() {
                   metodoPago = value!;
-                  vuelto = null; // Resetear vuelto
+                  vuelto = null;
                 });
               },
             ),
@@ -493,7 +518,7 @@ class _PagoScreenState extends State<PagoScreen> {
     }
   }
 
-  // 🔥 MÉTODO MEJORADO PARA CONFIRMAR PEDIDO CON WHATSAPP AUTOMÁTICO
+  // 🔥 MÉTODO MEJORADO PARA CONFIRMAR PEDIDO CON ADICIONALES
   void _confirmarPedido() async {
     // Mostrar loading
     showDialog(
@@ -513,7 +538,7 @@ class _PagoScreenState extends State<PagoScreen> {
       // Generar número de pedido único
       String numeroPedido = DateTime.now().millisecondsSinceEpoch.toString().substring(7);
       
-      // 🔥 ENVIAR PEDIDO AUTOMÁTICAMENTE POR WHATSAPP
+      // 🔥 ENVIAR PEDIDO AUTOMÁTICAMENTE POR WHATSAPP CON ADICIONALES
       await _enviarPedidoPorWhatsApp(numeroPedido);
       
       // Cerrar loading
@@ -566,7 +591,7 @@ class _PagoScreenState extends State<PagoScreen> {
     }
   }
 
-  // 🔥 NUEVO MÉTODO PARA ENVIAR PEDIDO AUTOMÁTICAMENTE
+  // 🔥 MÉTODO ACTUALIZADO PARA INCLUIR ADICIONALES EN WHATSAPP
   Future<void> _enviarPedidoPorWhatsApp(String numeroPedido) async {
     // Crear link de Google Maps si hay ubicación
     String linkUbicacion = '';
@@ -583,7 +608,14 @@ class _PagoScreenState extends State<PagoScreen> {
 • *Teléfono:* ${telefonoController.text}
 
 🛒 *PRODUCTOS:*
-${widget.carrito.map((item) => '• ${item.cantidad}x ${item.nombre} (${item.tamano}) - S/${(item.precio * item.cantidad).toStringAsFixed(2)}').join('\n')}
+${widget.carrito.map((item) {
+  String linea = '• ${item.cantidad}x ${item.nombre} (${item.tamano})';
+  if (item.adicionales.isNotEmpty) {
+    linea += ' + ${item.adicionales.map((a) => '${a.icono}${a.nombre}').join(', ')}';
+  }
+  linea += ' - S/${(item.precioTotal * item.cantidad).toStringAsFixed(2)}';
+  return linea;
+}).join('\n')}
 
 💰 *TOTAL: S/${widget.total.toStringAsFixed(2)}*
 
