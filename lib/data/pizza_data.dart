@@ -1,7 +1,7 @@
 import '../models/models.dart';
 
 class PizzaData {
-  // 🍕 PIZZAS EXISTENTES
+  // 🍕 PIZZAS EXISTENTES (Solo las 6 de la carta)
   static final List<Pizza> pizzas = [
     Pizza(
       nombre: 'Americana',
@@ -47,7 +47,7 @@ class PizzaData {
     ),
   ];
 
-  // 🍗 MOSTRITOS (BROASTER + ACOMPAÑAMIENTOS)
+  // 🍗 MOSTRITOS (Broaster Ala, Pecho, Pierna)
   static final List<Mostrito> mostritos = [
     Mostrito(
       nombre: 'Mostrito Ala',
@@ -69,73 +69,103 @@ class PizzaData {
     ),
   ];
 
-  // 🍕 PIZZAS FAMILIARES ESPECIALES (2 Y 4 SABORES)
+  // 🍕 PIZZAS ESPECIALES 2 SABORES (Según carta completa)
   static final List<PizzaEspecial> pizzasEspeciales = [
     PizzaEspecial(
-      nombre: 'Pizza Familiar 2 Sabores',
-      descripcion: 'Elige 2 sabores de nuestras pizzas disponibles',
+      nombre: 'Americana y Pepperoni',
+      descripcion: 'Mitad americana + Mitad pepperoni (Incluye bebida)',
       precio: 35.0,
-      imagen: 'assets/images/pizzas/familiar_2_sabores.png',
+      imagen: 'assets/images/pizzas/americana_pepperoni.png',
       tipo: '2 Sabores',
     ),
     PizzaEspecial(
-      nombre: 'Pizza Familiar 4 Sabores',
-      descripcion: 'Elige 4 sabores de nuestras pizzas disponibles',
-      precio: 45.0,
-      imagen: 'assets/images/pizzas/familiar_4_sabores.png',
+      nombre: 'Hawaiana y Pepperoni',
+      descripcion: 'Mitad hawaiana + Mitad pepperoni (Incluye bebida)',
+      precio: 35.0,
+      imagen: 'assets/images/pizzas/hawaiana_pepperoni.png',
+      tipo: '2 Sabores',
+    ),
+    PizzaEspecial(
+      nombre: 'Americana y Tocino',
+      descripcion: 'Mitad americana + Mitad tocino (Incluye bebida)',
+      precio: 36.0,
+      imagen: 'assets/images/pizzas/americana_tocino.png',
+      tipo: '2 Sabores',
+    ),
+    PizzaEspecial(
+      nombre: 'Hawaiana y Tocino',
+      descripcion: 'Mitad hawaiana + Mitad tocino (Incluye bebida)',
+      precio: 36.0,
+      imagen: 'assets/images/pizzas/hawaiana_tocino.png',
+      tipo: '2 Sabores',
+    ),
+    PizzaEspecial(
+      nombre: 'Pepperoni y Tocino',
+      descripcion: 'Mitad pepperoni + Mitad tocino (Incluye bebida)',
+      precio: 37.0,
+      imagen: 'assets/images/pizzas/pepperoni_tocino.png',
+      tipo: '2 Sabores',
+    ),
+    PizzaEspecial(
+      nombre: 'Dúo 4 Sabores',
+      descripcion: 'Pizza 1: Mitad hawaiana + Mitad americana. Pizza 2: Mitad pepperoni + Mitad tocino',
+      precio: 55.0,
+      imagen: 'assets/images/pizzas/duo_4_sabores.png',
       tipo: '4 Sabores',
     ),
   ];
 
-  // 🍕 COMBOS PIZZA (ordenados por precio)
-  static final List<Combo> combosPizza = [
+  // 🍗 COMBOS BROASTER (Según carta completa)
+  static final List<Combo> combosBroaster = [
+    Combo(
+      nombre: 'Combo 1',
+      descripcion: '2 alitas + papas fritas + cremas + gaseosa 355ml',
+      precio: 11.0,
+      imagen: 'assets/images/combos/combo_1.png',
+    ),
+    Combo(
+      nombre: 'Combo 2',
+      descripcion: '2 piezas de pollo + papas fritas + cremas + gaseosa 355ml',
+      precio: 13.0,
+      imagen: 'assets/images/combos/combo_2.png',
+    ),
+    Combo(
+      nombre: 'Combo 3',
+      descripcion: '4 piezas de pollo + papas fritas + cremas + gaseosa 750ml',
+      precio: 25.0,
+      imagen: 'assets/images/combos/combo_3.png',
+    ),
+    Combo(
+      nombre: 'Combo 4',
+      descripcion: '6 piezas de pollo + papas fritas + cremas + gaseosa 750ml',
+      precio: 35.0,
+      imagen: 'assets/images/combos/combo_4.png',
+    ),
+    Combo(
+      nombre: 'Combo 5',
+      descripcion: '8 piezas de pollo + papas fritas + cremas + gaseosa 750ml',
+      precio: 48.0,
+      imagen: 'assets/images/combos/combo_5.png',
+    ),
+  ];
+
+  // 🔥 FUSIONES (PIZZA + BROASTER) - según carta
+  static final List<Combo> fusiones = [
     Combo(
       nombre: 'Fusión Junior',
-      descripcion: 'Personal + Pepsi jumbo + 2 Broaster + Papas + 2 Pan al ajo',
+      descripcion: 'Pizza personal (sabor a elección) + Pepsi jumbo + 2 broaster + papas fritas + 2 panes al ajo',
       precio: 28.0,
       imagen: 'assets/images/combos/fusion_junior.png',
     ),
     Combo(
       nombre: 'Familiar + Broaster',
-      descripcion: 'Familiar + 6 Brazitos + 1 Jumbo Pepsi',
+      descripcion: 'Pizza familiar (sabor a elección) + 6 brazitos de pollo + 1 Pepsi jumbo',
       precio: 35.0,
       imagen: 'assets/images/combos/familiar_broaster.png',
     ),
     Combo(
       nombre: 'Fusión Familiar',
-      descripcion: 'Familiar + 4 Broaster + papas + 2 pepsis + 4 pan al ajo',
-      precio: 50.0,
-      imagen: 'assets/images/combos/fusion_familiar.png',
-    ),
-  ];
-
-  // 🍗 COMBOS BROASTER (ordenados por precio)
-  static final List<Combo> combosBroaster = [
-    Combo(
-      nombre: 'Combo Broaster Básico',
-      descripcion: '4 piezas de broaster + papas + gaseosa',
-      precio: 25.0,
-      imagen: 'assets/images/combos/broaster_basico.png',
-    ),
-    Combo(
-      nombre: 'Combo Broaster Familiar',
-      descripcion: '8 piezas de broaster + papas grandes + 2 gaseosas',
-      precio: 45.0,
-      imagen: 'assets/images/combos/broaster_familiar.png',
-    ),
-  ];
-
-  // 🔥 FUSIONES (PIZZA + BROASTER) - ordenados por precio
-  static final List<Combo> fusiones = [
-    Combo(
-      nombre: 'Fusión Junior',
-      descripcion: 'Pizza Personal + 2 Broaster + Papas + Pan al ajo + Pepsi',
-      precio: 28.0,
-      imagen: 'assets/images/combos/fusion_junior.png',
-    ),
-    Combo(
-      nombre: 'Fusión Familiar',
-      descripcion: 'Pizza Familiar + 4 Broaster + Papas + 4 Pan al ajo + 2 Pepsis',
+      descripcion: 'Pizza familiar (sabor a elección) + 4 piezas de pollo broaster + papas fritas + 2 Pepsi + 4 panes al ajo',
       precio: 50.0,
       imagen: 'assets/images/combos/fusion_familiar.png',
     ),
@@ -192,12 +222,6 @@ class PizzaData {
 
   static List<PizzaEspecial> get pizzasEspecialesOrdenadas {
     List<PizzaEspecial> lista = List.from(pizzasEspeciales);
-    lista.sort((a, b) => a.precio.compareTo(b.precio));
-    return lista;
-  }
-
-  static List<Combo> get combosPizzaOrdenados {
-    List<Combo> lista = List.from(combosPizza);
     lista.sort((a, b) => a.precio.compareTo(b.precio));
     return lista;
   }

@@ -25,13 +25,12 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color colorFondo = Color(0xFFF8F9FA);
   static const Color colorTarjeta = Colors.white;
 
-  // 🏷️ CATEGORÍAS ACTUALIZADAS SEGÚN TU SOLICITUD
+  // 🏷️ CATEGORÍAS ACTUALIZADAS - ELIMINADAS LAS QUE NO ESTÁN EN CARTA
   final List<Map<String, dynamic>> categorias = [
     {'nombre': 'Pizza Familiar', 'icono': Icons.local_pizza},
     {'nombre': 'Pizza Personal', 'icono': Icons.local_pizza_outlined},
     {'nombre': 'Mostritos', 'icono': Icons.fastfood},
     {'nombre': 'Pizza Especial', 'icono': Icons.star},
-    {'nombre': 'Combo Pizza', 'icono': Icons.restaurant_menu},
     {'nombre': 'Combo Broaster', 'icono': Icons.restaurant},
     {'nombre': 'Fusión', 'icono': Icons.auto_awesome},
   ];
@@ -101,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 10),
                         Row(
                           children: [
-                            // 🍕 LOGO CIRCULAR
+                            // 🍕 LOGO DE IMAGEN
                             Container(
                               width: 50,
                               height: 50,
@@ -116,10 +115,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ],
                               ),
-                              child: Icon(
-                                Icons.local_pizza,
-                                color: colorSecundario,
-                                size: 28,
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/images/logo/pizza_fabichelo_logo.png', // 🔥 CAMBIA ESTA RUTA POR TU LOGO
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    // Si no encuentra el logo, muestra el icono por defecto
+                                    return Icon(
+                                      Icons.local_pizza,
+                                      color: colorSecundario,
+                                      size: 28,
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -296,8 +304,6 @@ class _HomeScreenState extends State<HomeScreen> {
         return _buildMostritos();
       case 'Pizza Especial':
         return _buildPizzasEspeciales();
-      case 'Combo Pizza':
-        return _buildCombosPizza();
       case 'Combo Broaster':
         return _buildCombosBroaster();
       case 'Fusión':
@@ -316,6 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Icons.local_pizza,
           colorPrimario,
           PizzaData.pizzasFamiliaresOrdenadas.length,
+          etiquetaExtra: '8 tajadas',
         ),
         
         ListView.builder(
@@ -351,6 +358,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Icons.local_pizza_outlined,
           colorSecundario,
           PizzaData.pizzasPersonalesOrdenadas.length,
+          etiquetaExtra: '4 tajadas',
         ),
         
         ListView.builder(
@@ -382,7 +390,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         _buildSectionHeader(
           'Mostritos',
-          'Broaster con acompañamientos',
+          'Broaster con acompañamientos deliciosos',
           Icons.fastfood,
           Colors.orange,
           PizzaData.mostritosOrdenados.length,
@@ -419,6 +427,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Icons.star,
           Colors.purple,
           PizzaData.pizzasEspecialesOrdenadas.length,
+          etiquetaExtra: 'Con bebida',
         ),
         
         ListView.builder(
@@ -443,45 +452,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCombosPizza() {
-    return Column(
-      children: [
-        _buildSectionHeader(
-          'Combos Pizza',
-          'Pizzas con acompañamientos',
-          Icons.restaurant_menu,
-          colorAcento,
-          PizzaData.combosPizzaOrdenados.length,
-        ),
-        
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: PizzaData.combosPizzaOrdenados.length,
-          itemBuilder: (context, index) {
-            final combo = PizzaData.combosPizzaOrdenados[index];
-            return ComboCard(
-              combo: combo,
-              onAgregarAlCarrito: () => agregarAlCarrito(
-                combo.nombre,
-                combo.precio,
-                'Combo Pizza',
-                combo.imagen,
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
   Widget _buildCombosBroaster() {
     return Column(
       children: [
         _buildSectionHeader(
-          'Combos Broaster',
-          'Pollo broaster con acompañamientos',
+          'Combo Broaster',
+          'Pollo broaster crispy con acompañamientos',
           Icons.restaurant,
           Colors.brown,
           PizzaData.combosBroasterOrdenados.length,
@@ -514,7 +490,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         _buildSectionHeader(
           'Fusiones',
-          'Lo mejor de pizza y broaster',
+          'Lo mejor de pizza y broaster juntos',
           Icons.auto_awesome,
           Colors.deepPurple,
           PizzaData.fusionesOrdenadas.length,
@@ -542,8 +518,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // 🎨 MÉTODO PARA CREAR HEADER DE SECCIÓN
-  Widget _buildSectionHeader(String titulo, String subtitulo, IconData icono, Color color, int cantidad) {
+  // 🎨 MÉTODO PARA CREAR HEADER DE SECCIÓN CON ETIQUETA EXTRA
+  Widget _buildSectionHeader(String titulo, String subtitulo, IconData icono, Color color, int cantidad, {String? etiquetaExtra}) {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 20, 20, 15),
       padding: const EdgeInsets.all(16),
@@ -569,13 +545,36 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  titulo,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      titulo,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    if (etiquetaExtra != null) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: color.withOpacity(0.3)),
+                        ),
+                        child: Text(
+                          etiquetaExtra,
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: color,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 Text(
                   subtitulo,

@@ -70,6 +70,20 @@ class MostritoCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 🏆 NOMBRE DEL MOSTRITO
+                  Text(
+                    mostrito.nombre,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black87,
+                      height: 1.2,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+
+                  const SizedBox(height: 4),
                   // 🏷️ ETIQUETA MOSTRITO
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -88,23 +102,7 @@ class MostritoCard extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 6),
-
-                  // 🏆 NOMBRE DEL MOSTRITO
-                  Text(
-                    mostrito.nombre,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.black87,
-                      height: 1.2,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-
                   const SizedBox(height: 8),
-
                   // 📝 DESCRIPCIÓN
                   Text(
                     mostrito.descripcion,
