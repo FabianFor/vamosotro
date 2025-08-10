@@ -7,42 +7,42 @@ class PizzaData {
       ingredientes: 'queso mozzarella, jamón, salchichón',
       precioFamiliar: 26.0,
       precioPersonal: 11.0,
-      imagen: 'assets/images/americana.jpg', // 🔥 NUEVA IMAGEN
+      imagen: 'assets/images/pizzas/americana.png', // 🔥 NUEVA RUTA
     ),
     Pizza(
       nombre: 'Hawaiana',
       ingredientes: 'queso mozzarella, jamón, piña',
       precioFamiliar: 28.0,
       precioPersonal: 12.0,
-      imagen: 'assets/images/hawaiana.jpg', // 🔥 NUEVA IMAGEN
+      imagen: 'assets/images/pizzas/hawaiana.png', // 🔥 NUEVA RUTA
     ),
     Pizza(
       nombre: 'Pepperoni',
       ingredientes: 'queso mozzarella, pepperoni',
       precioFamiliar: 30.0,
       precioPersonal: 14.0,
-      imagen: 'assets/images/pepperoni.jpg', // 🔥 NUEVA IMAGEN
+      imagen: 'assets/images/pizzas/pepperoni.png', // 🔥 NUEVA RUTA
     ),
     Pizza(
       nombre: 'Extremo',
       ingredientes: 'queso mozzarella, salami, jamón, tocino, pepperoni, chorizo español',
       precioFamiliar: 32.0,
       precioPersonal: 14.0,
-      imagen: 'assets/images/extremo.jpg', // 🔥 NUEVA IMAGEN
+      imagen: 'assets/images/pizzas/extremo.png', // 🔥 NUEVA RUTA
     ),
     Pizza(
       nombre: 'Tocino',
       ingredientes: 'queso mozzarella, tocino, jamón',
       precioFamiliar: 29.0,
       precioPersonal: 13.0,
-      imagen: 'assets/images/tocino.jpg', // 🔥 NUEVA IMAGEN
+      imagen: 'assets/images/pizzas/tocino.png', // 🔥 NUEVA RUTA
     ),
     Pizza(
       nombre: 'Africana',
       ingredientes: 'queso mozzarella, salami, salchichón, jamón, pepperoni, chorizo español',
       precioFamiliar: 30.0,
       precioPersonal: 14.0,
-      imagen: 'assets/images/africana.jpg', // 🔥 NUEVA IMAGEN
+      imagen: 'assets/images/pizzas/africana.png', // 🔥 NUEVA RUTA
     ),
   ];
 
@@ -51,7 +51,7 @@ class PizzaData {
       nombre: 'Combo Estrella',
       descripcion: 'Pizza Familiar 2 sabores + 6 Bracitos + Porción papas + Pepsi Jumbo',
       precio: 42.0,
-      imagen: 'assets/images/combo_estrella.jpg', // 🔥 NUEVA IMAGEN
+      imagen: 'assets/images/combos/combo_estrella.png', // 🔥 NUEVA RUTA
     ),
   ];
 

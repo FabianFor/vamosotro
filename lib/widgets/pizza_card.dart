@@ -1,3 +1,4 @@
+// 📂 widgets/pizza_card.dart
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 
@@ -18,134 +19,109 @@ class PizzaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 6,
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 5,
             offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // 🔥 IMAGEN DE LA PIZZA
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+      child: Row(
+        children: [
+          // 📸 Pizza en grande, recortada y a la izquierda
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(12),
+              bottomLeft: Radius.circular(12),
+            ),
+            child: Transform.scale(
+              scale: 1.4,
+              child: Transform.translate(
+                offset: const Offset(-10, 0),
                 child: Image.asset(
                   pizza.imagen,
+                  width: 100,
+                  height: 100,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    // 🔥 PLACEHOLDER SI NO ENCUENTRA LA IMAGEN
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Colors.orange[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.local_pizza,
-                        size: 40,
-                        color: Colors.orange,
-                      ),
-                    );
-                  },
                 ),
               ),
             ),
+          ),
 
-            const SizedBox(width: 16),
+          const SizedBox(width: 12),
 
-            // 🔥 INFORMACIÓN DE LA PIZZA
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    pizza.nombre,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+          // 📄 Texto + botón
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 8),
+                Text(
+                  pizza.nombre,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$tamano | ${pizza.ingredientes}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                      height: 1.3,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '$tamano | ${pizza.ingredientes}',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 13,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'S/${precio.toStringAsFixed(0)}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 6),
 
-            // 🔥 BOTÓN ADD IGUAL AL DE LA REFERENCIA
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: onAgregarAlCarrito,
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.add, color: Colors.white, size: 16),
-                        SizedBox(width: 4),
-                        Text(
-                          'ADD',
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'S/${precio.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF6B35),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: onAgregarAlCarrito,
+                        icon: const Icon(Icons.add,
+                            size: 16, color: Colors.white),
+                        label: const Text(
+                          'AGREGAR',
                           style: TextStyle(
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
                             fontSize: 12,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ),
+                const SizedBox(height: 8),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -64,7 +64,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('Mi Carrito', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.red,
+        backgroundColor: const Color(0xFFFF6B35),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: carritoLocal.isEmpty
@@ -110,25 +110,27 @@ class _CarritoScreenState extends State<CarritoScreen> {
                               padding: const EdgeInsets.all(16),
                               child: Row(
                                 children: [
-                                  // 🔥 IMAGEN DEL PRODUCTO
+                                  // 🔥 IMAGEN CIRCULAR DEL PRODUCTO
                                   Container(
                                     width: 60,
                                     height: 60,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
                                     ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
+                                    child: ClipOval(
                                       child: Image.asset(
                                         item.imagen,
                                         fit: BoxFit.cover,
                                         errorBuilder: (context, error, stackTrace) {
                                           return Container(
-                                            color: Colors.orange[100],
+                                            decoration: const BoxDecoration(
+                                              color: Color(0xFFF5F5F5),
+                                              shape: BoxShape.circle,
+                                            ),
                                             child: Icon(
                                               item.tamano == 'Combo' ? Icons.restaurant_menu : Icons.local_pizza,
                                               size: 30,
-                                              color: Colors.orange,
+                                              color: const Color(0xFFFF6B35),
                                             ),
                                           );
                                         },
@@ -234,7 +236,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                                         ],
                                       ),
                                       
-                                      // 🔥 BOTÓN PERSONALIZAR (SOLO PARA PIZZAS)
+                                      // 🔥 BOTÓN PERSONALIZAR EN ESPAÑOL
                                       if (esPersonalizable)
                                         TextButton.icon(
                                           onPressed: () {
@@ -248,11 +250,11 @@ class _CarritoScreenState extends State<CarritoScreen> {
                                           },
                                           icon: Icon(
                                             isExpanded ? Icons.expand_less : Icons.expand_more,
-                                            color: Colors.blue,
+                                            color: const Color(0xFFFF6B35),
                                           ),
                                           label: Text(
                                             isExpanded ? 'Ocultar' : 'Personalizar',
-                                            style: const TextStyle(color: Colors.blue, fontSize: 12),
+                                            style: const TextStyle(color: Color(0xFFFF6B35), fontSize: 12),
                                           ),
                                         ),
                                     ],
@@ -265,20 +267,20 @@ class _CarritoScreenState extends State<CarritoScreen> {
                             if (isExpanded && esPersonalizable) ...[
                               Container(
                                 width: double.infinity,
-                                color: Colors.blue[50],
+                                color: const Color(0xFFFFF3E0),
                                 padding: const EdgeInsets.all(16),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
                                       children: [
-                                        const Icon(Icons.restaurant, color: Colors.blue, size: 20),
+                                        const Icon(Icons.restaurant, color: Color(0xFFFF6B35), size: 20),
                                         const SizedBox(width: 8),
                                         Text(
                                           'Personaliza tu ${item.nombre}',
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.blue,
+                                            color: Color(0xFFFF6B35),
                                           ),
                                         ),
                                       ],
@@ -338,7 +340,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                   ),
                 ),
 
-                // 🔥 FOOTER CON TOTAL Y BOTÓN DE PAGO
+                // 🔥 FOOTER CON TOTAL Y BOTÓN DE PAGO EN ESPAÑOL
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -363,7 +365,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                         children: [
                           const Text('Total:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                           Text('S/ ${total.toStringAsFixed(2)}',
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red)),
+                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFFF6B35))),
                         ],
                       ),
                       const SizedBox(height: 15),
@@ -372,12 +374,15 @@ class _CarritoScreenState extends State<CarritoScreen> {
                         child: ElevatedButton(
                           onPressed: carritoLocal.isEmpty ? null : () => _procederAlPago(context),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
+                            backgroundColor: const Color(0xFFFF6B35),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          child: const Text('PROCEDER AL PAGO', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          child: const Text(
+                            'PROCEDER AL PAGO', 
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+                          ),
                         ),
                       ),
                     ],
