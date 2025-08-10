@@ -171,34 +171,123 @@ class PizzaData {
     ),
   ];
 
-  // 🔥 LISTA DE ADICIONALES DISPONIBLES
-  static final List<Adicional> adicionalesDisponibles = [
+  // 🔥 ADICIONALES DISPONIBLES PARA PIZZAS FAMILIARES (30cm - 8 tajadas)
+  static final List<Adicional> adicionalesFamiliar = [
     Adicional(
       nombre: 'Queso Extra',
-      precio: 3.0,
+      precio: 8.0,
       icono: '🧀',
     ),
     Adicional(
+      nombre: 'Brazitos de Pollo',
+      precio: 6.0,
+      icono: '🍗',
+    ),
+    Adicional(
+      nombre: 'Gaseosa Jumbo',
+      precio: 4.0,
+      icono: '🥤',
+    ),
+    Adicional(
       nombre: 'Doble Carne',
-      precio: 5.0,
+      precio: 8.0,
       icono: '🥩',
     ),
     Adicional(
       nombre: 'Champiñones',
-      precio: 4.0,
+      precio: 5.0,
       icono: '🍄',
     ),
     Adicional(
       nombre: 'Aceitunas',
-      precio: 3.0,
+      precio: 4.0,
       icono: '🫒',
     ),
     Adicional(
       nombre: 'Pepperoni Extra',
-      precio: 4.0,
+      precio: 6.0,
       icono: '🌶️',
     ),
   ];
+
+  // 🔥 ADICIONALES DISPONIBLES PARA PIZZAS PERSONALES (18cm - 4 tajadas)
+  static final List<Adicional> adicionalesPersonal = [
+    Adicional(
+      nombre: 'Queso Extra',
+      precio: 4.0,
+      icono: '🧀',
+    ),
+    Adicional(
+      nombre: 'Brazitos de Pollo',
+      precio: 3.0,
+      icono: '🍗',
+    ),
+    Adicional(
+      nombre: 'Gaseosa Personal',
+      precio: 2.5,
+      icono: '🥤',
+    ),
+    Adicional(
+      nombre: 'Doble Carne',
+      precio: 4.0,
+      icono: '🥩',
+    ),
+    Adicional(
+      nombre: 'Champiñones',
+      precio: 3.0,
+      icono: '🍄',
+    ),
+    Adicional(
+      nombre: 'Aceitunas',
+      precio: 2.5,
+      icono: '🫒',
+    ),
+    Adicional(
+      nombre: 'Pepperoni Extra',
+      precio: 3.5,
+      icono: '🌶️',
+    ),
+  ];
+
+  // 🔥 ADICIONALES PARA COMBOS CON PIZZAS (FUSIONES Y PIZZAS ESPECIALES)
+  static final List<Adicional> adicionalesCombo = [
+    Adicional(
+      nombre: 'Queso Extra',
+      precio: 6.0,
+      icono: '🧀',
+    ),
+    Adicional(
+      nombre: 'Brazitos de Pollo Extra',
+      precio: 5.0,
+      icono: '🍗',
+    ),
+    Adicional(
+      nombre: 'Gaseosa Extra',
+      precio: 3.0,
+      icono: '🥤',
+    ),
+    Adicional(
+      nombre: 'Doble Carne',
+      precio: 6.0,
+      icono: '🥩',
+    ),
+  ];
+
+  // 🎯 MÉTODO PARA OBTENER ADICIONALES SEGÚN EL TIPO DE PRODUCTO
+  static List<Adicional> getAdicionalesDisponibles(String tamano) {
+    switch (tamano) {
+      case 'Familiar':
+        return adicionalesFamiliar;
+      case 'Personal':
+        return adicionalesPersonal;
+      case '2 Sabores':
+      case '4 Sabores':
+      case 'Fusión':
+        return adicionalesCombo;
+      default:
+        return []; // Sin adicionales para mostritos y combos broaster puros
+    }
+  }
 
   // 🎯 MÉTODOS PARA OBTENER LISTAS ORDENADAS POR PRECIO
   

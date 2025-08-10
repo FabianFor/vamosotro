@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color colorFondo = Color(0xFFF8F9FA);
   static const Color colorTarjeta = Colors.white;
 
-  // 🏷️ CATEGORÍAS ACTUALIZADAS - ELIMINADAS LAS QUE NO ESTÁN EN CARTA
+  // 🏷️ CATEGORÍAS ACTUALIZADAS
   final List<Map<String, dynamic>> categorias = [
     {'nombre': 'Pizza Familiar', 'icono': Icons.local_pizza},
     {'nombre': 'Pizza Personal', 'icono': Icons.local_pizza_outlined},
@@ -117,10 +117,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               child: ClipOval(
                                 child: Image.asset(
-                                  'assets/images/logo/pizza_fabichelo_logo.png', // 🔥 CAMBIA ESTA RUTA POR TU LOGO
+                                  'assets/images/logo/pizza_fabichelo_logo.png',
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
-                                    // Si no encuentra el logo, muestra el icono por defecto
                                     return Icon(
                                       Icons.local_pizza,
                                       color: colorSecundario,
@@ -216,13 +215,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
 
-          // 🏷️ CATEGORÍAS HORIZONTALES
+          // 🏷️ CATEGORÍAS HORIZONTALES MEJORADAS
           SliverToBoxAdapter(
             child: Container(
               color: colorTarjeta,
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: SizedBox(
-                height: 80,
+                height: 85, // Aumentado para mejor visual
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -234,14 +233,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     return GestureDetector(
                       onTap: () => setState(() => categoriaSeleccionada = categoria['nombre']),
                       child: Container(
-                        margin: const EdgeInsets.only(right: 16),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        margin: const EdgeInsets.only(right: 12), // Reducido para mejor spacing
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Ajustado
+                        width: 95, // Ancho fijo para evitar problemas de texto cortado
                         decoration: BoxDecoration(
                           gradient: isSelected ? LinearGradient(
                             colors: [colorPrimario, colorPrimario.withOpacity(0.8)],
                           ) : null,
                           color: isSelected ? null : Colors.grey[100],
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(16),
                           boxShadow: isSelected ? [
                             BoxShadow(
                               color: colorPrimario.withOpacity(0.3),
@@ -253,22 +253,25 @@ class _HomeScreenState extends State<HomeScreen> {
                           border: !isSelected ? Border.all(color: Colors.grey[300]!) : null,
                         ),
                         child: Column(
-                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
                               categoria['icono'],
                               color: isSelected ? Colors.white : colorPrimario,
                               size: 24,
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 4),
                             Text(
                               categoria['nombre'],
                               style: TextStyle(
                                 color: isSelected ? Colors.white : colorPrimario,
                                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                fontSize: 11,
+                                fontSize: 10,
+                                height: 1.1,
                               ),
                               textAlign: TextAlign.center,
+                              maxLines: 2, // Permitir 2 líneas
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -318,11 +321,11 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         _buildSectionHeader(
           'Pizzas Familiares',
-          'Perfectas para compartir',
+          'Perfectas para compartir en familia',
           Icons.local_pizza,
           colorPrimario,
           PizzaData.pizzasFamiliaresOrdenadas.length,
-          etiquetaExtra: '8 tajadas',
+          etiquetasExtra: ['30cm', '8 tajadas'],
         ),
         
         ListView.builder(
@@ -354,11 +357,11 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         _buildSectionHeader(
           'Pizzas Personales',
-          'Ideales para una persona',
+          'Ideales para disfrutar solo',
           Icons.local_pizza_outlined,
           colorSecundario,
           PizzaData.pizzasPersonalesOrdenadas.length,
-          etiquetaExtra: '4 tajadas',
+          etiquetasExtra: ['18cm', '4 tajadas'],
         ),
         
         ListView.builder(
@@ -427,7 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Icons.star,
           Colors.purple,
           PizzaData.pizzasEspecialesOrdenadas.length,
-          etiquetaExtra: 'Con bebida',
+          etiquetasExtra: ['Con bebida', 'Familiar'],
         ),
         
         ListView.builder(
@@ -494,6 +497,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Icons.auto_awesome,
           Colors.deepPurple,
           PizzaData.fusionesOrdenadas.length,
+          etiquetasExtra: ['Pizza + Pollo'],
         ),
         
         ListView.builder(
@@ -518,8 +522,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // 🎨 MÉTODO PARA CREAR HEADER DE SECCIÓN CON ETIQUETA EXTRA
-  Widget _buildSectionHeader(String titulo, String subtitulo, IconData icono, Color color, int cantidad, {String? etiquetaExtra}) {
+  // 🎨 MÉTODO PARA CREAR HEADER DE SECCIÓN CON ETIQUETAS MEJORADAS
+  Widget _buildSectionHeader(String titulo, String subtitulo, IconData icono, Color color, int cantidad, {List<String>? etiquetasExtra}) {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 20, 20, 15),
       padding: const EdgeInsets.all(16),
@@ -547,47 +551,63 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Row(
                   children: [
-                    Text(
-                      titulo,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                    Flexible(
+                      child: Text(
+                        titulo,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (etiquetaExtra != null) ...[
+                    // ETIQUETAS EXTRAS MEJORADAS
+                    if (etiquetasExtra != null) ...[
                       const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: color.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: color.withOpacity(0.3)),
-                        ),
-                        child: Text(
-                          etiquetaExtra,
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: color,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      Flexible(
+                        child: Wrap(
+                          spacing: 4,
+                          children: etiquetasExtra.map((etiqueta) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: color.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: color.withOpacity(0.3)),
+                              ),
+                              child: Text(
+                                etiqueta,
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  color: color,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            );
+                          }).toList(),
                         ),
                       ),
                     ],
                   ],
                 ),
+                const SizedBox(height: 2),
                 Text(
                   subtitulo,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: colorAcento.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
@@ -595,7 +615,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Text(
               '$cantidad opciones',
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 10,
                 color: colorAcento.withOpacity(0.8),
                 fontWeight: FontWeight.w600,
               ),
