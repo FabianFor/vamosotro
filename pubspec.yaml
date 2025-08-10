@@ -30,6 +30,8 @@ flutter:
     - assets/images/
     - assets/images/pizzas/
     - assets/images/combos/
+    - assets/images/categorias/    # 🔥 NUEVO: Para imágenes de categorías
+    - assets/images/logo/         # 🔥 NUEVO: Para el logo de Fabichelo
   
 flutter_icons:
   android: true     
