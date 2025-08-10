@@ -14,9 +14,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<ItemPedido> carrito = [];
-  String categoriaSeleccionada = 'Pizza Familiar'; // 🔥 CATEGORÍA POR DEFECTO
+  String categoriaSeleccionada = 'Pizza Familiar';
 
-  // 🔥 LISTA DE CATEGORÍAS SEPARADAS
+  // 🎨 NUEVA PALETA DE COLORES INSPIRADA EN EL LOGO  
+  static const Color colorPrimario = Color(0xFFD4332A); // Rojo del logo como principal
+  static const Color colorSecundario = Color(0xFF2C5F2D); // Verde del logo 
+  static const Color colorAcento = Color(0xFFF4B942); // Amarillo/dorado
+  static const Color colorFondo = Color(0xFFF8F9FA);
+  static const Color colorTarjeta = Colors.white;
+
   final List<Map<String, dynamic>> categorias = [
     {'nombre': 'Pizza Familiar', 'icono': Icons.local_pizza},
     {'nombre': 'Pizza Personal', 'icono': Icons.local_pizza_outlined},
@@ -29,15 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void agregarAlCarrito(String nombre, double precio, String tamano, String imagen) {
     setState(() {
-      // Buscar si ya existe el item
       int index = carrito.indexWhere((item) => 
         item.nombre == nombre && item.tamano == tamano && item.adicionales.isEmpty);
       
       if (index != -1) {
-        // Si existe, incrementar cantidad
         carrito[index] = carrito[index].copyWith(cantidad: carrito[index].cantidad + 1);
       } else {
-        // Si no existe, agregar nuevo
         carrito.add(ItemPedido(
           nombre: nombre,
           precio: precio,
@@ -52,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
       SnackBar(
         content: Text('$nombre ($tamano) agregado al carrito'),
         duration: const Duration(seconds: 1),
-        backgroundColor: Colors.green,
+        backgroundColor: colorPrimario,
       ),
     );
   }
@@ -60,176 +63,222 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: const Color(0xFFFF6B35),
-        title: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.local_pizza, color: Color(0xFFFF6B35)),
-            ),
-            const SizedBox(width: 10),
-            const Text(
-              'PIZZA FABICHELO',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.shopping_cart, color: Colors.white),
-                onPressed: () => _mostrarCarrito(context),
-              ),
-              if (carrito.isNotEmpty)
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
-                    ),
-                    child: Text(
-                      '${carrito.fold(0, (sum, item) => sum + item.cantidad)}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // 🔥 HEADER CON INFORMACIÓN DE DELIVERY
-          Container(
-            color: const Color(0xFFFF6B35),
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-            child: Row(
-              children: [
-                const Icon(Icons.delivery_dining, color: Colors.white, size: 20),
-                const SizedBox(width: 8),
-                const Text(
-                  'DELIVERY',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.location_on, color: Colors.white, size: 14),
-                      SizedBox(width: 4),
-                      Text(
-                        'La Posta',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
+      backgroundColor: colorFondo,
+      body: CustomScrollView(
+        slivers: [
+          // 🎨 SLIVER APP BAR MÁS COMPACTO Y ELEGANTE
+          SliverAppBar(
+            expandedHeight: 120,
+            floating: false,
+            pinned: true,
+            backgroundColor: colorPrimario,
+            elevation: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      colorPrimario,
+                      colorPrimario.withOpacity(0.8),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-
-          // 🔥 CATEGORÍAS HORIZONTALES SEPARADAS
-          Container(
-            color: Colors.white,
-            height: 100,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: categorias.length,
-              itemBuilder: (context, index) {
-                final categoria = categorias[index];
-                final isSelected = categoriaSeleccionada == categoria['nombre'];
-                
-                return GestureDetector(
-                  onTap: () => setState(() => categoriaSeleccionada = categoria['nombre']),
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 16, top: 16, bottom: 16),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFFF6B35) : Colors.grey[100],
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: isSelected ? [
-                        BoxShadow(
-                          color: const Color(0xFFFF6B35).withOpacity(0.3),
-                          spreadRadius: 1,
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ] : null,
-                    ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          categoria['icono'],
-                          color: isSelected ? Colors.white : Colors.grey[600],
-                          size: 24,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          categoria['nombre'],
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.grey[700],
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            fontSize: 12,
-                          ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            // 🍕 LOGO CIRCULAR MEJORADO
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.local_pizza,
+                                color: colorSecundario,
+                                size: 28,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'PIZZA FABICHELO',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Deliciosas pizzas artesanales',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                );
-              },
+                ),
+              ),
+            ),
+            actions: [
+              // 🛒 CARRITO DE COMPRAS MEJORADO
+              Container(
+                margin: const EdgeInsets.only(right: 15, top: 8, bottom: 8),
+                child: Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.shopping_cart, color: Colors.white),
+                        onPressed: () => _mostrarCarrito(context),
+                      ),
+                    ),
+                    if (carrito.isNotEmpty)
+                      Positioned(
+                        right: 4,
+                        top: 4,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: colorSecundario,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: colorSecundario.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 18,
+                            minHeight: 18,
+                          ),
+                          child: Text(
+                            '${carrito.fold(0, (sum, item) => sum + item.cantidad)}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          // 🏷️ CATEGORÍAS HORIZONTALES MEJORADAS
+          SliverToBoxAdapter(
+            child: Container(
+              color: colorTarjeta,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: SizedBox(
+                height: 80,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: categorias.length,
+                  itemBuilder: (context, index) {
+                    final categoria = categorias[index];
+                    final isSelected = categoriaSeleccionada == categoria['nombre'];
+                    
+                    return GestureDetector(
+                      onTap: () => setState(() => categoriaSeleccionada = categoria['nombre']),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        decoration: BoxDecoration(
+                          gradient: isSelected ? LinearGradient(
+                            colors: [colorPrimario, colorPrimario.withOpacity(0.8)],
+                          ) : null,
+                          color: isSelected ? null : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: isSelected ? [
+                            BoxShadow(
+                              color: colorPrimario.withOpacity(0.3),
+                              spreadRadius: 1,
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ] : null,
+                          border: !isSelected ? Border.all(color: Colors.grey[300]!) : null,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              categoria['icono'],
+                              color: isSelected ? Colors.white : colorPrimario,
+                              size: 24,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              categoria['nombre'],
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : colorPrimario,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                fontSize: 11,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
 
-          // 🔥 CONTENIDO SEGÚN CATEGORÍA SELECCIONADA
-          Expanded(
+          // 📱 CONTENIDO PRINCIPAL
+          SliverToBoxAdapter(
             child: _buildContenidoPorCategoria(),
           ),
 
-          // Footer con información
-          _buildFooter(),
+          // 📞 FOOTER CON INFORMACIÓN DE CONTACTO
+          SliverToBoxAdapter(
+            child: _buildFooter(),
+          ),
         ],
       ),
     );
   }
 
-  // 🔥 CONSTRUIR CONTENIDO SEGÚN CATEGORÍA
   Widget _buildContenidoPorCategoria() {
     switch (categoriaSeleccionada) {
       case 'Pizza Familiar':
@@ -243,38 +292,64 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // 🔥 SECCIÓN DE PIZZAS FAMILIARES
   Widget _buildPizzasFamiliares() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 🔥 TÍTULO DE SECCIÓN
+        // 🏷️ HEADER DE SECCIÓN MEJORADO
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+          margin: const EdgeInsets.fromLTRB(20, 20, 20, 15),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [colorPrimario.withOpacity(0.1), Colors.transparent],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: colorPrimario.withOpacity(0.2)),
+          ),
           child: Row(
             children: [
-              const Icon(Icons.local_pizza, color: Color(0xFFFF6B35), size: 24),
-              const SizedBox(width: 10),
-              const Text(
-                'Pizzas Familiares',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: colorPrimario,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.local_pizza, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Pizzas Familiares',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      'Perfectas para compartir',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.green[100],
+                  color: colorAcento.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '${PizzaData.pizzas.length} opciones',
                   style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.green[800],
+                    fontSize: 11,
+                    color: colorAcento.withOpacity(0.8),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -283,63 +358,88 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         
-        // 🔥 LISTA DE PIZZAS FAMILIARES
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount: PizzaData.pizzas.length,
-            itemBuilder: (context, index) {
-              final pizza = PizzaData.pizzas[index];
-              return PizzaCard(
-                pizza: pizza,
-                tamano: 'Familiar',
-                precio: pizza.precioFamiliar,
-                onAgregarAlCarrito: () => agregarAlCarrito(
-                  pizza.nombre,
-                  pizza.precioFamiliar,
-                  'Familiar',
-                  pizza.imagen,
-                ),
-              );
-            },
-          ),
+        // 📜 LISTA DE PIZZAS
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: PizzaData.pizzas.length,
+          itemBuilder: (context, index) {
+            final pizza = PizzaData.pizzas[index];
+            return PizzaCard(
+              pizza: pizza,
+              tamano: 'Familiar',
+              precio: pizza.precioFamiliar,
+              onAgregarAlCarrito: () => agregarAlCarrito(
+                pizza.nombre,
+                pizza.precioFamiliar,
+                'Familiar',
+                pizza.imagen,
+              ),
+            );
+          },
         ),
       ],
     );
   }
 
-  // 🔥 SECCIÓN DE PIZZAS PERSONALES
   Widget _buildPizzasPersonales() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 🔥 TÍTULO DE SECCIÓN
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+          margin: const EdgeInsets.fromLTRB(20, 20, 20, 15),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [colorSecundario.withOpacity(0.1), Colors.transparent],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: colorSecundario.withOpacity(0.2)),
+          ),
           child: Row(
             children: [
-              const Icon(Icons.local_pizza_outlined, color: Color(0xFFFF6B35), size: 24),
-              const SizedBox(width: 10),
-              const Text(
-                'Pizzas Personales',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: colorSecundario,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.local_pizza_outlined, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Pizzas Personales',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      'Ideales para una persona',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.blue[100],
+                  color: colorAcento.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '${PizzaData.pizzas.length} opciones',
                   style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.blue[800],
+                    fontSize: 11,
+                    color: colorAcento.withOpacity(0.8),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -348,63 +448,87 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         
-        // 🔥 LISTA DE PIZZAS PERSONALES
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount: PizzaData.pizzas.length,
-            itemBuilder: (context, index) {
-              final pizza = PizzaData.pizzas[index];
-              return PizzaCard(
-                pizza: pizza,
-                tamano: 'Personal',
-                precio: pizza.precioPersonal,
-                onAgregarAlCarrito: () => agregarAlCarrito(
-                  pizza.nombre,
-                  pizza.precioPersonal,
-                  'Personal',
-                  pizza.imagen,
-                ),
-              );
-            },
-          ),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: PizzaData.pizzas.length,
+          itemBuilder: (context, index) {
+            final pizza = PizzaData.pizzas[index];
+            return PizzaCard(
+              pizza: pizza,
+              tamano: 'Personal',
+              precio: pizza.precioPersonal,
+              onAgregarAlCarrito: () => agregarAlCarrito(
+                pizza.nombre,
+                pizza.precioPersonal,
+                'Personal',
+                pizza.imagen,
+              ),
+            );
+          },
         ),
       ],
     );
   }
 
-  // 🔥 SECCIÓN DE COMBOS
   Widget _buildCombos() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 🔥 TÍTULO DE SECCIÓN
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+          margin: const EdgeInsets.fromLTRB(20, 20, 20, 15),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [colorAcento.withOpacity(0.1), Colors.transparent],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: colorAcento.withOpacity(0.3)),
+          ),
           child: Row(
             children: [
-              const Icon(Icons.restaurant_menu, color: Color(0xFFFF6B35), size: 24),
-              const SizedBox(width: 10),
-              const Text(
-                'Combos Especiales',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: colorAcento,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.restaurant_menu, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Combos Especiales',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      'La mejor opción completa',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.orange[100],
+                  color: colorAcento.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '${PizzaData.combos.length} combo${PizzaData.combos.length != 1 ? 's' : ''}',
                   style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.orange[800],
+                    fontSize: 11,
+                    color: colorAcento.withOpacity(0.8),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -413,87 +537,156 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         
-        // 🔥 LISTA DE COMBOS
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount: PizzaData.combos.length,
-            itemBuilder: (context, index) {
-              final combo = PizzaData.combos[index];
-              return ComboCard(
-                combo: combo,
-                onAgregarAlCarrito: () => agregarAlCarrito(
-                  combo.nombre,
-                  combo.precio,
-                  'Combo',
-                  combo.imagen,
-                ),
-              );
-            },
-          ),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: PizzaData.combos.length,
+          itemBuilder: (context, index) {
+            final combo = PizzaData.combos[index];
+            return ComboCard(
+              combo: combo,
+              onAgregarAlCarrito: () => agregarAlCarrito(
+                combo.nombre,
+                combo.precio,
+                'Combo',
+                combo.imagen,
+              ),
+            );
+          },
         ),
       ],
     );
   }
 
-  // 🔥 FOOTER CON INFORMACIÓN
   Widget _buildFooter() {
     return Container(
-      color: const Color(0xFFFF6B35),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          const Row(
-            children: [
-              Icon(Icons.phone, color: Colors.green),
-              SizedBox(width: 10),
-              Text('933 214 908', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          const Row(
-            children: [
-              Icon(Icons.phone, color: Colors.blue),
-              SizedBox(width: 10),
-              Text('01 6723 711', style: TextStyle(color: Colors.white)),
-            ],
-          ),
-          const SizedBox(height: 10),
-          const Row(
-            children: [
-              Icon(Icons.location_on, color: Colors.white),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Paradero la posta subiendo una cuadra',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
+      margin: const EdgeInsets.only(top: 30),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            colorPrimario,
+            colorPrimario.withOpacity(0.9),
+          ],
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            // 📱 INFORMACIÓN DE CONTACTO
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.2)),
               ),
-            ],
-          ),
-          const SizedBox(height: 15),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.purple,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text('Yape', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: Column(
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.phone, color: Colors.white, size: 20),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          '933 214 908 | 01 6723 711',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const Row(
+                    children: [
+                      Icon(Icons.location_on, color: Colors.white, size: 20),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Paradero la posta subiendo una cuadra',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // 💳 MÉTODOS DE PAGO
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.purple,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.purple.withOpacity(0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Text(
+                          'Yape',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.teal,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.teal.withOpacity(0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Text(
+                          'Plin',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(width: 20),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.teal,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text('Plin', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // 🍕 MARCA
+            Text(
+              '© 2024 Pizza Fabichelo',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 12,
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
