@@ -3,6 +3,8 @@ import '../models/models.dart';
 import '../data/pizza_data.dart';
 import '../widgets/pizza_card.dart';
 import '../widgets/combo_card.dart';
+import '../widgets/mostrito_card.dart';
+import '../widgets/pizza_especial_card.dart';
 import 'carrito_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,25 +19,21 @@ class _HomeScreenState extends State<HomeScreen> {
   String categoriaSeleccionada = 'Pizza Familiar';
 
   // 🎨 PALETA DE COLORES INSPIRADA EN EL LOGO  
-  static const Color colorPrimario = Color(0xFFD4332A); // Rojo del logo como principal
+  static const Color colorPrimario = Color(0xFFD4332A); // Rojo del logo
   static const Color colorSecundario = Color(0xFF2C5F2D); // Verde del logo 
   static const Color colorAcento = Color(0xFFF4B942); // Amarillo/dorado
   static const Color colorFondo = Color(0xFFF8F9FA);
   static const Color colorTarjeta = Colors.white;
 
+  // 🏷️ CATEGORÍAS ACTUALIZADAS SEGÚN TU SOLICITUD
   final List<Map<String, dynamic>> categorias = [
-    {
-      'nombre': 'Pizza Familiar',
-      'imagen': 'assets/images/categorias/pizza_familiar.png' // 🔥 IMAGEN PARA PIZZA FAMILIAR
-    },
-    {
-      'nombre': 'Pizza Personal',
-      'imagen': 'assets/images/categorias/pizza_personal.png' // 🔥 IMAGEN PARA PIZZA PERSONAL
-    },
-    {
-      'nombre': 'Combos',
-      'imagen': 'assets/images/categorias/combos.png' // 🔥 IMAGEN PARA COMBOS
-    },
+    {'nombre': 'Pizza Familiar', 'icono': Icons.local_pizza},
+    {'nombre': 'Pizza Personal', 'icono': Icons.local_pizza_outlined},
+    {'nombre': 'Mostritos', 'icono': Icons.fastfood},
+    {'nombre': 'Pizza Especial', 'icono': Icons.star},
+    {'nombre': 'Combo Pizza', 'icono': Icons.restaurant_menu},
+    {'nombre': 'Combo Broaster', 'icono': Icons.restaurant},
+    {'nombre': 'Fusión', 'icono': Icons.auto_awesome},
   ];
 
   double get totalCarrito {
@@ -75,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: colorFondo,
       body: CustomScrollView(
         slivers: [
-          // 🎨 SLIVER APP BAR ACTUALIZADO
+          // 🎨 SLIVER APP BAR
           SliverAppBar(
             expandedHeight: 120,
             floating: false,
@@ -103,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 10),
                         Row(
                           children: [
-                            // 🔥 LOGO CIRCULAR CON IMAGEN PERSONALIZADA
+                            // 🍕 LOGO CIRCULAR
                             Container(
                               width: 50,
                               height: 50,
@@ -118,18 +116,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ],
                               ),
-                              child: ClipOval(
-                                child: Image.asset(
-                                  'assets/images/logo/fabichelo_logo.png', // 🔥 TU LOGO AQUÍ
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Icon(
-                                      Icons.restaurant,
-                                      color: colorSecundario,
-                                      size: 28,
-                                    );
-                                  },
-                                ),
+                              child: Icon(
+                                Icons.local_pizza,
+                                color: colorSecundario,
+                                size: 28,
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -138,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'FABICHELO', // 🔥 CAMBIADO A SOLO "FABICHELO"
+                                    'PIZZA FABICHELO',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -218,13 +208,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
 
-          // 🏷️ CATEGORÍAS HORIZONTALES CON IMÁGENES
+          // 🏷️ CATEGORÍAS HORIZONTALES
           SliverToBoxAdapter(
             child: Container(
               color: colorTarjeta,
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: SizedBox(
-                height: 100, // 🔥 AUMENTADO PARA LAS IMÁGENES
+                height: 80,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -236,9 +226,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     return GestureDetector(
                       onTap: () => setState(() => categoriaSeleccionada = categoria['nombre']),
                       child: Container(
-                        width: 100, // 🔥 ANCHO FIJO PARA LAS CATEGORÍAS
                         margin: const EdgeInsets.only(right: 16),
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
                           gradient: isSelected ? LinearGradient(
                             colors: [colorPrimario, colorPrimario.withOpacity(0.8)],
@@ -258,49 +247,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // 🔥 IMAGEN DE LA CATEGORÍA
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: isSelected ? Colors.white.withOpacity(0.2) : Colors.transparent,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.asset(
-                                  categoria['imagen'],
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    // 🔥 FALLBACK A ICONOS SI NO HAY IMAGEN
-                                    IconData icono = Icons.restaurant;
-                                    if (categoria['nombre'].contains('Familiar')) {
-                                      icono = Icons.local_pizza;
-                                    } else if (categoria['nombre'].contains('Personal')) {
-                                      icono = Icons.local_pizza_outlined;
-                                    } else if (categoria['nombre'].contains('Combos')) {
-                                      icono = Icons.restaurant_menu;
-                                    }
-                                    return Icon(
-                                      icono,
-                                      color: isSelected ? Colors.white : colorPrimario,
-                                      size: 24,
-                                    );
-                                  },
-                                ),
-                              ),
+                            Icon(
+                              categoria['icono'],
+                              color: isSelected ? Colors.white : colorPrimario,
+                              size: 24,
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 6),
                             Text(
                               categoria['nombre'],
                               style: TextStyle(
                                 color: isSelected ? Colors.white : colorPrimario,
                                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                fontSize: 10,
+                                fontSize: 11,
                               ),
                               textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -317,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: _buildContenidoPorCategoria(),
           ),
 
-          // 📞 FOOTER CON INFORMACIÓN DE CONTACTO
+          // 📞 FOOTER
           SliverToBoxAdapter(
             child: _buildFooter(),
           ),
@@ -332,8 +292,16 @@ class _HomeScreenState extends State<HomeScreen> {
         return _buildPizzasFamiliares();
       case 'Pizza Personal':
         return _buildPizzasPersonales();
-      case 'Combos':
-        return _buildCombos();
+      case 'Mostritos':
+        return _buildMostritos();
+      case 'Pizza Especial':
+        return _buildPizzasEspeciales();
+      case 'Combo Pizza':
+        return _buildCombosPizza();
+      case 'Combo Broaster':
+        return _buildCombosBroaster();
+      case 'Fusión':
+        return _buildFusiones();
       default:
         return _buildPizzasFamiliares();
     }
@@ -342,62 +310,21 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildPizzasFamiliares() {
     return Column(
       children: [
-        // 🏷️ HEADER DE SECCIÓN ACTUALIZADO
-        Container(
-          margin: const EdgeInsets.fromLTRB(20, 20, 20, 15),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [colorPrimario.withOpacity(0.1), Colors.transparent],
-            ),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorPrimario.withOpacity(0.2)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: colorPrimario,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.local_pizza, color: Colors.white, size: 20),
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Pizzas Familiares',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Text(
-                      '30 cm con 8 tajadas', // 🔥 CAMBIADO EL TEXTO
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        _buildSectionHeader(
+          'Pizzas Familiares',
+          'Perfectas para compartir',
+          Icons.local_pizza,
+          colorPrimario,
+          PizzaData.pizzasFamiliaresOrdenadas.length,
         ),
         
-        // 📜 LISTA DE PIZZAS
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: PizzaData.pizzas.length,
+          itemCount: PizzaData.pizzasFamiliaresOrdenadas.length,
           itemBuilder: (context, index) {
-            final pizza = PizzaData.pizzas[index];
+            final pizza = PizzaData.pizzasFamiliaresOrdenadas[index];
             return PizzaCard(
               pizza: pizza,
               tamano: 'Familiar',
@@ -418,60 +345,21 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildPizzasPersonales() {
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.fromLTRB(20, 20, 20, 15),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [colorSecundario.withOpacity(0.1), Colors.transparent],
-            ),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorSecundario.withOpacity(0.2)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: colorSecundario,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.local_pizza_outlined, color: Colors.white, size: 20),
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Pizzas Personales',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Text(
-                      '18 cm con 4 tajadas', // 🔥 CAMBIADO EL TEXTO
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        _buildSectionHeader(
+          'Pizzas Personales',
+          'Ideales para una persona',
+          Icons.local_pizza_outlined,
+          colorSecundario,
+          PizzaData.pizzasPersonalesOrdenadas.length,
         ),
         
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: PizzaData.pizzas.length,
+          itemCount: PizzaData.pizzasPersonalesOrdenadas.length,
           itemBuilder: (context, index) {
-            final pizza = PizzaData.pizzas[index];
+            final pizza = PizzaData.pizzasPersonalesOrdenadas[index];
             return PizzaCard(
               pizza: pizza,
               tamano: 'Personal',
@@ -489,75 +377,233 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCombos() {
+  Widget _buildMostritos() {
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.fromLTRB(20, 20, 20, 15),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [colorAcento.withOpacity(0.1), Colors.transparent],
-            ),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorAcento.withOpacity(0.3)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: colorAcento,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.restaurant_menu, color: Colors.white, size: 20),
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Combos Especiales',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Text(
-                      'La mejor opción completa', // 🔥 MANTUVE EL TEXTO ORIGINAL
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        _buildSectionHeader(
+          'Mostritos',
+          'Broaster con acompañamientos',
+          Icons.fastfood,
+          Colors.orange,
+          PizzaData.mostritosOrdenados.length,
         ),
         
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: PizzaData.combos.length,
+          itemCount: PizzaData.mostritosOrdenados.length,
           itemBuilder: (context, index) {
-            final combo = PizzaData.combos[index];
+            final mostrito = PizzaData.mostritosOrdenados[index];
+            return MostritoCard(
+              mostrito: mostrito,
+              onAgregarAlCarrito: () => agregarAlCarrito(
+                mostrito.nombre,
+                mostrito.precio,
+                'Mostrito',
+                mostrito.imagen,
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPizzasEspeciales() {
+    return Column(
+      children: [
+        _buildSectionHeader(
+          'Pizzas Especiales',
+          'Múltiples sabores en una pizza',
+          Icons.star,
+          Colors.purple,
+          PizzaData.pizzasEspecialesOrdenadas.length,
+        ),
+        
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: PizzaData.pizzasEspecialesOrdenadas.length,
+          itemBuilder: (context, index) {
+            final pizzaEspecial = PizzaData.pizzasEspecialesOrdenadas[index];
+            return PizzaEspecialCard(
+              pizzaEspecial: pizzaEspecial,
+              onAgregarAlCarrito: () => agregarAlCarrito(
+                pizzaEspecial.nombre,
+                pizzaEspecial.precio,
+                pizzaEspecial.tipo,
+                pizzaEspecial.imagen,
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCombosPizza() {
+    return Column(
+      children: [
+        _buildSectionHeader(
+          'Combos Pizza',
+          'Pizzas con acompañamientos',
+          Icons.restaurant_menu,
+          colorAcento,
+          PizzaData.combosPizzaOrdenados.length,
+        ),
+        
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: PizzaData.combosPizzaOrdenados.length,
+          itemBuilder: (context, index) {
+            final combo = PizzaData.combosPizzaOrdenados[index];
             return ComboCard(
               combo: combo,
               onAgregarAlCarrito: () => agregarAlCarrito(
                 combo.nombre,
                 combo.precio,
-                'Combo',
+                'Combo Pizza',
                 combo.imagen,
               ),
             );
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildCombosBroaster() {
+    return Column(
+      children: [
+        _buildSectionHeader(
+          'Combos Broaster',
+          'Pollo broaster con acompañamientos',
+          Icons.restaurant,
+          Colors.brown,
+          PizzaData.combosBroasterOrdenados.length,
+        ),
+        
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: PizzaData.combosBroasterOrdenados.length,
+          itemBuilder: (context, index) {
+            final combo = PizzaData.combosBroasterOrdenados[index];
+            return ComboCard(
+              combo: combo,
+              onAgregarAlCarrito: () => agregarAlCarrito(
+                combo.nombre,
+                combo.precio,
+                'Combo Broaster',
+                combo.imagen,
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFusiones() {
+    return Column(
+      children: [
+        _buildSectionHeader(
+          'Fusiones',
+          'Lo mejor de pizza y broaster',
+          Icons.auto_awesome,
+          Colors.deepPurple,
+          PizzaData.fusionesOrdenadas.length,
+        ),
+        
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: PizzaData.fusionesOrdenadas.length,
+          itemBuilder: (context, index) {
+            final fusion = PizzaData.fusionesOrdenadas[index];
+            return ComboCard(
+              combo: fusion,
+              onAgregarAlCarrito: () => agregarAlCarrito(
+                fusion.nombre,
+                fusion.precio,
+                'Fusión',
+                fusion.imagen,
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  // 🎨 MÉTODO PARA CREAR HEADER DE SECCIÓN
+  Widget _buildSectionHeader(String titulo, String subtitulo, IconData icono, Color color, int cantidad) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 20, 20, 15),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [color.withOpacity(0.1), Colors.transparent],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icono, color: Colors.white, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  titulo,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                Text(
+                  subtitulo,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: colorAcento.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '$cantidad opciones',
+              style: TextStyle(
+                fontSize: 11,
+                color: colorAcento.withOpacity(0.8),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -681,7 +727,7 @@ class _HomeScreenState extends State<HomeScreen> {
             
             // 🍕 MARCA
             Text(
-              '© 2024 Fabichelo',
+              '© 2024 Pizza Fabichelo',
               style: TextStyle(
                 color: Colors.white.withOpacity(0.7),
                 fontSize: 12,
