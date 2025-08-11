@@ -149,7 +149,41 @@ class PizzaData {
     ),
   ];
 
-  // 🔥 FUSIONES (PIZZA + BROASTER) - según carta
+  // 🍕 COMBOS PIZZA - NUEVA CATEGORÍA
+  static final List<Combo> combosPizza = [
+    Combo(
+      nombre: 'Combo Clásico',
+      descripcion: 'Mitad Americana + Mitad Hawaiana + Pepsi + 3 pan al ajo',
+      precio: 32.0,
+      imagen: 'assets/images/combos/combo_clasico.png',
+    ),
+    Combo(
+      nombre: 'Combo Compartir',
+      descripcion: '2 pizzas americanas • Familiar + Personal',
+      precio: 34.0,
+      imagen: 'assets/images/combos/combo_compartir.png',
+    ),
+    Combo(
+      nombre: 'Combo Brother',
+      descripcion: '3 pizzas personales (Pepperoni, Hawaiana y Americana) + Pepsi',
+      precio: 32.0,
+      imagen: 'assets/images/combos/combo_brother.png',
+    ),
+    Combo(
+      nombre: 'Combo Familiar',
+      descripcion: 'Americana + Pepsi + Pan al ajo (3 Porciones)',
+      precio: 29.0,
+      imagen: 'assets/images/combos/combo_familiar_pizza.png',
+    ),
+    Combo(
+      nombre: 'Oferta Dúo',
+      descripcion: '2 pizzas familiares • Hawaiana + Americana',
+      precio: 50.0,
+      imagen: 'assets/images/combos/oferta_duo.png',
+    ),
+  ];
+
+  // 🔥 FUSIONES (PIZZA + BROASTER) - ACTUALIZADO CON COMBO ESTRELLA
   static final List<Combo> fusiones = [
     Combo(
       nombre: 'Fusión Junior',
@@ -162,6 +196,12 @@ class PizzaData {
       descripcion: 'Pizza familiar (sabor a elección) + 6 brazitos de pollo + 1 Pepsi jumbo',
       precio: 35.0,
       imagen: 'assets/images/combos/familiar_broaster.png',
+    ),
+    Combo(
+      nombre: 'Combo Estrella',
+      descripcion: 'Pizza Familiar 2 sabores + 6 Bracitos + Porción papas + Pepsi jumbo',
+      precio: 42.0,
+      imagen: 'assets/images/combos/combo_estrella.png',
     ),
     Combo(
       nombre: 'Fusión Familiar',
@@ -283,6 +323,7 @@ class PizzaData {
       case '2 Sabores':
       case '4 Sabores':
       case 'Fusión':
+      case 'Combo Pizza':
         return adicionalesCombo;
       default:
         return []; // Sin adicionales para mostritos y combos broaster puros
@@ -317,6 +358,13 @@ class PizzaData {
 
   static List<Combo> get combosBroasterOrdenados {
     List<Combo> lista = List.from(combosBroaster);
+    lista.sort((a, b) => a.precio.compareTo(b.precio));
+    return lista;
+  }
+
+  // 🍕 NUEVA CATEGORÍA COMBOS PIZZA ORDENADOS
+  static List<Combo> get combosPizzaOrdenados {
+    List<Combo> lista = List.from(combosPizza);
     lista.sort((a, b) => a.precio.compareTo(b.precio));
     return lista;
   }

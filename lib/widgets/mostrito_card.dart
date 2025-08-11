@@ -19,7 +19,7 @@ class MostritoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6), // Mismo margen que pizza_card
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -30,142 +30,150 @@ class MostritoCard extends StatelessWidget {
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // 🍗 IMAGEN DEL MOSTRITO
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  mostrito.imagen,
-                  fit: BoxFit.cover,
-                  width: 100,
-                  height: 100,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[200],
-                      child: const Icon(
-                        Icons.fastfood,
-                        size: 50,
-                        color: Colors.orange,
-                      ),
-                    );
-                  },
-                ),
+      child: Row(
+        children: [
+          // 🍗 IMAGEN DEL MOSTRITO - SIN MARCO, IMAGEN COMPLETA VISIBLE
+          Container(
+            width: 120,
+            height: 120,
+            padding: const EdgeInsets.all(8),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                mostrito.imagen,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[200],
+                    child: const Icon(
+                      Icons.fastfood,
+                      size: 50,
+                      color: Colors.orange,
+                    ),
+                  );
+                },
               ),
             ),
+          ),
 
-            const SizedBox(width: 16),
+          const SizedBox(width: 12), // Espacio normal
 
-            // 📄 CONTENIDO DEL MOSTRITO
-            Expanded(
+          // 📄 Texto + botón (igual estructura que pizza)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8), // Menos espacio vertical
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🏆 NOMBRE DEL MOSTRITO
-                  Text(
-                    mostrito.nombre,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Colors.black87,
-                      height: 1.2,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-
-                  const SizedBox(height: 4),
-                  // 🏷️ ETIQUETA MOSTRITO
+                  // 🏷️ BADGE DE MOSTRITO (igual que badge de tamaño en pizza)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: colorMostrito.withOpacity(0.2),
+                      color: colorMostrito.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: colorMostrito.withOpacity(0.3)),
+                      border: Border.all(
+                        color: colorMostrito.withOpacity(0.3),
+                      ),
                     ),
                     child: Text(
-                      '🍗 Mostrito',
+                      'Mostrito',
                       style: TextStyle(
                         fontSize: 10,
-                        color: colorMostrito.withOpacity(0.8),
+                        color: colorMostrito,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 8),
-                  // 📝 DESCRIPCIÓN
+                  
+                  const SizedBox(height: 4),
+                  
                   Text(
-                    mostrito.descripcion,
+                    mostrito.nombre,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15, // Reducir un poco
+                      color: Colors.black87,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  
+                  const SizedBox(height: 3),
+                  
+                  // 📝 DESCRIPCIÓN SIMPLE Y COMPACTA
+                  Text(
+                    mostrito.descripcion.replaceAll(' + ', ' • '),
                     style: TextStyle(
                       color: Colors.grey[600],
-                      fontSize: 12,
+                      fontSize: 11,
                       height: 1.3,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
 
-                  // 💰 PRECIO Y BOTÓN
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // 💵 PRECIO
-                      Text(
-                        'S/ ${mostrito.precio.toStringAsFixed(0)}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Colors.orange,
-                        ),
+                      // 💰 PRECIO CON MEJOR DISEÑO (igual que pizza)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'S/ ${mostrito.precio.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.orange,
+                            ),
+                          ),
+                          Text(
+                            'Con bebida',
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
                       ),
-
-                      // 🛒 BOTÓN AGREGAR
+                      
+                      // 🛒 BOTÓN AGREGAR (igual estilo que pizza pero color naranja)
                       Container(
+                        margin: const EdgeInsets.only(right: 8),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [
-                              Colors.orange,
-                              Colors.deepOrange,
-                            ],
+                            colors: [Colors.orange, Colors.deepOrange],
                           ),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.orange.withOpacity(0.4),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
+                              color: Colors.orange.withOpacity(0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             onTap: onAgregarAlCarrito,
                             child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.add_shopping_cart, size: 18, color: Colors.white),
-                                  SizedBox(width: 6),
+                                  Icon(Icons.add, size: 16, color: Colors.white),
+                                  SizedBox(width: 4),
                                   Text(
                                     'AGREGAR',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 12,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
                                     ),
@@ -181,8 +189,8 @@ class MostritoCard extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -25,14 +25,15 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color colorFondo = Color(0xFFF8F9FA);
   static const Color colorTarjeta = Colors.white;
 
-  // 🏷️ CATEGORÍAS ACTUALIZADAS
+// 🏷️ CATEGORÍAS ACTUALIZADAS - AGREGANDO COMBO PIZZA
   final List<Map<String, dynamic>> categorias = [
     {'nombre': 'Pizza Familiar', 'icono': Icons.local_pizza},
     {'nombre': 'Pizza Personal', 'icono': Icons.local_pizza_outlined},
-    {'nombre': 'Mostritos', 'icono': Icons.fastfood},
-    {'nombre': 'Pizza Especial', 'icono': Icons.star},
+    {'nombre': 'Combo Pizza', 'icono': Icons.local_pizza}, // NUEVA CATEGORÍA
     {'nombre': 'Combo Broaster', 'icono': Icons.restaurant},
+    {'nombre': 'Pizza Especial', 'icono': Icons.star},
     {'nombre': 'Fusión', 'icono': Icons.auto_awesome},
+    {'nombre': 'Mostritos', 'icono': Icons.fastfood},
   ];
 
   double get totalCarrito {
@@ -297,20 +298,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildContenidoPorCategoria() {
+Widget _buildContenidoPorCategoria() {
     switch (categoriaSeleccionada) {
       case 'Pizza Familiar':
         return _buildPizzasFamiliares();
       case 'Pizza Personal':
         return _buildPizzasPersonales();
-      case 'Mostritos':
-        return _buildMostritos();
-      case 'Pizza Especial':
-        return _buildPizzasEspeciales();
+      case 'Combo Pizza':
+        return _buildCombosPizza(); // NUEVA CATEGORÍA
       case 'Combo Broaster':
         return _buildCombosBroaster();
+      case 'Pizza Especial':
+        return _buildPizzasEspeciales();
       case 'Fusión':
         return _buildFusiones();
+      case 'Mostritos':
+        return _buildMostritos();
       default:
         return _buildPizzasFamiliares();
     }
@@ -514,6 +517,40 @@ class _HomeScreenState extends State<HomeScreen> {
                 fusion.precio,
                 'Fusión',
                 fusion.imagen,
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+  // 🍕 NUEVA SECCIÓN COMBO PIZZA
+  Widget _buildCombosPizza() {
+    return Column(
+      children: [
+        _buildSectionHeader(
+          'Combo Pizza',
+          'Combinaciones especiales con pizzas',
+          Icons.local_pizza,
+          Colors.indigo,
+          PizzaData.combosPizzaOrdenados.length,
+          etiquetasExtra: ['Combo', 'Pizza'],
+        ),
+        
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: PizzaData.combosPizzaOrdenados.length,
+          itemBuilder: (context, index) {
+            final comboPizza = PizzaData.combosPizzaOrdenados[index];
+            return ComboCard(
+              combo: comboPizza,
+              onAgregarAlCarrito: () => agregarAlCarrito(
+                comboPizza.nombre,
+                comboPizza.precio,
+                'Combo Pizza',
+                comboPizza.imagen,
               ),
             );
           },

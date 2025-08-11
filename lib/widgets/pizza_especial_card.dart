@@ -11,14 +11,15 @@ class PizzaEspecialCard extends StatelessWidget {
     required this.onAgregarAlCarrito,
   });
 
-  // 🎨 COLORES
-  static const Color colorPrimario = Color(0xFFD4332A); // Rojo
+  // 🎨 COLORES ACTUALIZADOS IGUAL QUE EN PIZZA_CARD
+  static const Color colorPrimario = Color.fromRGBO(19, 182, 22, 1);
+  static const Color colorSecundario = Color(0xFFD4332A);
   static const Color colorEspecial = Colors.purple; // Color especial para pizzas especiales
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6), // Mismo margen que pizza_card
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -29,31 +30,30 @@ class PizzaEspecialCard extends StatelessWidget {
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // 🍕 IMAGEN DE LA PIZZA ESPECIAL
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+      child: Row(
+        children: [
+          // 🍕 Pizza especial sin borde blanco y pegada más cerca (EXACTAMENTE IGUAL QUE PIZZA_CARD)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(0), // Eliminar el borde
+            child: Transform.scale(
+              scale: 1.4,
+              child: Transform.translate(
+                offset: const Offset(-20, 0), // Mover un poco a la izquierda
                 child: Image.asset(
                   pizzaEspecial.imagen,
-                  fit: BoxFit.cover,
-                  width: 100,
-                  height: 100,
+                  width: 110,  // Tamaño ajustado para que sobresalga más
+                  height: 140, // Tamaño ajustado para que sobresalga más
+                  fit: BoxFit.contain, // Cambiado a BoxFit.contain
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      color: Colors.grey[200],
+                      width: 110,
+                      height: 110,
+                      color: const Color(0xFFF5F5F5),
                       child: const Icon(
                         Icons.star,
-                        size: 50,
+                        size: 40,
                         color: Colors.purple,
                       ),
                     );
@@ -61,112 +61,121 @@ class PizzaEspecialCard extends StatelessWidget {
                 ),
               ),
             ),
+          ),
 
-            const SizedBox(width: 16),
+          const SizedBox(width: 8), // Reducir el espacio entre las imágenes
 
-            // 📄 CONTENIDO DE LA PIZZA ESPECIAL
-            Expanded(
+          // 📄 Texto + botón (EXACTAMENTE IGUAL QUE PIZZA_CARD)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🏷️ ETIQUETA ESPECIAL
+                  // 🏷️ BADGE DE TIPO (igual que badge de tamaño en pizza)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: colorEspecial.withOpacity(0.2),
+                      color: colorEspecial.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: colorEspecial.withOpacity(0.3)),
+                      border: Border.all(
+                        color: colorEspecial.withOpacity(0.3),
+                      ),
                     ),
                     child: Text(
-                      '⭐ ${pizzaEspecial.tipo}',
+                      pizzaEspecial.tipo,
                       style: TextStyle(
                         fontSize: 10,
-                        color: colorEspecial.withOpacity(0.8),
+                        color: colorEspecial,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-
+                  
                   const SizedBox(height: 6),
-
-                  // 🏆 NOMBRE DE LA PIZZA
+                  
                   Text(
                     pizzaEspecial.nombre,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                      fontSize: 16,
                       color: Colors.black87,
-                      height: 1.2,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-
-                  const SizedBox(height: 8),
-
-                  // 📝 DESCRIPCIÓN
+                  
+                  const SizedBox(height: 3),
+                  
                   Text(
                     pizzaEspecial.descripcion,
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 12,
-                      height: 1.3,
+                      height: 1.2,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
 
-                  // 💰 PRECIO Y BOTÓN
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // 💵 PRECIO
-                      Text(
-                        'S/ ${pizzaEspecial.precio.toStringAsFixed(0)}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Colors.purple,
-                        ),
+                      // 💰 PRECIO CON MEJOR DISEÑO (igual que pizza)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'S/ ${pizzaEspecial.precio.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.purple,
+                            ),
+                          ),
+                          Text(
+                            'Especial',
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
                       ),
-
-                      // 🛒 BOTÓN AGREGAR
+                      
+                      // 🛒 BOTÓN AGREGAR (igual estilo que pizza pero color púrpura)
                       Container(
+                        margin: const EdgeInsets.only(right: 8),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [
-                              Colors.purple,
-                              Colors.deepPurple,
-                            ],
+                            colors: [Colors.purple, Colors.deepPurple],
                           ),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.purple.withOpacity(0.4),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
+                              color: Colors.purple.withOpacity(0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             onTap: onAgregarAlCarrito,
                             child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.add_shopping_cart, size: 18, color: Colors.white),
-                                  SizedBox(width: 6),
+                                  Icon(Icons.add, size: 16, color: Colors.white),
+                                  SizedBox(width: 4),
                                   Text(
                                     'AGREGAR',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 12,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
                                     ),
@@ -182,8 +191,8 @@ class PizzaEspecialCard extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
