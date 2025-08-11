@@ -19,7 +19,7 @@ class ComboCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6), // Mismo margen que pizza_card
+      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -34,16 +34,16 @@ class ComboCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 🍗 IMAGEN DEL COMBO - SIN MARCO, IMAGEN COMPLETA VISIBLE
+          // 🍗 IMAGEN DEL COMBO - MÁS GRANDE Y SIN RECORTE
           Container(
-            width: 120,
-            height: 120,
-            padding: const EdgeInsets.all(8),
+            width: 140, // más grande que antes
+            height: 180,
+            padding: const EdgeInsets.all(4),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8), // menos redondeado
               child: Image.asset(
                 combo.imagen,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain, // muestra toda la imagen
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     color: Colors.grey[200],
@@ -58,16 +58,16 @@ class ComboCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 12), // Espacio normal
+          const SizedBox(width: 12),
 
-          // 📄 Texto + botón (igual estructura que pizza)
+          // 📄 Texto + botón
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8), // Menos espacio vertical
+              padding: const EdgeInsets.symmetric(vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🏷️ BADGE DE COMBO (igual que badge de tamaño en pizza)
+                  // 🏷️ BADGE DE COMBO
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
@@ -93,7 +93,7 @@ class ComboCard extends StatelessWidget {
                     combo.nombre,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 15, // Reducir un poco
+                      fontSize: 15,
                       color: Colors.black87,
                     ),
                     maxLines: 1,
@@ -102,7 +102,6 @@ class ComboCard extends StatelessWidget {
                   
                   const SizedBox(height: 3),
                   
-                  // 📝 DESCRIPCIÓN SIMPLE Y COMPACTA
                   Text(
                     combo.descripcion.replaceAll(' + ', ' • '),
                     style: TextStyle(
@@ -119,7 +118,7 @@ class ComboCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // 💰 PRECIO CON MEJOR DISEÑO (igual que pizza)
+                      // 💰 PRECIO
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -141,7 +140,7 @@ class ComboCard extends StatelessWidget {
                         ],
                       ),
                       
-                      // 🛒 BOTÓN AGREGAR (igual estilo que pizza pero color marrón)
+                      // 🛒 BOTÓN AGREGAR
                       Container(
                         margin: const EdgeInsets.only(right: 8),
                         decoration: BoxDecoration(
