@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'PIZZA FABICHELO',
+                                    'FABICHELO',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -320,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
         _buildSectionHeader(
-          'Pizzas Familiares',
+          'Familiares',
           'Perfectas para compartir en familia',
           Icons.local_pizza,
           colorPrimario,
@@ -356,7 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
         _buildSectionHeader(
-          'Pizzas Personales',
+          'Personales',
           'Ideales para disfrutar solo',
           Icons.local_pizza_outlined,
           colorSecundario,
@@ -425,12 +425,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
         _buildSectionHeader(
-          'Pizzas Especiales',
+          'Especiales',
           'Múltiples sabores en una pizza',
           Icons.star,
           Colors.purple,
           PizzaData.pizzasEspecialesOrdenadas.length,
-          etiquetasExtra: ['Con bebida', 'Familiar'],
+          etiquetasExtra: ['Familiar'],
         ),
         
         ListView.builder(

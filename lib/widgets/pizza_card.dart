@@ -16,7 +16,7 @@ class PizzaCard extends StatelessWidget {
   });
 
   // 🎨 COLORES ACTUALIZADOS IGUAL QUE EN HOME SCREEN
-  static const Color colorPrimario = Color.fromARGB(255, 0, 255, 4);
+  static const Color colorPrimario = Color.fromRGBO(19, 182, 22, 1);
   static const Color colorSecundario = Color(0xFFD4332A);
   static const Color colorAcento = Color(0xFFF4B942);
 
@@ -81,12 +81,12 @@ class PizzaCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: tamano == 'Familiar' 
-                          ? colorPrimario.withOpacity(0.1)
+                          ? const Color.fromRGBO(19, 182, 22, 1).withOpacity(0.1)
                           : colorSecundario.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: tamano == 'Familiar' 
-                            ? colorPrimario.withOpacity(0.3)
+                            ? const Color.fromRGBO(19, 182, 22, 1).withOpacity(0.3)
                             : colorSecundario.withOpacity(0.3),
                       ),
                     ),
@@ -157,7 +157,7 @@ class PizzaCard extends StatelessWidget {
                         margin: const EdgeInsets.only(right: 8),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [const Color.fromARGB(255, 5, 255, 10), const Color.fromARGB(255, 0, 255, 4).withOpacity(0.8)],
+                            colors: [const Color.fromARGB(255, 5, 255, 10), const Color.fromRGBO(19, 182, 22, 1).withOpacity(0.8)],
                           ),
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [

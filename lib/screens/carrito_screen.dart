@@ -63,6 +63,11 @@ class _CarritoScreenState extends State<CarritoScreen> {
     });
   }
 
+  // 🎯 OBTENER ADICIONALES DISPONIBLES SEGÚN EL TAMAÑO
+  List<Adicional> _getAdicionalesDisponibles(String tamano) {
+    return PizzaData.getAdicionalesDisponibles(tamano);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,10 +110,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
                     itemBuilder: (context, index) {
                       final item = carritoLocal[index];
                       final isExpanded = itemsExpandidos.contains(index);
-                      final esPersonalizable = item.tamano != 'Combo' && 
-                                             item.tamano != 'Combo Broaster' &&
-                                             item.tamano != 'Fusión' &&
-                                             item.tamano != 'Mostrito'; // 🔥 SOLO PIZZAS SON PERSONALIZABLES
+                      final esPersonalizable = item.tamano != 'Combo Broaster' && 
+                                             item.tamano != 'Mostrito'; // 🔥 SOLO PIZZAS Y FUSIONES SON PERSONALIZABLES
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 16),
@@ -192,6 +195,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
                                             fontSize: 16,
                                             color: Colors.black87,
                                           ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                         const SizedBox(height: 6),
                                         // 🏷️ ETIQUETA DE CATEGORÍA
@@ -404,7 +409,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                                                     isExpanded ? 'Ocultar' : 'Extras',
                                                     style: TextStyle(
                                                       color: colorAcento,
-                                                      fontSize: 15,
+                                                      fontSize: 10,
                                                       fontWeight: FontWeight.w600,
                                                     ),
                                                   ),
@@ -462,8 +467,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
                                     ),
                                     const SizedBox(height: 12),
                                     
-                                    // 🔥 LISTA DE ADICIONALES DISPONIBLES
-                                    ...PizzaData.adicionalesDisponibles.map((adicional) {
+                                    // 🔥 LISTA DE ADICIONALES DISPONIBLES POR TAMAÑO
+                                    ..._getAdicionalesDisponibles(item.tamano).map((adicional) {
                                       final isSelected = item.adicionales.any((a) => a.nombre == adicional.nombre);
                                       
                                       return Container(
@@ -501,6 +506,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                                                   style: TextStyle(
                                                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                                                     color: isSelected ? colorSecundario : Colors.black87,
+                                                    fontSize: 13,
                                                   ),
                                                 ),
                                               ),
@@ -631,12 +637,12 @@ class _CarritoScreenState extends State<CarritoScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
-                          child: Row(
+                          child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.payment, size: 20),
-                              const SizedBox(width: 8),
-                              const Text(
+                              Icon(Icons.payment, size: 20),
+                              SizedBox(width: 8),
+                              Text(
                                 'PROCEDER AL PAGO', 
                                 style: TextStyle(
                                   fontSize: 16, 
