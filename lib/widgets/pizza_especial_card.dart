@@ -19,7 +19,8 @@ class PizzaEspecialCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6), // Mismo margen que pizza_card
+      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+      height: 150, // 🔧 ALTURA AUMENTADA PARA MÁS ESPACIO DE TEXTO
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -34,22 +35,22 @@ class PizzaEspecialCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 🍕 Pizza especial sin borde blanco y pegada más cerca (EXACTAMENTE IGUAL QUE PIZZA_CARD)
+          // 🍕 Pizza especial - IGUAL QUE PIZZA_CARD PERO CON TAMAÑO OPTIMIZADO
           ClipRRect(
-            borderRadius: BorderRadius.circular(0), // Eliminar el borde
+            borderRadius: BorderRadius.circular(0),
             child: Transform.scale(
-              scale: 1.4,
+              scale: 1.3, // 🔧 LIGERAMENTE MÁS PEQUEÑA PARA DAR ESPACIO AL TEXTO
               child: Transform.translate(
-                offset: const Offset(-20, 0), // Mover un poco a la izquierda
+                offset: const Offset(-15, 0), // 🔧 MENOS DESPLAZAMIENTO
                 child: Image.asset(
                   pizzaEspecial.imagen,
-                  width: 110,  // Tamaño ajustado para que sobresalga más
-                  height: 140, // Tamaño ajustado para que sobresalga más
-                  fit: BoxFit.contain, // Cambiado a BoxFit.contain
+                  width: 110,
+                  height: 150, // 🔧 AJUSTADO A LA NUEVA ALTURA
+                  fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       width: 110,
-                      height: 110,
+                      height: 120,
                       color: const Color(0xFFF5F5F5),
                       child: const Icon(
                         Icons.star,
@@ -63,94 +64,112 @@ class PizzaEspecialCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 8), // Reducir el espacio entre las imágenes
+          const SizedBox(width: 8),
 
-          // 📄 Texto + botón (EXACTAMENTE IGUAL QUE PIZZA_CARD)
+          // 📄 Texto + botón - OPTIMIZADO PARA TEXTO COMPLETO
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 10), // 🔧 PADDING OPTIMIZADO
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🏷️ BADGE DE TIPO (igual que badge de tamaño en pizza)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: colorEspecial.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: colorEspecial.withOpacity(0.3),
-                      ),
+                  // 🔝 PARTE SUPERIOR (Badge + Título + Descripción) - MÁS ESPACIO
+                  Expanded(
+                    flex: 3, // 🔧 MÁS ESPACIO PARA EL CONTENIDO
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 🏷️ BADGE DE TIPO - MÁS COMPACTO
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: colorEspecial.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: colorEspecial.withOpacity(0.3),
+                            ),
+                          ),
+                          child: Text(
+                            pizzaEspecial.tipo,
+                            style: TextStyle(
+                              fontSize: 9, // 🔧 MÁS PEQUEÑO
+                              color: colorEspecial,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 4), // 🔧 MENOS ESPACIO
+                        
+                        // 🏷️ TÍTULO - MÁS COMPACTO
+                        Text(
+                          pizzaEspecial.nombre,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15, // 🔧 LIGERAMENTE MÁS PEQUEÑO
+                            color: Colors.black87,
+                            height: 1.1, // 🔧 ALTURA DE LÍNEA MÁS COMPACTA
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        
+                        const SizedBox(height: 2), // 🔧 MENOS ESPACIO
+                        
+                        // 📝 DESCRIPCIÓN - MÁS LÍNEAS Y MEJOR AJUSTE
+                        Expanded(
+                          child: Text(
+                            pizzaEspecial.descripcion,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 10.5, // 🔧 TAMAÑO OPTIMIZADO
+                              height: 1.25, // 🔧 ALTURA DE LÍNEA COMPACTA
+                            ),
+                            maxLines: 3, // 🔧 HASTA 3 LÍNEAS
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      pizzaEspecial.tipo,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: colorEspecial,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 6),
-                  
-                  Text(
-                    pizzaEspecial.nombre,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 3),
-                  
-                  Text(
-                    pizzaEspecial.descripcion,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                      height: 1.2,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
 
-                  const SizedBox(height: 10),
-
+                  // 🔽 PARTE INFERIOR (Precio + Botón) - MÁS COMPACTO
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // 💰 PRECIO CON MEJOR DISEÑO (igual que pizza)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'S/ ${pizzaEspecial.precio.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.purple,
+                      // 💰 PRECIO - MÁS COMPACTO
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'S/ ${pizzaEspecial.precio.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17, // 🔧 LIGERAMENTE MÁS PEQUEÑO
+                                color: Colors.purple,
+                              ),
                             ),
-                          ),
-                          Text(
-                            'Especial',
-                            style: TextStyle(
-                              fontSize: 9,
-                              color: Colors.grey[500],
+                            Text(
+                              'Especial',
+                              style: TextStyle(
+                                fontSize: 8, // 🔧 MÁS PEQUEÑO
+                                color: Colors.grey[500],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       
-                      // 🛒 BOTÓN AGREGAR (igual estilo que pizza pero color púrpura)
+                      // 🛒 BOTÓN AGREGAR - MÁS COMPACTO
                       Container(
-                        margin: const EdgeInsets.only(right: 8),
+                        margin: const EdgeInsets.only(right: 6),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [Colors.purple, Colors.deepPurple],
                           ),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.purple.withOpacity(0.3),
@@ -162,20 +181,20 @@ class PizzaEspecialCard extends StatelessWidget {
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10),
                             onTap: onAgregarAlCarrito,
                             child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // 🔧 MÁS COMPACTO
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.add, size: 16, color: Colors.white),
-                                  SizedBox(width: 4),
+                                  Icon(Icons.add, size: 14, color: Colors.white), // 🔧 ÍCONO MÁS PEQUEÑO
+                                  SizedBox(width: 3),
                                   Text(
                                     'AGREGAR',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 11,
+                                      fontSize: 10, // 🔧 TEXTO MÁS PEQUEÑO
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
                                     ),

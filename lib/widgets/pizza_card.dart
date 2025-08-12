@@ -81,12 +81,12 @@ class PizzaCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: tamano == 'Familiar' 
-                          ? const Color.fromRGBO(19, 182, 22, 1).withOpacity(0.1)
+                          ? const Color.fromARGB(192, 36, 145, 38).withOpacity(0.1)
                           : colorSecundario.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: tamano == 'Familiar' 
-                            ? const Color.fromRGBO(19, 182, 22, 1).withOpacity(0.3)
+                            ? const Color.fromARGB(255, 32, 131, 33).withOpacity(0.3)
                             : colorSecundario.withOpacity(0.3),
                       ),
                     ),
@@ -157,7 +157,7 @@ class PizzaCard extends StatelessWidget {
                         margin: const EdgeInsets.only(right: 8),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [const Color.fromARGB(255, 5, 255, 10), const Color.fromRGBO(19, 182, 22, 1).withOpacity(0.8)],
+                            colors: [const Color.fromARGB(255, 40, 133, 41), const Color.fromRGBO(19, 182, 22, 1).withOpacity(0.8)],
                           ),
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
