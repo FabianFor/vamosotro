@@ -20,188 +20,186 @@ class PizzaCard extends StatelessWidget {
   static const Color colorSecundario = Color(0xFFD4332A);
 
   @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    
-    // Dimensiones responsivas
-    final cardHeight = screenHeight * (isPortrait ? 0.18 : 0.35);
-    final imageSize = screenWidth * (isPortrait ? 0.28 : 0.2);
-    final horizontalMargin = screenWidth * 0.01;
-    final verticalMargin = screenHeight * 0.008;
-    
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: horizontalMargin, vertical: verticalMargin),
-      height: cardHeight,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(screenWidth * 0.04),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: screenWidth * 0.025,
-            offset: Offset(0, screenHeight * 0.005),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
-      ),
-      child: Row(
-        children: [
-          // 📸 Pizza responsive
-          ClipRRect(
-            borderRadius: BorderRadius.circular(0),
-            child: Transform.scale(
-              scale: isPortrait ? 1.4 : 1.2,
-              child: Transform.translate(
-                offset: Offset(screenWidth * -0.05, 0),
-                child: Image.asset(
-                  pizza.imagen,
-                  width: imageSize,
-                  height: cardHeight,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: imageSize,
-                      height: imageSize,
-                      color: const Color(0xFFF5F5F5),
-                      child: Icon(
-                        Icons.local_pizza,
-                        size: screenWidth * 0.1,
-                        color: colorSecundario,
-                      ),
-                    );
-                  },
+  Widget build(BuildContext context) {  
+    return MediaQuery(
+      // 🔥 FORZAR TEXTO FIJO
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+        height: 140, // ALTURA FIJA
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+          border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        ),
+        child: Row(
+          children: [
+            // 📸 IMAGEN PIZZA - TAMAÑO FIJO con recorte
+            Container(
+              width: 130, // ANCHO FIJO
+              height: 130, // ALTURA FIJA
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16), // recortar con bordes redondeados
+                child: Transform.scale(
+                  scale: 1.3,
+                  child: Transform.translate(
+                    offset: const Offset(-25, 0),
+                    child: Image.asset(
+                      pizza.imagen,
+                      fit: BoxFit.cover, // recorta la imagen para llenar el espacio
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: const Color(0xFFF5F5F5),
+                          child: const Icon(
+                            Icons.local_pizza,
+                            size: 40,
+                            color: colorSecundario,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
 
-          SizedBox(width: screenWidth * 0.02),
+            const SizedBox(width:2),
 
-          // 📄 Texto + botón - SIN BADGE
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Título
-                  Text(
-                    pizza.nombre,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: screenWidth * 0.04,
-                      color: Colors.black87,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  
-                  SizedBox(height: screenHeight * 0.005),
-                  
-                  // Ingredientes
-                  Expanded(
-                    child: Text(
-                      pizza.ingredientes,
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: screenWidth * 0.03,
-                        height: 1.2,
+            // 📄 CONTENIDO TEXTO - EXPANDIDO
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // TÍTULO - TAMAÑO FIJO
+                    Text(
+                      pizza.nombre,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16, // TAMAÑO FIJO
+                        color: Colors.black87,
                       ),
-                      maxLines: isPortrait ? 3 : 2,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ),
+                    
+                    const SizedBox(height: 0),
+                    
+                    // INGREDIENTES - TAMAÑO FIJO
+                    Expanded(
+                      child: Text(
+                        pizza.ingredientes,
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12, // TAMAÑO FIJO
+                          height: 1.4,
+                        ),
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
 
-                  SizedBox(height: screenHeight * 0.01),
+                    const SizedBox(height: 8),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // 💰 PRECIO RESPONSIVE
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'S/ ${precio.toStringAsFixed(2)}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: screenWidth * 0.045,
-                              color: colorSecundario,
-                            ),
-                          ),
-                          if (tamano == 'Familiar')
+                    // FILA PRECIO Y BOTÓN
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        // 💰 PRECIO - TAMAÑO FIJO
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
                             Text(
-                              'Para compartir',
-                              style: TextStyle(
-                                fontSize: screenWidth * 0.022,
-                                color: Colors.grey[500],
+                              'S/ ${precio.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18, // TAMAÑO FIJO
+                                color: colorSecundario,
                               ),
                             ),
-                        ],
-                      ),
-                      
-                      // 🛒 BOTÓN RESPONSIVE
-                      Container(
-                        margin: EdgeInsets.only(right: screenWidth * 0.02),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color.fromARGB(255, 40, 133, 41), 
-                              const Color.fromRGBO(19, 182, 22, 1).withOpacity(0.8)
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                          boxShadow: [
-                            BoxShadow(
-                              color: colorPrimario.withOpacity(0.3),
-                              blurRadius: screenWidth * 0.015,
-                              offset: Offset(0, screenHeight * 0.002),
-                            ),
+                            if (tamano == 'Familiar')
+                              Text(
+                                'Para compartir',
+                                style: TextStyle(
+                                  fontSize: 0, // TAMAÑO FIJO
+                                  color: Colors.grey[500],
+                                ),
+                              ),
                           ],
                         ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                            onTap: onAgregarAlCarrito,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.04, 
-                                vertical: screenHeight * 0.012,
+                        
+                        // 🛒 BOTÓN - TAMAÑO FIJO
+                        Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          height: 34, // ALTURA FIJA
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color.fromARGB(255, 40, 133, 41), 
+                                Color.fromRGBO(19, 182, 22, 1)
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: colorPrimario.withOpacity(0.3),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.add, 
-                                    size: screenWidth * 0.04, 
-                                    color: Colors.white,
-                                  ),
-                                  SizedBox(width: screenWidth * 0.01),
-                                  Text(
-                                    'AGREGAR',
-                                    style: TextStyle(
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(18),
+                              onTap: onAgregarAlCarrito,
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8, 
+                                  vertical: 8,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.add, 
+                                      size: 16, // TAMAÑO FIJO
                                       color: Colors.white,
-                                      fontSize: screenWidth * 0.028,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.5,
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'AGREGAR',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11, // TAMAÑO FIJO
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

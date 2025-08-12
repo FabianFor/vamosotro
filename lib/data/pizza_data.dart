@@ -51,19 +51,19 @@ class PizzaData {
   static final List<Mostrito> mostritos = [
     Mostrito(
       nombre: 'Mostrito Ala',
-      descripcion: 'Broaster Ala + Chaufa + Papas Fritas + Gaseosa',
+      descripcion: 'Broaster ala + chaufa + papas fritas + gaseosa 355ml',
       precio: 11.0,
       imagen: 'assets/images/mostritos/mostrito_ala.png',
     ),
     Mostrito(
       nombre: 'Mostrito Pecho',
-      descripcion: 'Broaster Pecho + Chaufa + Papas Fritas + Gaseosa',
+      descripcion: 'Broaster pecho + chaufa + papas fritas + gaseosa 355ml',
       precio: 14.0,
       imagen: 'assets/images/mostritos/mostrito_pecho.png',
     ),
     Mostrito(
       nombre: 'Mostrito Pierna',
-      descripcion: 'Broaster Pierna + Chaufa + Papas Fritas + Gaseosa',
+      descripcion: 'Broaster pierna + chaufa + papas fritas + gaseosa 355ml',
       precio: 12.0,
       imagen: 'assets/images/mostritos/mostrito_pierna.png',
     ),
@@ -73,42 +73,42 @@ class PizzaData {
   static final List<PizzaEspecial> pizzasEspeciales = [
     PizzaEspecial(
       nombre: 'Americana y Pepperoni',
-      descripcion: 'Mitad americana + Mitad pepperoni + gaseosa 750ml',
+      descripcion: 'Mitad americana + mitad pepperoni + gaseosa 750ml',
       precio: 35.0,
       imagen: 'assets/images/pizzas/americana_pepperoni.png',
       tipo: '2 Sabores',
     ),
     PizzaEspecial(
       nombre: 'Hawaiana y Pepperoni',
-      descripcion: 'Mitad hawaiana + Mitad pepperoni + gaseosa 750ml',
+      descripcion: 'Mitad hawaiana + mitad pepperoni + gaseosa 750ml',
       precio: 35.0,
       imagen: 'assets/images/pizzas/hawaiana_pepperoni.png',
       tipo: '2 Sabores',
     ),
     PizzaEspecial(
       nombre: 'Americana y Tocino',
-      descripcion: 'Mitad americana + Mitad tocino + gaseosa 750ml',
+      descripcion: 'Mitad americana + mitad tocino + gaseosa 750ml',
       precio: 36.0,
       imagen: 'assets/images/pizzas/americana_tocino.png',
       tipo: '2 Sabores',
     ),
     PizzaEspecial(
       nombre: 'Hawaiana y Tocino',
-      descripcion: 'Mitad hawaiana + Mitad tocino + gaseosa 750ml',
+      descripcion: 'Mitad hawaiana + mitad tocino + gaseosa 750ml',
       precio: 36.0,
       imagen: 'assets/images/pizzas/hawaiana_tocino.png',
       tipo: '2 Sabores',
     ),
     PizzaEspecial(
       nombre: 'Pepperoni y Tocino',
-      descripcion: 'Mitad pepperoni + Mitad tocino + gaseosa 750ml',
+      descripcion: 'Mitad pepperoni + mitad tocino + gaseosa 750ml',
       precio: 37.0,
       imagen: 'assets/images/pizzas/pepperoni_tocino.png',
       tipo: '2 Sabores',
     ),
     PizzaEspecial(
       nombre: 'Dúo 4 Sabores',
-      descripcion: 'Pizza 1: Mitad hawaiana + Mitad americana. Pizza 2: Mitad pepperoni + Mitad tocino',
+      descripcion: '2 pizzas familiares una mitad hawaiana + americana y otra mitad pepperoni + tocino.',
       precio: 55.0,
       imagen: 'assets/images/pizzas/duo_4_sabores.png',
       tipo: '4 Sabores',
@@ -143,7 +143,7 @@ class PizzaData {
     ),
     Combo(
       nombre: 'Combo 5',
-      descripcion: '8 piezas de pollo + papas fritas + cremas + gaseosa 750ml',
+      descripcion: '8 piezas de pollo + papas fritas + cremas + 2 gaseosa 750ml',
       precio: 48.0,
       imagen: 'assets/images/combos/combo_5.png',
     ),
@@ -153,31 +153,31 @@ class PizzaData {
   static final List<Combo> combosPizza = [
     Combo(
       nombre: 'Combo Clásico',
-      descripcion: 'Mitad Americana + Mitad Hawaiana + Pepsi + 3 pan al ajo',
+      descripcion: 'Mitad Americana + mitad Hawaiana + pepsi 750ml + 3 porciones de pan al ajo',
       precio: 32.0,
       imagen: 'assets/images/combos/combo_clasico.png',
     ),
     Combo(
       nombre: 'Combo Compartir',
-      descripcion: '2 pizzas americanas • Familiar + Personal',
+      descripcion: '2 pizzas americanas, tamaño familiar y personal',
       precio: 34.0,
       imagen: 'assets/images/combos/combo_compartir.png',
     ),
     Combo(
       nombre: 'Combo Brother',
-      descripcion: '3 pizzas personales (Pepperoni, Hawaiana y Americana) + Pepsi',
+      descripcion: '3 pizzas personales pepperoni, hawaiana y americana + pepsi 355ml',
       precio: 32.0,
       imagen: 'assets/images/combos/combo_brother.png',
     ),
     Combo(
       nombre: 'Combo Familiar',
-      descripcion: 'Americana + Pepsi + Pan al ajo (3 Porciones)',
+      descripcion: 'Americana + pepsi 750ml + 3 porciones de pan al ajo',
       precio: 29.0,
       imagen: 'assets/images/combos/combo_familiar_pizza.png',
     ),
     Combo(
       nombre: 'Oferta Dúo',
-      descripcion: '2 pizzas familiares • Hawaiana + Americana',
+      descripcion: '2 pizzas familiares hawaiana + americana',
       precio: 50.0,
       imagen: 'assets/images/combos/oferta_duo.png',
     ),
@@ -187,25 +187,25 @@ class PizzaData {
   static final List<Combo> fusiones = [
     Combo(
       nombre: 'Fusión Junior',
-      descripcion: 'Pizza personal (sabor a elección) + Pepsi jumbo + 2 broaster + papas fritas + 2 panes al ajo',
+      descripcion: 'Pizza personal(sabor a elección)+Pepsi 750ml+2 broaster+papas fritas+2 panes al ajo',
       precio: 28.0,
       imagen: 'assets/images/combos/fusion_junior.png',
     ),
     Combo(
       nombre: 'Familiar + Broaster',
-      descripcion: 'Pizza familiar (sabor a elección) + 6 brazitos de pollo + 1 Pepsi jumbo',
+      descripcion: 'Pizza familiar (sabor a elección) + 6 brazitos de pollo + Pepsi 750ml',
       precio: 35.0,
       imagen: 'assets/images/combos/familiar_broaster.png',
     ),
     Combo(
       nombre: 'Combo Estrella',
-      descripcion: 'Pizza Familiar 2 sabores + 6 Bracitos + Porción papas + Pepsi jumbo',
+      descripcion: 'Pizza familiar 2 sabores + 6 Bracitos + Porción de papas + Pepsi 750ml',
       precio: 42.0,
       imagen: 'assets/images/combos/combo_estrella.png',
     ),
     Combo(
       nombre: 'Fusión Familiar',
-      descripcion: 'Pizza familiar (sabor a elección) + 4 piezas de pollo broaster + papas fritas + 2 Pepsi + 4 panes al ajo',
+      descripcion: 'Pizza familiar (a elección) + 4 broaster + papas + 2 Pepsi 750 ml + 4 panes de ajo.',
       precio: 50.0,
       imagen: 'assets/images/combos/fusion_familiar.png',
     ),
@@ -228,26 +228,6 @@ class PizzaData {
       precio: 4.0,
       icono: '🥤',
     ),
-    Adicional(
-      nombre: 'Doble Carne',
-      precio: 8.0,
-      icono: '🥩',
-    ),
-    Adicional(
-      nombre: 'Champiñones',
-      precio: 5.0,
-      icono: '🍄',
-    ),
-    Adicional(
-      nombre: 'Aceitunas',
-      precio: 4.0,
-      icono: '🫒',
-    ),
-    Adicional(
-      nombre: 'Pepperoni Extra',
-      precio: 6.0,
-      icono: '🌶️',
-    ),
   ];
 
   // 🔥 ADICIONALES DISPONIBLES PARA PIZZAS PERSONALES (18cm - 4 tajadas)
@@ -264,28 +244,8 @@ class PizzaData {
     ),
     Adicional(
       nombre: 'Gaseosa Personal',
-      precio: 2.5,
+      precio: 2.0,
       icono: '🥤',
-    ),
-    Adicional(
-      nombre: 'Doble Carne',
-      precio: 4.0,
-      icono: '🥩',
-    ),
-    Adicional(
-      nombre: 'Champiñones',
-      precio: 3.0,
-      icono: '🍄',
-    ),
-    Adicional(
-      nombre: 'Aceitunas',
-      precio: 2.5,
-      icono: '🫒',
-    ),
-    Adicional(
-      nombre: 'Pepperoni Extra',
-      precio: 3.5,
-      icono: '🌶️',
     ),
   ];
 
@@ -305,11 +265,6 @@ class PizzaData {
       nombre: 'Gaseosa Extra',
       precio: 3.0,
       icono: '🥤',
-    ),
-    Adicional(
-      nombre: 'Doble Carne',
-      precio: 6.0,
-      icono: '🥩',
     ),
   ];
 

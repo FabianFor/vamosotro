@@ -54,7 +54,6 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
   }
 
   void _setupAnimaciones() {
-    // Animación de pulso para el ícono
     _pulseController = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
@@ -63,8 +62,6 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
     _pulseController.repeat(reverse: true);
-
-    // Animación de deslizamiento para las tarjetas
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -85,7 +82,6 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
   }
 
   void _simularProcesoPedido() {
-    // Simular confirmación de pago después de 3 segundos
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         setState(() {
@@ -180,7 +176,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
       case 'preparando':
       case 'listo':
       case 'en_camino':
-        return '25-35 minutos'; // 🔥 CAMBIADO: Siempre 25-35 minutos para todos los estados
+        return '25-35 minutos';
       default:
         return '';
     }
@@ -294,7 +290,6 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
 
               const SizedBox(height: 20),
 
-              // 🔥 RECORDATORIO IMPORTANTE - SOLO PARA DELIVERY
               if (widget.tipoEntrega == 'delivery') ...[
                 Container(
                   width: double.infinity,
@@ -403,31 +398,26 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                 const SizedBox(height: 20),
               ],
 
-              // Información de pago mejorada
               if (widget.metodoPago != 'efectivo')
                 _buildTarjetaPago(),
-
               if (widget.metodoPago == 'efectivo')
                 _buildTarjetaEfectivo(),
-
               const SizedBox(height: 15),
-
-              // Detalles del pedido
+              
               _buildTarjetaResumen(),
 
               const SizedBox(height: 15),
 
-              // Información de entrega
+             
               _buildTarjetaEntrega(),
 
               const SizedBox(height: 30),
 
-              // Botones de acción
+              
               _buildBotonesAccion(),
 
               const SizedBox(height: 20),
 
-              // Botón opcional de WhatsApp
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(15),
@@ -447,7 +437,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                     ),
                     const SizedBox(height: 10),
                     ElevatedButton.icon(
-                      onPressed: _contactarPorWhatsApp, // 🔥 CAMBIADO: nuevo método
+                      onPressed: _contactarPorWhatsApp, 
                     icon: FaIcon(FontAwesomeIcons.whatsapp),
                       label: const Text('Contactar por WhatsApp (Opcional)'),
                       style: ElevatedButton.styleFrom(

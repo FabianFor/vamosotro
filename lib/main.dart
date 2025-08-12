@@ -17,14 +17,23 @@ class PizzeriaApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
           ),
         ),
       ),
-      home: HomeScreen(),
+      home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        final mediaQueryData = MediaQuery.of(context);
+        return MediaQuery(
+          data: mediaQueryData.copyWith(
+            textScaler: TextScaler.linear(1.0),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }

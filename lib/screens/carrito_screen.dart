@@ -442,7 +442,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                                                     isExpanded ? 'Ocultar' : 'Extras',
                                                     style: TextStyle(
                                                       color: colorAcento,
-                                                      fontSize: 10,
+                                                      fontSize: 12,
                                                       fontWeight: FontWeight.w600,
                                                     ),
                                                   ),

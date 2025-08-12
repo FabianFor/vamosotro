@@ -11,7 +11,7 @@ class DialogUtils {
           children: [
             Icon(Icons.location_off, color: Colors.red),
             SizedBox(width: 10),
-            Text('GPS Desactivado'),
+            Text('Ubicación Desactivada'),
           ],
         ),
         content: const Column(
@@ -23,7 +23,7 @@ class DialogUtils {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
-            Text('Por favor activa el GPS en tu dispositivo para continuar.'),
+            Text('Por favor activa su ubicacion en tu dispositivo para continuar.'),
           ],
         ),
         actions: [

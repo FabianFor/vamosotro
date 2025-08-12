@@ -11,60 +11,47 @@ class PizzaEspecialCard extends StatelessWidget {
     required this.onAgregarAlCarrito,
   });
 
-  // 🎨 COLORES ACTUALIZADOS
   static const Color colorPrimario = Color.fromRGBO(19, 182, 22, 1);
   static const Color colorSecundario = Color(0xFFD4332A);
   static const Color colorEspecial = Colors.purple;
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    
-    // Dimensiones responsivas
-    final cardHeight = screenHeight * (isPortrait ? 0.18 : 0.35);
-    final imageSize = screenWidth * (isPortrait ? 0.28 : 0.2);
-    final horizontalMargin = screenWidth * 0.01;
-    final verticalMargin = screenHeight * 0.008;
-    
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: horizontalMargin, vertical: verticalMargin),
-      height: cardHeight,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(screenWidth * 0.04),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: screenWidth * 0.025,
-            offset: Offset(0, screenHeight * 0.005),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
-      ),
-      child: Row(
-        children: [
-          // 🍕 Pizza especial responsive
-          ClipRRect(
-            borderRadius: BorderRadius.circular(0),
-            child: Transform.scale(
-              scale: isPortrait ? 1.3 : 1.1,
-              child: Transform.translate(
-                offset: Offset(screenWidth * -0.04, 0),
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+        height: 140, // Altura fija igual que PizzaCard
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+          border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        ),
+        child: Row(
+          children: [
+            // Imagen tamaño fijo igual que PizzaCard, sin recortar ni zoom, con padding para que no quede pegada
+            Container(
+              width: 130,
+              height: 130,
+              padding: const EdgeInsets.all(6),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
                   pizzaEspecial.imagen,
-                  width: imageSize,
-                  height: cardHeight,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      width: imageSize,
-                      height: imageSize,
                       color: const Color(0xFFF5F5F5),
-                      child: Icon(
+                      child: const Icon(
                         Icons.star,
-                        size: screenWidth * 0.1,
+                        size: 40,
                         color: Colors.purple,
                       ),
                     );
@@ -72,141 +59,120 @@ class PizzaEspecialCard extends StatelessWidget {
                 ),
               ),
             ),
-          ),
 
-          SizedBox(width: screenWidth * 0.02),
+            const SizedBox(width: 2),
 
-          // 📄 Texto + botón - SIN BADGE
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.012),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 🔝 PARTE SUPERIOR (Título + Descripción)
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            // Contenido texto expandido
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Título máximo 2 líneas, tamaño fijo 16
+                    Text(
+                      pizzaEspecial.nombre,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.black87,
+                        height: 1.1,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    // Descripción tamaño 12, max 3 líneas para evitar que estire mucho
+                    Text(
+                      pizzaEspecial.descripcion,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                        height: 1.3,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const Spacer(),
+
+                    // Fila precio y botón con medidas y estilo similares a PizzaCard
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        // 🏷️ TÍTULO RESPONSIVE
                         Text(
-                          pizzaEspecial.nombre,
+                          'S/ ${pizzaEspecial.precio.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: screenWidth * 0.038,
-                            color: Colors.black87,
-                            height: 1.1,
+                            fontSize: 18,
+                            color: colorEspecial,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                        
-                        SizedBox(height: screenHeight * 0.005),
-                        
-                        // 📝 DESCRIPCIÓN RESPONSIVE
-                        Expanded(
-                          child: Text(
-                            pizzaEspecial.descripcion,
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: screenWidth * 0.028,
-                              height: 1.25,
+                        const Spacer(),
+                        Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          height: 34,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Colors.purple,
+                                Colors.deepPurple,
+                              ],
                             ),
-                            maxLines: isPortrait ? 4 : 3,
-                            overflow: TextOverflow.ellipsis,
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.deepPurple.withOpacity(0.3),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(18),
+                              onTap: onAgregarAlCarrito,
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.add,
+                                      size: 16,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(width: 6),
+                                    Flexible(
+                                      child: Text(
+                                        'AGREGAR',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-
-                  // 🔽 PARTE INFERIOR (Precio + Botón)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // 💰 PRECIO RESPONSIVE
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'S/ ${pizzaEspecial.precio.toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: screenWidth * 0.043,
-                                color: Colors.purple,
-                              ),
-                            ),
-                            Text(
-                              'Especial',
-                              style: TextStyle(
-                                fontSize: screenWidth * 0.02,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      
-                      // 🛒 BOTÓN AGREGAR RESPONSIVE
-                      Container(
-                        margin: EdgeInsets.only(right: screenWidth * 0.015),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Colors.purple, Colors.deepPurple],
-                          ),
-                          borderRadius: BorderRadius.circular(screenWidth * 0.025),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.purple.withOpacity(0.3),
-                              blurRadius: screenWidth * 0.015,
-                              offset: Offset(0, screenHeight * 0.002),
-                            ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(screenWidth * 0.025),
-                            onTap: onAgregarAlCarrito,
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.03, 
-                                vertical: screenHeight * 0.01,
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.add, 
-                                    size: screenWidth * 0.035, 
-                                    color: Colors.white,
-                                  ),
-                                  SizedBox(width: screenWidth * 0.008),
-                                  Text(
-                                    'AGREGAR',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: screenWidth * 0.025,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
