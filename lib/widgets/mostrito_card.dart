@@ -1,7 +1,5 @@
-// lib/widgets/mostrito_card.dart
 import 'package:flutter/material.dart';
 import '../models/models.dart';
-import '../utils/responsive_helper.dart';
 
 class MostritoCard extends StatelessWidget {
   final Mostrito mostrito;
@@ -14,43 +12,46 @@ class MostritoCard extends StatelessWidget {
   });
 
   // 🎨 COLORES
-  static const Color colorPrimario = Color(0xFFD4332A); // Rojo
-  static const Color colorSecundario = Color(0xFF2C5F2D); // Verde
-  static const Color colorMostrito = Colors.orange; // Color especial para mostritos
+  static const Color colorPrimario = Color(0xFFD4332A);
+  static const Color colorSecundario = Color(0xFF2C5F2D);
+  static const Color colorMostrito = Colors.orange;
 
   @override
   Widget build(BuildContext context) {
-    ResponsiveHelper().init(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    
+    // Dimensiones responsivas
+    final cardHeight = screenHeight * (isPortrait ? 0.18 : 0.35);
+    final imageWidth = screenWidth * (isPortrait ? 0.35 : 0.23);
+    final horizontalMargin = screenWidth * 0.04;
+    final verticalMargin = screenHeight * 0.012;
     
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: ResponsiveHelper.getHorizontalPadding(),
-        vertical: ResponsiveHelper.getProportionateScreenHeight(10),
-      ),
-      height: ResponsiveHelper.getCardHeight(),
+      margin: EdgeInsets.symmetric(horizontal: horizontalMargin, vertical: verticalMargin),
+      height: cardHeight,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(screenWidth * 0.04),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: screenWidth * 0.025,
+            offset: Offset(0, screenHeight * 0.005),
           ),
         ],
         border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
       child: Row(
         children: [
-          // 🍗 IMAGEN DEL MOSTRITO RESPONSIVA
+          // 🍗 IMAGEN DEL MOSTRITO RESPONSIVE
           Container(
-            width: ResponsiveHelper.isSmallScreen() 
-                ? ResponsiveHelper.getProportionateScreenWidth(120)
-                : ResponsiveHelper.getProportionateScreenWidth(130),
-            height: ResponsiveHelper.getCardHeight(),
-            padding: EdgeInsets.all(ResponsiveHelper.getProportionateScreenWidth(4)),
+            width: imageWidth,
+            height: cardHeight,
+            padding: EdgeInsets.all(screenWidth * 0.01),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(screenWidth * 0.03),
               child: Image.asset(
                 mostrito.imagen,
                 fit: BoxFit.cover,
@@ -59,7 +60,7 @@ class MostritoCard extends StatelessWidget {
                     color: Colors.grey[200],
                     child: Icon(
                       Icons.fastfood,
-                      size: ResponsiveHelper.getProportionateScreenWidth(50),
+                      size: screenWidth * 0.12,
                       color: Colors.orange,
                     ),
                   );
@@ -68,54 +69,27 @@ class MostritoCard extends StatelessWidget {
             ),
           ),
 
-          SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(8)),
+          SizedBox(width: screenWidth * 0.02),
 
-          // 📄 Texto + botón - RESPONSIVO
+          // 📄 Texto + botón - SIN BADGE
           Expanded(
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: ResponsiveHelper.getProportionateScreenHeight(10),
-              ),
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.012),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🔝 PARTE SUPERIOR - RESPONSIVA
+                  // 🔝 PARTE SUPERIOR (Título + Descripción)
                   Expanded(
                     flex: 3,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 🏷️ BADGE DE MOSTRITO - RESPONSIVO
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: ResponsiveHelper.getProportionateScreenWidth(6),
-                            vertical: ResponsiveHelper.getProportionateScreenHeight(1),
-                          ),
-                          decoration: BoxDecoration(
-                            color: colorMostrito.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: colorMostrito.withOpacity(0.3),
-                            ),
-                          ),
-                          child: Text(
-                            'Mostrito',
-                            style: TextStyle(
-                              fontSize: ResponsiveHelper.getFontSize(9),
-                              color: colorMostrito,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        
-                        SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(4)),
-                        
-                        // 🏷️ TÍTULO - RESPONSIVO
+                        // 🏷️ TÍTULO RESPONSIVE
                         Text(
                           mostrito.nombre,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: ResponsiveHelper.getFontSize(15),
+                            fontSize: screenWidth * 0.038,
                             color: Colors.black87,
                             height: 1.1,
                           ),
@@ -123,18 +97,18 @@ class MostritoCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         
-                        SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(2)),
+                        SizedBox(height: screenHeight * 0.005),
                         
-                        // 📝 DESCRIPCIÓN - RESPONSIVA
+                        // 📝 DESCRIPCIÓN RESPONSIVE
                         Expanded(
                           child: Text(
                             mostrito.descripcion.replaceAll(' + ', ' • '),
                             style: TextStyle(
                               color: Colors.grey[600],
-                              fontSize: ResponsiveHelper.getFontSize(10.5),
+                              fontSize: screenWidth * 0.028,
                               height: 1.25,
                             ),
-                            maxLines: 3,
+                            maxLines: isPortrait ? 4 : 3,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -142,11 +116,11 @@ class MostritoCard extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔽 PARTE INFERIOR - RESPONSIVA
+                  // 🔽 PARTE INFERIOR (Precio + Botón)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // 💰 PRECIO - RESPONSIVO
+                      // 💰 PRECIO RESPONSIVE
                       Expanded(
                         flex: 2,
                         child: Column(
@@ -156,14 +130,14 @@ class MostritoCard extends StatelessWidget {
                               'S/ ${mostrito.precio.toStringAsFixed(2)}',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: ResponsiveHelper.getFontSize(17),
+                                fontSize: screenWidth * 0.043,
                                 color: Colors.orange,
                               ),
                             ),
                             Text(
                               'Con bebida',
                               style: TextStyle(
-                                fontSize: ResponsiveHelper.getFontSize(8),
+                                fontSize: screenWidth * 0.02,
                                 color: Colors.grey[500],
                               ),
                             ),
@@ -171,48 +145,46 @@ class MostritoCard extends StatelessWidget {
                         ),
                       ),
                       
-                      // 🛒 BOTÓN AGREGAR - RESPONSIVO
+                      // 🛒 BOTÓN AGREGAR RESPONSIVE
                       Container(
-                        margin: EdgeInsets.only(
-                          right: ResponsiveHelper.getProportionateScreenWidth(6),
-                        ),
+                        margin: EdgeInsets.only(right: screenWidth * 0.015),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [Colors.orange, Colors.deepOrange],
                           ),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(screenWidth * 0.025),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.orange.withOpacity(0.3),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                              blurRadius: screenWidth * 0.015,
+                              offset: Offset(0, screenHeight * 0.002),
                             ),
                           ],
                         ),
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(screenWidth * 0.025),
                             onTap: onAgregarAlCarrito,
                             child: Padding(
                               padding: EdgeInsets.symmetric(
-                                horizontal: ResponsiveHelper.getProportionateScreenWidth(12),
-                                vertical: ResponsiveHelper.getProportionateScreenHeight(8),
+                                horizontal: screenWidth * 0.03, 
+                                vertical: screenHeight * 0.01,
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(
                                     Icons.add, 
-                                    size: ResponsiveHelper.getFontSize(14), 
+                                    size: screenWidth * 0.035, 
                                     color: Colors.white,
                                   ),
-                                  SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(3)),
+                                  SizedBox(width: screenWidth * 0.008),
                                   Text(
                                     'AGREGAR',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: ResponsiveHelper.getFontSize(10),
+                                      fontSize: screenWidth * 0.025,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
                                     ),

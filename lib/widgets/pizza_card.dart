@@ -1,7 +1,5 @@
-// lib/widgets/pizza_card.dart
 import 'package:flutter/material.dart';
 import '../models/models.dart';
-import '../utils/responsive_helper.dart';
 
 class PizzaCard extends StatelessWidget {
   final Pizza pizza;
@@ -17,55 +15,59 @@ class PizzaCard extends StatelessWidget {
     required this.onAgregarAlCarrito,
   });
 
-  // 🎨 COLORES FIJOS
+  // 🎨 COLORES ACTUALIZADOS
   static const Color colorPrimario = Color.fromRGBO(19, 182, 22, 1);
   static const Color colorSecundario = Color(0xFFD4332A);
 
   @override
   Widget build(BuildContext context) {
-    // Inicializar responsive helper
-    ResponsiveHelper().init(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    
+    // Dimensiones responsivas
+    final cardHeight = screenHeight * (isPortrait ? 0.18 : 0.35);
+    final imageSize = screenWidth * (isPortrait ? 0.28 : 0.2);
+    final horizontalMargin = screenWidth * 0.01;
+    final verticalMargin = screenHeight * 0.008;
     
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: ResponsiveHelper.getHorizontalPadding() * 0.5,
-        vertical: ResponsiveHelper.getSmallVerticalSpacing(),
-      ),
-      height: ResponsiveHelper.getCardHeight(),
+      margin: EdgeInsets.symmetric(horizontal: horizontalMargin, vertical: verticalMargin),
+      height: cardHeight,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(ResponsiveHelper.getBorderRadius()),
+        borderRadius: BorderRadius.circular(screenWidth * 0.04),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: screenWidth * 0.025,
+            offset: Offset(0, screenHeight * 0.005),
           ),
         ],
         border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
       child: Row(
         children: [
-          // 🖼️ IMAGEN DE LA PIZZA - DIMENSIONES FIJAS
+          // 📸 Pizza responsive
           ClipRRect(
             borderRadius: BorderRadius.circular(0),
             child: Transform.scale(
-              scale: ResponsiveHelper.getImageScale(),
+              scale: isPortrait ? 1.4 : 1.2,
               child: Transform.translate(
-                offset: ResponsiveHelper.getImageOffset(),
+                offset: Offset(screenWidth * -0.05, 0),
                 child: Image.asset(
                   pizza.imagen,
-                  width: ResponsiveHelper.getImageWidth(),
-                  height: ResponsiveHelper.getCardHeight(),
+                  width: imageSize,
+                  height: cardHeight,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      width: ResponsiveHelper.getImageWidth(),
-                      height: ResponsiveHelper.getImageWidth(),
+                      width: imageSize,
+                      height: imageSize,
                       color: const Color(0xFFF5F5F5),
                       child: Icon(
                         Icons.local_pizza,
-                        size: ResponsiveHelper.getIconSize('large'),
+                        size: screenWidth * 0.1,
                         color: colorSecundario,
                       ),
                     );
@@ -75,151 +77,114 @@ class PizzaCard extends StatelessWidget {
             ),
           ),
 
-          SizedBox(width: ResponsiveHelper.getSmallHorizontalSpacing()),
+          SizedBox(width: screenWidth * 0.02),
 
-          // 📝 CONTENIDO DE TEXTO - ESPACIADO FIJO
+          // 📄 Texto + botón - SIN BADGE
           Expanded(
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: ResponsiveHelper.getMediumVerticalSpacing(),
-              ),
+              padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🏷️ BADGE DE TAMAÑO - DIMENSIONES FIJAS
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: ResponsiveHelper.getSmallHorizontalSpacing(),
-                      vertical: 2.0, // Fijo
-                    ),
-                    decoration: BoxDecoration(
-                      color: tamano == 'Familiar' 
-                          ? const Color.fromARGB(192, 36, 145, 38).withOpacity(0.1)
-                          : colorSecundario.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(ResponsiveHelper.getBorderRadius() - 2),
-                      border: Border.all(
-                        color: tamano == 'Familiar' 
-                            ? const Color.fromARGB(255, 32, 131, 33).withOpacity(0.3)
-                            : colorSecundario.withOpacity(0.3),
-                      ),
-                    ),
-                    child: Text(
-                      tamano,
-                      style: TextStyle(
-                        fontSize: ResponsiveHelper.getFontSize(10),
-                        color: tamano == 'Familiar' 
-                            ? const Color.fromARGB(255, 51, 148, 52) 
-                            : colorSecundario,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  
-                  SizedBox(height: ResponsiveHelper.getSmallVerticalSpacing()),
-                  
-                  // 🏷️ TÍTULO - TAMAÑO FIJO
+                  // Título
                   Text(
                     pizza.nombre,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: ResponsiveHelper.getFontSize(16),
+                      fontSize: screenWidth * 0.04,
                       color: Colors.black87,
-                      height: 1.1, // Line height fijo
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   
-                  SizedBox(height: ResponsiveHelper.getSmallVerticalSpacing()),
+                  SizedBox(height: screenHeight * 0.005),
                   
-                  // 📝 INGREDIENTES - TAMAÑO FIJO
+                  // Ingredientes
                   Expanded(
                     child: Text(
                       pizza.ingredientes,
                       style: TextStyle(
                         color: Colors.grey[600],
-                        fontSize: ResponsiveHelper.getFontSize(12),
-                        height: 1.2, // Line height fijo
+                        fontSize: screenWidth * 0.03,
+                        height: 1.2,
                       ),
-                      maxLines: 2,
+                      maxLines: isPortrait ? 3 : 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
 
-                  SizedBox(height: ResponsiveHelper.getSmallVerticalSpacing()),
+                  SizedBox(height: screenHeight * 0.01),
 
-                  // 💰 PRECIO Y BOTÓN - DIMENSIONES FIJAS
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // 💰 PRECIO
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                      // 💰 PRECIO RESPONSIVE
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'S/ ${precio.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: screenWidth * 0.045,
+                              color: colorSecundario,
+                            ),
+                          ),
+                          if (tamano == 'Familiar')
                             Text(
-                              'S/ ${precio.toStringAsFixed(2)}',
+                              'Para compartir',
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: ResponsiveHelper.getFontSize(18),
-                                color: colorSecundario,
+                                fontSize: screenWidth * 0.022,
+                                color: Colors.grey[500],
                               ),
                             ),
-                            if (tamano == 'Familiar')
-                              Text(
-                                'Para compartir',
-                                style: TextStyle(
-                                  fontSize: ResponsiveHelper.getFontSize(9),
-                                  color: Colors.grey[500],
-                                ),
-                              ),
-                          ],
-                        ),
+                        ],
                       ),
                       
-                      // 🛒 BOTÓN AGREGAR - DIMENSIONES FIJAS
+                      // 🛒 BOTÓN RESPONSIVE
                       Container(
-                        margin: EdgeInsets.only(
-                          right: ResponsiveHelper.getSmallHorizontalSpacing(),
-                        ),
+                        margin: EdgeInsets.only(right: screenWidth * 0.02),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
                               const Color.fromARGB(255, 40, 133, 41), 
-                              colorPrimario.withOpacity(0.8)
+                              const Color.fromRGBO(19, 182, 22, 1).withOpacity(0.8)
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(ResponsiveHelper.getBorderRadius()),
+                          borderRadius: BorderRadius.circular(screenWidth * 0.03),
                           boxShadow: [
                             BoxShadow(
                               color: colorPrimario.withOpacity(0.3),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                              blurRadius: screenWidth * 0.015,
+                              offset: Offset(0, screenHeight * 0.002),
                             ),
                           ],
                         ),
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(ResponsiveHelper.getBorderRadius()),
+                            borderRadius: BorderRadius.circular(screenWidth * 0.03),
                             onTap: onAgregarAlCarrito,
                             child: Padding(
-                              padding: ResponsiveHelper.getButtonPadding(),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.04, 
+                                vertical: screenHeight * 0.012,
+                              ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(
                                     Icons.add, 
-                                    size: ResponsiveHelper.getIconSize('medium'), 
+                                    size: screenWidth * 0.04, 
                                     color: Colors.white,
                                   ),
-                                  SizedBox(width: ResponsiveHelper.getSmallHorizontalSpacing()),
+                                  SizedBox(width: screenWidth * 0.01),
                                   Text(
                                     'AGREGAR',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: ResponsiveHelper.getFontSize(11),
+                                      fontSize: screenWidth * 0.028,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
                                     ),
