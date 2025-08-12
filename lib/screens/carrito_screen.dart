@@ -138,12 +138,18 @@ class _CarritoScreenState extends State<CarritoScreen> {
                               padding: const EdgeInsets.all(16),
                               child: Row(
                                 children: [
-                                  // 🔥 IMAGEN CIRCULAR DEL PRODUCTO CON COLORES MEJORADOS
+                                  // 🔥 IMAGEN ADAPTATIVA SEGÚN EL TIPO DE PRODUCTO
                                   Container(
                                     width: 60,
                                     height: 60,
                                     decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
+                                      // Solo circular para pizzas, rectangular para el resto
+                                      shape: (item.tamano == 'Familiar' || item.tamano == 'Personal') 
+                                          ? BoxShape.circle 
+                                          : BoxShape.rectangle,
+                                      borderRadius: (item.tamano == 'Familiar' || item.tamano == 'Personal') 
+                                          ? null 
+                                          : BorderRadius.circular(12), // Bordes redondeados para combos
                                       gradient: LinearGradient(
                                         colors: [
                                           colorSecundario.withOpacity(0.1),
@@ -155,30 +161,57 @@ class _CarritoScreenState extends State<CarritoScreen> {
                                         width: 2,
                                       ),
                                     ),
-                                    child: ClipOval(
-                                      child: Image.asset(
-                                        item.imagen,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Container(
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFF5F5F5),
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: colorPrimario,
-                                                width: 2,
-                                              ),
+                                    child: (item.tamano == 'Familiar' || item.tamano == 'Personal') 
+                                        ? ClipOval( // Solo clip circular para pizzas
+                                            child: Image.asset(
+                                              item.imagen,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Container(
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFFF5F5F5),
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                      color: colorPrimario,
+                                                      width: 2,
+                                                    ),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.local_pizza,
+                                                    size: 30,
+                                                    color: colorPrimario,
+                                                  ),
+                                                );
+                                              },
                                             ),
-                                            child: Icon(
-                                              item.tamano.contains('Combo') ? Icons.restaurant_menu : 
-                                              item.tamano == 'Mostrito' ? Icons.fastfood : Icons.local_pizza,
-                                              size: 30,
-                                              color: colorPrimario,
+                                          )
+                                        : ClipRRect( // Clip rectangular para todo lo demás
+                                            borderRadius: BorderRadius.circular(12),
+                                            child: Image.asset(
+                                              item.imagen,
+                                              fit: BoxFit.contain, // contain para mostrar imagen completa
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Container(
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFFF5F5F5),
+                                                    borderRadius: BorderRadius.circular(12),
+                                                    border: Border.all(
+                                                      color: colorPrimario,
+                                                      width: 2,
+                                                    ),
+                                                  ),
+                                                  child: Icon(
+                                                    item.tamano.contains('Combo') ? Icons.restaurant_menu : 
+                                                    item.tamano == 'Mostrito' ? Icons.fastfood : 
+                                                    item.tamano == 'Fusión' ? Icons.auto_awesome :
+                                                    Icons.local_pizza,
+                                                    size: 30,
+                                                    color: colorPrimario,
+                                                  ),
+                                                );
+                                              },
                                             ),
-                                          );
-                                        },
-                                      ),
-                                    ),
+                                          ),
                                   ),
 
                                   const SizedBox(width: 16),
