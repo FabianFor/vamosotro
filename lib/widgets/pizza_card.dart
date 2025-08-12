@@ -1,5 +1,7 @@
+// lib/widgets/pizza_card.dart
 import 'package:flutter/material.dart';
 import '../models/models.dart';
+import '../utils/responsive_helper.dart';
 
 class PizzaCard extends StatelessWidget {
   final Pizza pizza;
@@ -22,8 +24,18 @@ class PizzaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Inicializar responsive helper
+    ResponsiveHelper().init(context);
+    
+    // 🔧 DEBUG: Descomenta para ver info de responsive
+    // ResponsiveHelper.printDebugInfo();
+    
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6), // Reducir margen para pegar más las imágenes
+      margin: EdgeInsets.symmetric(
+        horizontal: ResponsiveHelper.getHorizontalPadding() * 0.25,
+        vertical: ResponsiveHelper.getProportionateScreenHeight(0.7), // 0.7% de altura
+      ),
+      height: ResponsiveHelper.getCardHeight(),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -38,26 +50,26 @@ class PizzaCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 📸 Pizza sin borde blanco y pegada más cerca
+          // 📸 Pizza - SISTEMA PORCENTUAL MEJORADO
           ClipRRect(
-            borderRadius: BorderRadius.circular(0), // Eliminar el borde
+            borderRadius: BorderRadius.circular(0),
             child: Transform.scale(
-              scale: 1.4,
+              scale: ResponsiveHelper.getImageScale(),
               child: Transform.translate(
-                offset: const Offset(-20, 0), // Mover un poco a la izquierda
+                offset: ResponsiveHelper.getImageOffset(),
                 child: Image.asset(
                   pizza.imagen,
-                  width: 110,  // Tamaño ajustado para que sobresalga más
-                  height: 140, // Tamaño ajustado para que sobresalga más
-                  fit: BoxFit.contain, // Cambiado a BoxFit.contain
+                  width: ResponsiveHelper.getImageWidth(),
+                  height: ResponsiveHelper.getCardHeight(),
+                  fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      width: 110,
-                      height: 110,
+                      width: ResponsiveHelper.getImageWidth(),
+                      height: ResponsiveHelper.getImageWidth(),
                       color: const Color(0xFFF5F5F5),
                       child: Icon(
                         Icons.local_pizza,
-                        size: 40,
+                        size: ResponsiveHelper.getProportionateScreenWidth(10), // 10% del ancho
                         color: colorSecundario,
                       ),
                     );
@@ -67,18 +79,23 @@ class PizzaCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 8), // Reducir el espacio entre las imágenes
+          SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(2)), // 2% del ancho
 
-          // 📄 Texto + botón (MEJORADO CON NUEVOS COLORES)
+          // 📄 Texto + botón - PORCENTUAL
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(
+                vertical: ResponsiveHelper.getProportionateScreenHeight(1.5), // 1.5% de altura
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🏷️ BADGE DE TAMAÑO
+                  // 🏷️ BADGE DE TAMAÑO - PORCENTUAL
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ResponsiveHelper.getProportionateScreenWidth(2), // 2% del ancho
+                      vertical: ResponsiveHelper.getProportionateScreenHeight(0.25), // 0.25% de altura
+                    ),
                     decoration: BoxDecoration(
                       color: tamano == 'Familiar' 
                           ? const Color.fromARGB(192, 36, 145, 38).withOpacity(0.1)
@@ -93,43 +110,45 @@ class PizzaCard extends StatelessWidget {
                     child: Text(
                       tamano,
                       style: TextStyle(
-                        fontSize: 10,
-                        color: tamano == 'Familiar' ? const Color.fromARGB(255, 51, 148, 52) : colorSecundario,
+                        fontSize: ResponsiveHelper.getFontSize(10),
+                        color: tamano == 'Familiar' 
+                            ? const Color.fromARGB(255, 51, 148, 52) 
+                            : colorSecundario,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                   
-                  const SizedBox(height: 6),
+                  SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(0.7)), // 0.7% de altura
                   
                   Text(
                     pizza.nombre,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: ResponsiveHelper.getFontSize(16),
                       color: Colors.black87,
                     ),
                   ),
                   
-                  const SizedBox(height: 3),
+                  SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(0.4)), // 0.4% de altura
                   
                   Text(
                     pizza.ingredientes,
                     style: TextStyle(
                       color: Colors.grey[600],
-                      fontSize: 12,
+                      fontSize: ResponsiveHelper.getFontSize(12),
                       height: 1.2,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
 
-                  const SizedBox(height: 10),
+                  SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(1.2)), // 1.2% de altura
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // 💰 PRECIO CON MEJOR DISEÑO
+                      // 💰 PRECIO - PORCENTUAL
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -137,7 +156,7 @@ class PizzaCard extends StatelessWidget {
                             'S/ ${precio.toStringAsFixed(2)}',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: ResponsiveHelper.getFontSize(18),
                               color: colorSecundario,
                             ),
                           ),
@@ -145,19 +164,24 @@ class PizzaCard extends StatelessWidget {
                             Text(
                               'Para compartir',
                               style: TextStyle(
-                                fontSize: 9,
+                                fontSize: ResponsiveHelper.getFontSize(9),
                                 color: Colors.grey[500],
                               ),
                             ),
                         ],
                       ),
                       
-                      // 🛒 BOTÓN AGREGAR MEJORADO
+                      // 🛒 BOTÓN AGREGAR - PORCENTUAL
                       Container(
-                        margin: const EdgeInsets.only(right: 8),
+                        margin: EdgeInsets.only(
+                          right: ResponsiveHelper.getProportionateScreenWidth(2), // 2% del ancho
+                        ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [const Color.fromARGB(255, 40, 133, 41), const Color.fromRGBO(19, 182, 22, 1).withOpacity(0.8)],
+                            colors: [
+                              const Color.fromARGB(255, 40, 133, 41), 
+                              const Color.fromRGBO(19, 182, 22, 1).withOpacity(0.8)
+                            ],
                           ),
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
@@ -173,18 +197,25 @@ class PizzaCard extends StatelessWidget {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(12),
                             onTap: onAgregarAlCarrito,
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: ResponsiveHelper.getProportionateScreenWidth(4), // 4% del ancho
+                                vertical: ResponsiveHelper.getProportionateScreenHeight(1.2), // 1.2% de altura
+                              ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.add, size: 16, color: Colors.white),
-                                  SizedBox(width: 4),
+                                  Icon(
+                                    Icons.add, 
+                                    size: ResponsiveHelper.getFontSize(16), 
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(1)), // 1% del ancho
                                   Text(
                                     'AGREGAR',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 11,
+                                      fontSize: ResponsiveHelper.getFontSize(11),
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
                                     ),

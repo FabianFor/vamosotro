@@ -1,5 +1,7 @@
+// lib/widgets/pizza_especial_card.dart
 import 'package:flutter/material.dart';
 import '../models/models.dart';
+import '../utils/responsive_helper.dart';
 
 class PizzaEspecialCard extends StatelessWidget {
   final PizzaEspecial pizzaEspecial;
@@ -18,9 +20,14 @@ class PizzaEspecialCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ResponsiveHelper().init(context);
+    
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-      height: 150, // 🔧 ALTURA AUMENTADA PARA MÁS ESPACIO DE TEXTO
+      margin: EdgeInsets.symmetric(
+        horizontal: ResponsiveHelper.getHorizontalPadding() * 0.25,
+        vertical: ResponsiveHelper.getProportionateScreenHeight(6),
+      ),
+      height: ResponsiveHelper.getCardHeight(),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -35,26 +42,30 @@ class PizzaEspecialCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 🍕 Pizza especial - IGUAL QUE PIZZA_CARD PERO CON TAMAÑO OPTIMIZADO
+          // 🍕 Pizza especial - RESPONSIVA COMO PIZZA_CARD
           ClipRRect(
             borderRadius: BorderRadius.circular(0),
             child: Transform.scale(
-              scale: 1.3, // 🔧 LIGERAMENTE MÁS PEQUEÑA PARA DAR ESPACIO AL TEXTO
+              scale: ResponsiveHelper.isSmallScreen() 
+                  ? ResponsiveHelper.getImageScale() * 0.9
+                  : ResponsiveHelper.getImageScale(),
               child: Transform.translate(
-                offset: const Offset(-15, 0), // 🔧 MENOS DESPLAZAMIENTO
+                offset: ResponsiveHelper.isSmallScreen() 
+                    ? const Offset(-12, 0) 
+                    : ResponsiveHelper.getImageOffset(),
                 child: Image.asset(
                   pizzaEspecial.imagen,
-                  width: 110,
-                  height: 150, // 🔧 AJUSTADO A LA NUEVA ALTURA
+                  width: ResponsiveHelper.getImageWidth(),
+                  height: ResponsiveHelper.getCardHeight(),
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      width: 110,
-                      height: 120,
+                      width: ResponsiveHelper.getImageWidth(),
+                      height: ResponsiveHelper.getImageWidth(),
                       color: const Color(0xFFF5F5F5),
-                      child: const Icon(
+                      child: Icon(
                         Icons.star,
-                        size: 40,
+                        size: ResponsiveHelper.getProportionateScreenWidth(40),
                         color: Colors.purple,
                       ),
                     );
@@ -64,24 +75,29 @@ class PizzaEspecialCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 8),
+          SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(8)),
 
-          // 📄 Texto + botón - OPTIMIZADO PARA TEXTO COMPLETO
+          // 📄 Texto + botón - RESPONSIVO
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10), // 🔧 PADDING OPTIMIZADO
+              padding: EdgeInsets.symmetric(
+                vertical: ResponsiveHelper.getProportionateScreenHeight(10),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🔝 PARTE SUPERIOR (Badge + Título + Descripción) - MÁS ESPACIO
+                  // 🔝 PARTE SUPERIOR - RESPONSIVA
                   Expanded(
-                    flex: 3, // 🔧 MÁS ESPACIO PARA EL CONTENIDO
+                    flex: 3,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 🏷️ BADGE DE TIPO - MÁS COMPACTO
+                        // 🏷️ BADGE DE TIPO - RESPONSIVO
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: ResponsiveHelper.getProportionateScreenWidth(6),
+                            vertical: ResponsiveHelper.getProportionateScreenHeight(1),
+                          ),
                           decoration: BoxDecoration(
                             color: colorEspecial.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10),
@@ -92,40 +108,40 @@ class PizzaEspecialCard extends StatelessWidget {
                           child: Text(
                             pizzaEspecial.tipo,
                             style: TextStyle(
-                              fontSize: 9, // 🔧 MÁS PEQUEÑO
+                              fontSize: ResponsiveHelper.getFontSize(9),
                               color: colorEspecial,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                         
-                        const SizedBox(height: 4), // 🔧 MENOS ESPACIO
+                        SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(4)),
                         
-                        // 🏷️ TÍTULO - MÁS COMPACTO
+                        // 🏷️ TÍTULO - RESPONSIVO
                         Text(
                           pizzaEspecial.nombre,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 15, // 🔧 LIGERAMENTE MÁS PEQUEÑO
+                            fontSize: ResponsiveHelper.getFontSize(15),
                             color: Colors.black87,
-                            height: 1.1, // 🔧 ALTURA DE LÍNEA MÁS COMPACTA
+                            height: 1.1,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         
-                        const SizedBox(height: 2), // 🔧 MENOS ESPACIO
+                        SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(2)),
                         
-                        // 📝 DESCRIPCIÓN - MÁS LÍNEAS Y MEJOR AJUSTE
+                        // 📝 DESCRIPCIÓN - RESPONSIVA
                         Expanded(
                           child: Text(
                             pizzaEspecial.descripcion,
                             style: TextStyle(
                               color: Colors.grey[600],
-                              fontSize: 10.5, // 🔧 TAMAÑO OPTIMIZADO
-                              height: 1.25, // 🔧 ALTURA DE LÍNEA COMPACTA
+                              fontSize: ResponsiveHelper.getFontSize(10.5),
+                              height: 1.25,
                             ),
-                            maxLines: 3, // 🔧 HASTA 3 LÍNEAS
+                            maxLines: 3,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -133,11 +149,11 @@ class PizzaEspecialCard extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔽 PARTE INFERIOR (Precio + Botón) - MÁS COMPACTO
+                  // 🔽 PARTE INFERIOR - RESPONSIVA
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // 💰 PRECIO - MÁS COMPACTO
+                      // 💰 PRECIO - RESPONSIVO
                       Expanded(
                         flex: 2,
                         child: Column(
@@ -145,16 +161,16 @@ class PizzaEspecialCard extends StatelessWidget {
                           children: [
                             Text(
                               'S/ ${pizzaEspecial.precio.toStringAsFixed(2)}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 17, // 🔧 LIGERAMENTE MÁS PEQUEÑO
+                                fontSize: ResponsiveHelper.getFontSize(17),
                                 color: Colors.purple,
                               ),
                             ),
                             Text(
                               'Especial',
                               style: TextStyle(
-                                fontSize: 8, // 🔧 MÁS PEQUEÑO
+                                fontSize: ResponsiveHelper.getFontSize(8),
                                 color: Colors.grey[500],
                               ),
                             ),
@@ -162,9 +178,11 @@ class PizzaEspecialCard extends StatelessWidget {
                         ),
                       ),
                       
-                      // 🛒 BOTÓN AGREGAR - MÁS COMPACTO
+                      // 🛒 BOTÓN AGREGAR - RESPONSIVO
                       Container(
-                        margin: const EdgeInsets.only(right: 6),
+                        margin: EdgeInsets.only(
+                          right: ResponsiveHelper.getProportionateScreenWidth(6),
+                        ),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [Colors.purple, Colors.deepPurple],
@@ -183,18 +201,25 @@ class PizzaEspecialCard extends StatelessWidget {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(10),
                             onTap: onAgregarAlCarrito,
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // 🔧 MÁS COMPACTO
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: ResponsiveHelper.getProportionateScreenWidth(12),
+                                vertical: ResponsiveHelper.getProportionateScreenHeight(8),
+                              ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.add, size: 14, color: Colors.white), // 🔧 ÍCONO MÁS PEQUEÑO
-                                  SizedBox(width: 3),
+                                  Icon(
+                                    Icons.add, 
+                                    size: ResponsiveHelper.getFontSize(14), 
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(3)),
                                   Text(
                                     'AGREGAR',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 10, // 🔧 TEXTO MÁS PEQUEÑO
+                                      fontSize: ResponsiveHelper.getFontSize(10),
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
                                     ),

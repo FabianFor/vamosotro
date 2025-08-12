@@ -1,3 +1,4 @@
+// lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../data/pizza_data.dart';
@@ -5,6 +6,7 @@ import '../widgets/pizza_card.dart';
 import '../widgets/combo_card.dart';
 import '../widgets/mostrito_card.dart';
 import '../widgets/pizza_especial_card.dart';
+import '../utils/responsive_helper.dart';
 import 'carrito_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -69,13 +71,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 🔧 INICIALIZAR RESPONSIVE HELPER
+    ResponsiveHelper().init(context);
+    
     return Scaffold(
       backgroundColor: colorFondo,
       body: CustomScrollView(
         slivers: [
-          // 🎨 SLIVER APP BAR
+          // 🎨 SLIVER APP BAR RESPONSIVO
           SliverAppBar(
-            expandedHeight: 120,
+            expandedHeight: ResponsiveHelper.getProportionateScreenHeight(120),
             floating: false,
             pinned: true,
             backgroundColor: colorPrimario,
@@ -94,17 +99,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ResponsiveHelper.getHorizontalPadding(),
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 10),
+                        SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(10)),
                         Row(
                           children: [
-                            // 🍕 LOGO DE IMAGEN
+                            // 🍕 LOGO DE IMAGEN RESPONSIVO
                             Container(
-                              width: 50,
-                              height: 50,
+                              width: ResponsiveHelper.getProportionateScreenWidth(50),
+                              height: ResponsiveHelper.getProportionateScreenWidth(50),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
@@ -124,14 +131,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                     return Icon(
                                       Icons.local_pizza,
                                       color: colorSecundario,
-                                      size: 28,
+                                      size: ResponsiveHelper.getFontSize(28),
                                     );
                                   },
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            const Expanded(
+                            SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(12)),
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -140,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
-                                      fontSize: 20,
+                                      fontSize: ResponsiveHelper.getFontSize(20),
                                       letterSpacing: 1,
                                     ),
                                   ),
@@ -148,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     'Deliciosas pizzas artesanales',
                                     style: TextStyle(
                                       color: Colors.white70,
-                                      fontSize: 12,
+                                      fontSize: ResponsiveHelper.getFontSize(12),
                                     ),
                                   ),
                                 ],
@@ -163,9 +170,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             actions: [
-              // 🛒 CARRITO DE COMPRAS
+              // 🛒 CARRITO DE COMPRAS RESPONSIVO
               Container(
-                margin: const EdgeInsets.only(right: 15, top: 8, bottom: 8),
+                margin: EdgeInsets.only(
+                  right: ResponsiveHelper.getProportionateScreenWidth(15),
+                  top: ResponsiveHelper.getProportionateScreenHeight(8),
+                  bottom: ResponsiveHelper.getProportionateScreenHeight(8),
+                ),
                 child: Stack(
                   children: [
                     Container(
@@ -174,7 +185,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.shopping_cart, color: Colors.white),
+                        icon: Icon(
+                          Icons.shopping_cart, 
+                          color: Colors.white,
+                          size: ResponsiveHelper.getFontSize(24),
+                        ),
                         onPressed: () => _mostrarCarrito(context),
                       ),
                     ),
@@ -183,7 +198,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         right: 4,
                         top: 4,
                         child: Container(
-                          padding: const EdgeInsets.all(4),
+                          padding: EdgeInsets.all(
+                            ResponsiveHelper.getProportionateScreenWidth(4),
+                          ),
                           decoration: BoxDecoration(
                             color: colorSecundario,
                             borderRadius: BorderRadius.circular(10),
@@ -195,15 +212,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ],
                           ),
-                          constraints: const BoxConstraints(
-                            minWidth: 18,
-                            minHeight: 18,
+                          constraints: BoxConstraints(
+                            minWidth: ResponsiveHelper.getProportionateScreenWidth(18),
+                            minHeight: ResponsiveHelper.getProportionateScreenWidth(18),
                           ),
                           child: Text(
                             '${carrito.fold(0, (sum, item) => sum + item.cantidad)}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 10,
+                              fontSize: ResponsiveHelper.getFontSize(10),
                               fontWeight: FontWeight.bold,
                             ),
                             textAlign: TextAlign.center,
@@ -216,16 +233,20 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
 
-          // 🏷️ CATEGORÍAS HORIZONTALES MEJORADAS
+          // 🏷️ CATEGORÍAS HORIZONTALES RESPONSIVAS
           SliverToBoxAdapter(
             child: Container(
               color: colorTarjeta,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: EdgeInsets.symmetric(
+                vertical: ResponsiveHelper.getProportionateScreenHeight(16),
+              ),
               child: SizedBox(
-                height: 85, // Aumentado para mejor visual
+                height: ResponsiveHelper.getProportionateScreenHeight(85),
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: ResponsiveHelper.getHorizontalPadding(),
+                  ),
                   itemCount: categorias.length,
                   itemBuilder: (context, index) {
                     final categoria = categorias[index];
@@ -234,9 +255,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     return GestureDetector(
                       onTap: () => setState(() => categoriaSeleccionada = categoria['nombre']),
                       child: Container(
-                        margin: const EdgeInsets.only(right: 12), // Reducido para mejor spacing
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Ajustado
-                        width: 95, // Ancho fijo para evitar problemas de texto cortado
+                        margin: EdgeInsets.only(
+                          right: ResponsiveHelper.getProportionateScreenWidth(12),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: ResponsiveHelper.getProportionateScreenWidth(12),
+                          vertical: ResponsiveHelper.getProportionateScreenHeight(8),
+                        ),
+                        width: ResponsiveHelper.isSmallScreen() 
+                            ? ResponsiveHelper.getProportionateScreenWidth(85)
+                            : ResponsiveHelper.getProportionateScreenWidth(95),
                         decoration: BoxDecoration(
                           gradient: isSelected ? LinearGradient(
                             colors: [colorPrimario, colorPrimario.withOpacity(0.8)],
@@ -259,19 +287,19 @@ class _HomeScreenState extends State<HomeScreen> {
                             Icon(
                               categoria['icono'],
                               color: isSelected ? Colors.white : colorPrimario,
-                              size: 24,
+                              size: ResponsiveHelper.getFontSize(24),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(4)),
                             Text(
                               categoria['nombre'],
                               style: TextStyle(
                                 color: isSelected ? Colors.white : colorPrimario,
                                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                fontSize: 10,
+                                fontSize: ResponsiveHelper.getFontSize(10),
                                 height: 1.1,
                               ),
                               textAlign: TextAlign.center,
-                              maxLines: 2, // Permitir 2 líneas
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
@@ -334,7 +362,9 @@ Widget _buildContenidoPorCategoria() {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: ResponsiveHelper.getHorizontalPadding(),
+          ),
           itemCount: PizzaData.pizzasFamiliaresOrdenadas.length,
           itemBuilder: (context, index) {
             final pizza = PizzaData.pizzasFamiliaresOrdenadas[index];
@@ -370,7 +400,9 @@ Widget _buildContenidoPorCategoria() {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: ResponsiveHelper.getHorizontalPadding(),
+          ),
           itemCount: PizzaData.pizzasPersonalesOrdenadas.length,
           itemBuilder: (context, index) {
             final pizza = PizzaData.pizzasPersonalesOrdenadas[index];
@@ -405,7 +437,9 @@ Widget _buildContenidoPorCategoria() {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: ResponsiveHelper.getHorizontalPadding(),
+          ),
           itemCount: PizzaData.mostritosOrdenados.length,
           itemBuilder: (context, index) {
             final mostrito = PizzaData.mostritosOrdenados[index];
@@ -439,7 +473,9 @@ Widget _buildContenidoPorCategoria() {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: ResponsiveHelper.getHorizontalPadding(),
+          ),
           itemCount: PizzaData.pizzasEspecialesOrdenadas.length,
           itemBuilder: (context, index) {
             final pizzaEspecial = PizzaData.pizzasEspecialesOrdenadas[index];
@@ -472,7 +508,9 @@ Widget _buildContenidoPorCategoria() {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: ResponsiveHelper.getHorizontalPadding(),
+          ),
           itemCount: PizzaData.combosBroasterOrdenados.length,
           itemBuilder: (context, index) {
             final combo = PizzaData.combosBroasterOrdenados[index];
@@ -506,7 +544,9 @@ Widget _buildContenidoPorCategoria() {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: ResponsiveHelper.getHorizontalPadding(),
+          ),
           itemCount: PizzaData.fusionesOrdenadas.length,
           itemBuilder: (context, index) {
             final fusion = PizzaData.fusionesOrdenadas[index];
@@ -524,7 +564,7 @@ Widget _buildContenidoPorCategoria() {
       ],
     );
   }
-  // 🍕 NUEVA SECCIÓN COMBO PIZZA
+  // 🍕 NUEVA SECCIÓN COMBO PIZZA RESPONSIVA
   Widget _buildCombosPizza() {
     return Column(
       children: [
@@ -540,7 +580,9 @@ Widget _buildContenidoPorCategoria() {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: ResponsiveHelper.getHorizontalPadding(),
+          ),
           itemCount: PizzaData.combosPizzaOrdenados.length,
           itemBuilder: (context, index) {
             final comboPizza = PizzaData.combosPizzaOrdenados[index];
@@ -559,11 +601,16 @@ Widget _buildContenidoPorCategoria() {
     );
   }
 
-  // 🎨 MÉTODO PARA CREAR HEADER DE SECCIÓN CON ETIQUETAS MEJORADAS
+  // 🎨 MÉTODO PARA CREAR HEADER DE SECCIÓN RESPONSIVO
   Widget _buildSectionHeader(String titulo, String subtitulo, IconData icono, Color color, int cantidad, {List<String>? etiquetasExtra}) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(20, 20, 20, 15),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.fromLTRB(
+        ResponsiveHelper.getHorizontalPadding(),
+        ResponsiveHelper.getProportionateScreenHeight(20),
+        ResponsiveHelper.getHorizontalPadding(),
+        ResponsiveHelper.getProportionateScreenHeight(15),
+      ),
+      padding: EdgeInsets.all(ResponsiveHelper.getProportionateScreenWidth(16)),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [color.withOpacity(0.1), Colors.transparent],
@@ -574,14 +621,18 @@ Widget _buildContenidoPorCategoria() {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(ResponsiveHelper.getProportionateScreenWidth(8)),
             decoration: BoxDecoration(
               color: color,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icono, color: Colors.white, size: 20),
+            child: Icon(
+              icono, 
+              color: Colors.white, 
+              size: ResponsiveHelper.getFontSize(20),
+            ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(12)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -591,8 +642,8 @@ Widget _buildContenidoPorCategoria() {
                     Flexible(
                       child: Text(
                         titulo,
-                        style: const TextStyle(
-                          fontSize: 18,
+                        style: TextStyle(
+                          fontSize: ResponsiveHelper.getFontSize(18),
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
@@ -600,15 +651,18 @@ Widget _buildContenidoPorCategoria() {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    // ETIQUETAS EXTRAS MEJORADAS
+                    // ETIQUETAS EXTRAS RESPONSIVAS
                     if (etiquetasExtra != null) ...[
-                      const SizedBox(width: 8),
+                      SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(8)),
                       Flexible(
                         child: Wrap(
-                          spacing: 4,
+                          spacing: ResponsiveHelper.getProportionateScreenWidth(4),
                           children: etiquetasExtra.map((etiqueta) {
                             return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: ResponsiveHelper.getProportionateScreenWidth(6),
+                                vertical: ResponsiveHelper.getProportionateScreenHeight(2),
+                              ),
                               decoration: BoxDecoration(
                                 color: color.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(8),
@@ -617,7 +671,7 @@ Widget _buildContenidoPorCategoria() {
                               child: Text(
                                 etiqueta,
                                 style: TextStyle(
-                                  fontSize: 9,
+                                  fontSize: ResponsiveHelper.getFontSize(9),
                                   color: color,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -629,11 +683,11 @@ Widget _buildContenidoPorCategoria() {
                     ],
                   ],
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(2)),
                 Text(
                   subtitulo,
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: TextStyle(
+                    fontSize: ResponsiveHelper.getFontSize(12),
                     color: Colors.grey,
                   ),
                   maxLines: 1,
@@ -642,9 +696,12 @@ Widget _buildContenidoPorCategoria() {
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(8)),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: EdgeInsets.symmetric(
+              horizontal: ResponsiveHelper.getProportionateScreenWidth(8),
+              vertical: ResponsiveHelper.getProportionateScreenHeight(4),
+            ),
             decoration: BoxDecoration(
               color: colorAcento.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
@@ -652,7 +709,7 @@ Widget _buildContenidoPorCategoria() {
             child: Text(
               '$cantidad opciones',
               style: TextStyle(
-                fontSize: 10,
+                fontSize: ResponsiveHelper.getFontSize(10),
                 color: colorAcento.withOpacity(0.8),
                 fontWeight: FontWeight.w600,
               ),
@@ -665,7 +722,9 @@ Widget _buildContenidoPorCategoria() {
 
   Widget _buildFooter() {
     return Container(
-      margin: const EdgeInsets.only(top: 30),
+      margin: EdgeInsets.only(
+        top: ResponsiveHelper.getProportionateScreenHeight(30),
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -677,12 +736,12 @@ Widget _buildContenidoPorCategoria() {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(ResponsiveHelper.getProportionateScreenWidth(24)),
         child: Column(
           children: [
-            // 📱 INFORMACIÓN DE CONTACTO
+            // 📱 INFORMACIÓN DE CONTACTO RESPONSIVA
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(ResponsiveHelper.getProportionateScreenWidth(20)),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
@@ -690,46 +749,57 @@ Widget _buildContenidoPorCategoria() {
               ),
               child: Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.phone, color: Colors.white, size: 20),
-                      SizedBox(width: 12),
+                      Icon(
+                        Icons.phone, 
+                        color: Colors.white, 
+                        size: ResponsiveHelper.getFontSize(20),
+                      ),
+                      SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(12)),
                       Expanded(
                         child: Text(
                           '933 214 908 | 01 6723 711',
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: ResponsiveHelper.getFontSize(16),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  const Row(
+                  SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(12)),
+                  Row(
                     children: [
-                      Icon(Icons.location_on, color: Colors.white, size: 20),
-                      SizedBox(width: 12),
+                      Icon(
+                        Icons.location_on, 
+                        color: Colors.white, 
+                        size: ResponsiveHelper.getFontSize(20),
+                      ),
+                      SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(12)),
                       Expanded(
                         child: Text(
                           'Paradero la posta subiendo una cuadra',
                           style: TextStyle(
                             color: Colors.white70,
-                            fontSize: 14,
+                            fontSize: ResponsiveHelper.getFontSize(14),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(16)),
                   
-                  // 💳 MÉTODOS DE PAGO
+                  // 💳 MÉTODOS DE PAGO RESPONSIVOS
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: ResponsiveHelper.getProportionateScreenWidth(16),
+                          vertical: ResponsiveHelper.getProportionateScreenHeight(8),
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.purple,
                           borderRadius: BorderRadius.circular(20),
@@ -741,18 +811,21 @@ Widget _buildContenidoPorCategoria() {
                             ),
                           ],
                         ),
-                        child: const Text(
+                        child: Text(
                           'Yape',
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            fontSize: ResponsiveHelper.getFontSize(12),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(16)),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: ResponsiveHelper.getProportionateScreenWidth(16),
+                          vertical: ResponsiveHelper.getProportionateScreenHeight(8),
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.teal,
                           borderRadius: BorderRadius.circular(20),
@@ -764,12 +837,12 @@ Widget _buildContenidoPorCategoria() {
                             ),
                           ],
                         ),
-                        child: const Text(
+                        child: Text(
                           'Plin',
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            fontSize: ResponsiveHelper.getFontSize(12),
                           ),
                         ),
                       ),
@@ -779,14 +852,14 @@ Widget _buildContenidoPorCategoria() {
               ),
             ),
             
-            const SizedBox(height: 16),
+            SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(16)),
             
             // 🍕 MARCA
             Text(
               '© 2024 Pizza Fabichelo',
               style: TextStyle(
                 color: Colors.white.withOpacity(0.7),
-                fontSize: 12,
+                fontSize: ResponsiveHelper.getFontSize(12),
               ),
             ),
           ],

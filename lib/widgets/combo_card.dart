@@ -1,5 +1,7 @@
+// lib/widgets/combo_card.dart
 import 'package:flutter/material.dart';
 import '../models/models.dart';
+import '../utils/responsive_helper.dart';
 
 class ComboCard extends StatelessWidget {
   final Combo combo;
@@ -18,9 +20,14 @@ class ComboCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ResponsiveHelper().init(context);
+    
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-      height: 150, // 🔧 ALTURA AUMENTADA PARA MÁS ESPACIO DE TEXTO
+      margin: EdgeInsets.symmetric(
+        horizontal: ResponsiveHelper.getHorizontalPadding() * 0.25,
+        vertical: ResponsiveHelper.getProportionateScreenHeight(6),
+      ),
+      height: ResponsiveHelper.getCardHeight(),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -35,20 +42,22 @@ class ComboCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 🍗 IMAGEN DEL COMBO - SIN MARCO PARA EVITAR CORTE
+          // 🍗 IMAGEN DEL COMBO - RESPONSIVA
           Container(
-            width: 150,
-            height: 150,
-            padding: const EdgeInsets.all(8),
+            width: ResponsiveHelper.isSmallScreen() 
+                ? ResponsiveHelper.getProportionateScreenWidth(130)
+                : ResponsiveHelper.getProportionateScreenWidth(150),
+            height: ResponsiveHelper.getCardHeight(),
+            padding: EdgeInsets.all(ResponsiveHelper.getProportionateScreenWidth(8)),
             child: Image.asset(
               combo.imagen,
-              fit: BoxFit.contain, // 🔧 CONTAIN PARA VER IMAGEN COMPLETA
+              fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
                   color: Colors.grey[200],
-                  child: const Icon(
+                  child: Icon(
                     Icons.restaurant_menu,
-                    size: 50,
+                    size: ResponsiveHelper.getProportionateScreenWidth(50),
                     color: Colors.brown,
                   ),
                 );
@@ -56,24 +65,29 @@ class ComboCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 2), // 🔧 SEPARACIÓN NORMAL
+          SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(2)),
 
-          // 📄 Texto + botón - OPTIMIZADO PARA TEXTO COMPLETO
+          // 📄 Texto + botón - RESPONSIVO
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14), // 🔧 PADDING OPTIMIZADO
+              padding: EdgeInsets.symmetric(
+                vertical: ResponsiveHelper.getProportionateScreenHeight(14),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🔝 PARTE SUPERIOR (Badge + Título + Descripción) - MÁS ESPACIO
+                  // 🔝 PARTE SUPERIOR - RESPONSIVA
                   Expanded(
-                    flex: 3, // 🔧 MÁS ESPACIO PARA EL CONTENIDO
+                    flex: 3,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 🏷️ BADGE DE COMBO - MÁS COMPACTO
+                        // 🏷️ BADGE DE COMBO - RESPONSIVO
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: ResponsiveHelper.getProportionateScreenWidth(6),
+                            vertical: ResponsiveHelper.getProportionateScreenHeight(1),
+                          ),
                           decoration: BoxDecoration(
                             color: colorCombo.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10),
@@ -84,40 +98,40 @@ class ComboCard extends StatelessWidget {
                           child: Text(
                             'Combo',
                             style: TextStyle(
-                              fontSize: 9, // 🔧 MÁS PEQUEÑO
+                              fontSize: ResponsiveHelper.getFontSize(9),
                               color: colorCombo,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                         
-                        const SizedBox(height: 4), // 🔧 MENOS ESPACIO
+                        SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(4)),
                         
-                        // 🏷️ TÍTULO - MÁS COMPACTO
+                        // 🏷️ TÍTULO - RESPONSIVO
                         Text(
                           combo.nombre,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 15, // 🔧 LIGERAMENTE MÁS PEQUEÑO
+                            fontSize: ResponsiveHelper.getFontSize(15),
                             color: Colors.black87,
-                            height: 1.1, // 🔧 ALTURA DE LÍNEA MÁS COMPACTA
+                            height: 1.1,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         
-                        const SizedBox(height: 2), // 🔧 MENOS ESPACIO
+                        SizedBox(height: ResponsiveHelper.getProportionateScreenHeight(2)),
                         
-                        // 📝 DESCRIPCIÓN - MÁS LÍNEAS Y MEJOR AJUSTE
+                        // 📝 DESCRIPCIÓN - RESPONSIVA
                         Expanded(
                           child: Text(
                             combo.descripcion.replaceAll(' + ', ' • '),
                             style: TextStyle(
                               color: Colors.grey[600],
-                              fontSize: 10.5, // 🔧 TAMAÑO OPTIMIZADO
-                              height: 1.25, // 🔧 ALTURA DE LÍNEA COMPACTA
+                              fontSize: ResponsiveHelper.getFontSize(10.5),
+                              height: 1.25,
                             ),
-                            maxLines: 3, // 🔧 HASTA 3 LÍNEAS
+                            maxLines: 3,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -125,11 +139,11 @@ class ComboCard extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔽 PARTE INFERIOR (Precio + Botón) - MÁS COMPACTO
+                  // 🔽 PARTE INFERIOR - RESPONSIVA
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // 💰 PRECIO - MÁS COMPACTO
+                      // 💰 PRECIO - RESPONSIVO
                       Expanded(
                         flex: 2,
                         child: Column(
@@ -137,16 +151,16 @@ class ComboCard extends StatelessWidget {
                           children: [
                             Text(
                               'S/ ${combo.precio.toStringAsFixed(2)}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 17, // 🔧 LIGERAMENTE MÁS PEQUEÑO
+                                fontSize: ResponsiveHelper.getFontSize(17),
                                 color: Colors.brown,
                               ),
                             ),
                             Text(
                               'Completo',
                               style: TextStyle(
-                                fontSize: 8, // 🔧 MÁS PEQUEÑO
+                                fontSize: ResponsiveHelper.getFontSize(8),
                                 color: Colors.grey[500],
                               ),
                             ),
@@ -154,9 +168,11 @@ class ComboCard extends StatelessWidget {
                         ),
                       ),
                       
-                      // 🛒 BOTÓN AGREGAR - MÁS COMPACTO
+                      // 🛒 BOTÓN AGREGAR - RESPONSIVO
                       Container(
-                        margin: const EdgeInsets.only(right: 10),
+                        margin: EdgeInsets.only(
+                          right: ResponsiveHelper.getProportionateScreenWidth(10),
+                        ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [Colors.brown, Colors.brown.withOpacity(0.8)],
@@ -175,18 +191,25 @@ class ComboCard extends StatelessWidget {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(12),
                             onTap: onAgregarAlCarrito,
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10), // 🔧 MÁS COMPACTO
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: ResponsiveHelper.getProportionateScreenWidth(16),
+                                vertical: ResponsiveHelper.getProportionateScreenHeight(10),
+                              ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.add, size: 16, color: Colors.white), // 🔧 ÍCONO MÁS PEQUEÑO
-                                  SizedBox(width: 4),
+                                  Icon(
+                                    Icons.add, 
+                                    size: ResponsiveHelper.getFontSize(16), 
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(width: ResponsiveHelper.getProportionateScreenWidth(4)),
                                   Text(
                                     'AGREGAR',
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 11, // 🔧 TEXTO MÁS PEQUEÑO
+                                      fontSize: ResponsiveHelper.getFontSize(11),
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
                                     ),
