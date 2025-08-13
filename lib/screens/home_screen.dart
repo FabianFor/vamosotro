@@ -27,8 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   static const List<Map<String, dynamic>> categorias = [
-    {'nombre': 'Pizza Familiar', 'icono': Icons.local_pizza},
-    {'nombre': 'Pizza Personal', 'icono': Icons.local_pizza_outlined},
+    {'nombre': 'Pizza Familiar (30cm)', 'icono': Icons.local_pizza},
+    {'nombre': 'Pizza Personal (18cm)', 'icono': Icons.local_pizza_outlined},
     {'nombre': 'Combo Pizza', 'icono': Icons.local_pizza},
     {'nombre': 'Pizza 2 sabores', 'icono': Icons.star},
     {'nombre': 'Fusión', 'icono': Icons.auto_awesome},
@@ -323,9 +323,9 @@ class _HomeScreenState extends State<HomeScreen> {
   // 🚀 DEVOLVER SLIVERS EN VEZ DE WIDGET ÚNICO
   List<Widget> _buildContenidoPorCategoria() {
     switch (categoriaSeleccionada) {
-      case 'Pizza Familiar':
+      case 'Pizza Familiar (30cm)':
         return _buildPizzasFamiliares();
-      case 'Pizza Personal':
+      case 'Pizza Personal (18cm)':
         return _buildPizzasPersonales();
       case 'Combo Pizza':
         return _buildCombosPizza();

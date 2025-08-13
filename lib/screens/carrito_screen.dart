@@ -464,9 +464,9 @@ class _CarritoScreenState extends State<CarritoScreen> {
                     ),
                     const SizedBox(width: 2),
                     Text(
-                      isExpanded ? 'Ocultar' : 'Extras',
+                      isExpanded ? 'Ocultar' : 'Adicionales',
                       style: TextStyle(
-                        color: colorAcento,
+                        color: const Color.fromARGB(255, 255, 136, 0),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),

@@ -214,7 +214,7 @@ class PizzaData {
   // 🔥 ADICIONALES DISPONIBLES PARA PIZZAS FAMILIARES (30cm - 8 tajadas)
   static final List<Adicional> adicionalesFamiliar = [
     Adicional(
-      nombre: 'Queso extra',
+      nombre: 'Queso adicional',
       precio: 8.0,
       icono: '🧀',
     ),
