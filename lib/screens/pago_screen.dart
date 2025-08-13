@@ -4,6 +4,7 @@ import '../models/models.dart';
 import '../services/services.dart';
 import '../widgets/dialogs.dart';
 import 'confirmacion_screen.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class PagoScreen extends StatefulWidget {
   final List<ItemPedido> carrito;
@@ -71,185 +72,512 @@ class _PagoScreenState extends State<PagoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Finalizar Pedido', style: TextStyle(color: Colors.white)),
+        title: const Text('Finalizar Pedido', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.red,
         iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔥 RESUMEN DEL PEDIDO ACTUALIZADO CON ADICIONALES
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(15),
+            // 🔥 RESUMEN DEL PEDIDO MEJORADO
+            _buildResumenPedido(),
+
+            const SizedBox(height: 24),
+
+            // 🔥 DATOS DEL CLIENTE MEJORADO
+            _buildDatosCliente(),
+
+            const SizedBox(height: 24),
+
+            // 🔥 TIPO DE ENTREGA MEJORADO
+            _buildTipoEntrega(),
+
+            const SizedBox(height: 24),
+
+            // 🔥 MÉTODO DE PAGO REORDENADO (YAPE, PLIN, EFECTIVO)
+            _buildMetodoPago(),
+
+            const SizedBox(height: 32),
+
+            // 🔥 BOTÓN CONFIRMAR MEJORADO
+            _buildBotonConfirmar(),
+
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResumenPedido() {
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.grey[50]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.receipt_long, color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Resumen del Pedido', 
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.blue[100]!),
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Resumen del Pedido', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
                     ...widget.carrito.map((item) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3),
+                      padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
                                 child: Text(
-                                  '${item.cantidad}x ${item.nombre} (${item.tamano})',
-                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                  '${item.cantidad}x',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ),
-                              Text('S/ ${(item.precioTotal * item.cantidad).toStringAsFixed(2)}'),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${item.nombre} (${item.tamano})',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    if (item.adicionales.isNotEmpty) ...[
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '+ ${item.adicionales.map((a) => '${a.icono} ${a.nombre}').join(', ')}',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.green[700],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                'S/ ${(item.precioTotal * item.cantidad).toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
+                                  fontSize: 14,
+                                ),
+                              ),
                             ],
                           ),
-                          // 🔥 MOSTRAR ADICIONALES SI LOS TIENE
-                          if (item.adicionales.isNotEmpty) ...[
-                            const SizedBox(height: 2),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 16),
-                              child: Text(
-                                '+ ${item.adicionales.map((a) => '${a.icono} ${a.nombre}').join(', ')}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.green[700],
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ),
-                          ],
                         ],
                       ),
                     )),
-                    const Divider(),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      height: 2,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.red[300]!, Colors.red[600]!],
+                        ),
+                        borderRadius: BorderRadius.circular(1),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Total:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        Text('S/ ${widget.total.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.red)),
+                        const Text(
+                          'TOTAL:', 
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold, 
+                            fontSize: 18,
+                            color: Colors.black87,
+                          )
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.red.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            'S/ ${widget.total.toStringAsFixed(2)}', 
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold, 
+                              fontSize: 18, 
+                              color: Colors.white,
+                            )
+                          ),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDatosCliente() {
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.person, color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Datos del Cliente', 
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)
+                ),
+              ],
             ),
-
-            const SizedBox(height: 20),
-
-            // Datos del cliente
-            const Text('Datos del Cliente', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             TextField(
               controller: nombreController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Nombre completo',
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.person_outline, color: Colors.green),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.green, width: 2),
+                ),
+                filled: true,
+                fillColor: Colors.green[50],
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             TextField(
               controller: telefonoController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Teléfono',
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.phone_outlined, color: Colors.green),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.green, width: 2),
+                ),
+                filled: true,
+                fillColor: Colors.green[50],
               ),
               keyboardType: TextInputType.phone,
             ),
+          ],
+        ),
+      ),
+    );
+  }
 
-            const SizedBox(height: 20),
-
-            // Tipo de entrega
-            const Text('Tipo de Entrega', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            RadioListTile(
-              title: const Text('Delivery'),
-              value: 'delivery',
-              groupValue: tipoEntrega,
-              onChanged: (value) {
-                setState(() {
-                  tipoEntrega = value!;
-                  ubicacionActual = null;
-                });
-              },
+  Widget _buildTipoEntrega() {
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.delivery_dining, color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Tipo de Entrega', 
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)
+                ),
+              ],
             ),
-            RadioListTile(
-              title: const Text('Recojo en tienda'),
-              value: 'recojo',
-              groupValue: tipoEntrega,
-              onChanged: (value) {
-                setState(() {
-                  tipoEntrega = value!;
-                  ubicacionActual = null;
-                });
-              },
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() {
+                      tipoEntrega = 'delivery';
+                      ubicacionActual = null;
+                    }),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: tipoEntrega == 'delivery' ? Colors.orange : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: tipoEntrega == 'delivery' ? Colors.orange : Colors.grey[300]!,
+                          width: 2,
+                        ),
+                        boxShadow: tipoEntrega == 'delivery' ? [
+                          BoxShadow(
+                            color: Colors.orange.withOpacity(0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ] : null,
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.delivery_dining,
+                            color: tipoEntrega == 'delivery' ? Colors.white : Colors.grey[600],
+                            size: 32,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Delivery',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: tipoEntrega == 'delivery' ? Colors.white : Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() {
+                      tipoEntrega = 'recojo';
+                      ubicacionActual = null;
+                    }),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: tipoEntrega == 'recojo' ? Colors.orange : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: tipoEntrega == 'recojo' ? Colors.orange : Colors.grey[300]!,
+                          width: 2,
+                        ),
+                        boxShadow: tipoEntrega == 'recojo' ? [
+                          BoxShadow(
+                            color: Colors.orange.withOpacity(0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ] : null,
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.store,
+                            color: tipoEntrega == 'recojo' ? Colors.white : Colors.grey[600],
+                            size: 32,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Recojo',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: tipoEntrega == 'recojo' ? Colors.white : Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
 
             // Ubicación para delivery
             if (tipoEntrega == 'delivery') ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               Container(
-                padding: const EdgeInsets.all(15),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.orange),
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.orange[50],
+                  gradient: LinearGradient(
+                    colors: [Colors.blue[50]!, Colors.blue[100]!],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue[200]!),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Row(
                       children: [
-                        Icon(Icons.info, color: Colors.orange),
+                        Icon(Icons.location_on, color: Colors.blue, size: 24),
                         SizedBox(width: 10),
-                        Text('Ubicación para Delivery', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          'Ubicación para Delivery', 
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.blue,
+                          )
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                     if (ubicacionActual == null) ...[
-                      const Text('Necesitamos tu ubicación exacta para el delivery'),
-                      const SizedBox(height: 10),
+                      const Text(
+                        'Necesitamos tu ubicación exacta para el delivery',
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                      const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           onPressed: cargandoUbicacion ? null : _obtenerUbicacion,
                           icon: cargandoUbicacion 
-                              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                              : const Icon(Icons.location_on),
-                          label: Text(cargandoUbicacion ? 'Obteniendo ubicación...' : 'Obtener mi ubicación'),
+                              ? const SizedBox(
+                                  width: 16, 
+                                  height: 16, 
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
+                                )
+                              : const Icon(Icons.location_on, color: Colors.white),
+                          label: Text(
+                            cargandoUbicacion ? 'Obteniendo ubicación...' : 'Obtener mi ubicación',
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                         ),
                       ),
                     ] else ...[
-                      const Row(
-                        children: [
-                          Icon(Icons.check_circle, color: Colors.green),
-                          SizedBox(width: 10),
-                          Text('Ubicación obtenida ✅', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        'Lat: ${ubicacionActual!.latitude.toStringAsFixed(6)}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      ),
-                      Text(
-                        'Lng: ${ubicacionActual!.longitude.toStringAsFixed(6)}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton.icon(
-                        onPressed: () => UbicacionService.abrirEnMaps(ubicacionActual!.latitude, ubicacionActual!.longitude),
-                        icon: const Icon(Icons.map),
-                        label: const Text('Ver en Maps'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.green[100],
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.green[300]!),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(Icons.check_circle, color: Colors.green, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Ubicación obtenida ✅', 
+                                  style: TextStyle(
+                                    color: Colors.green, 
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  )
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Lat: ${ubicacionActual!.latitude.toStringAsFixed(6)}',
+                              style: const TextStyle(fontSize: 12, color: Colors.green),
+                            ),
+                            Text(
+                              'Lng: ${ubicacionActual!.longitude.toStringAsFixed(6)}',
+                              style: const TextStyle(fontSize: 12, color: Colors.green),
+                            ),
+                            const SizedBox(height: 12),
+                            ElevatedButton.icon(
+                              onPressed: () => UbicacionService.abrirEnMaps(
+                                ubicacionActual!.latitude, 
+                                ubicacionActual!.longitude
+                              ),
+                              icon: const Icon(Icons.map, color: Colors.white),
+                              label: const Text(
+                                'Ver en Maps',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -257,105 +585,316 @@ class _PagoScreenState extends State<PagoScreen> {
                 ),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
 
-            const SizedBox(height: 20),
+  Widget _buildMetodoPago() {
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.purple,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.payment, color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Método de Pago', 
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
 
-            // Método de pago
-            const Text('Método de Pago', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            RadioListTile(
-              title: const Text('Efectivo'),
-              value: 'efectivo',
-              groupValue: metodoPago,
-              onChanged: (value) {
-                setState(() {
-                  metodoPago = value!;
-                });
-              },
-            ),
-            RadioListTile(
-              title: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.purple,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text('Yape', style: TextStyle(color: Colors.white, fontSize: 12)),
+            // YAPE - PRIMERO
+            GestureDetector(
+              onTap: () => setState(() {
+                metodoPago = 'yape';
+                vuelto = null;
+              }),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: metodoPago == 'yape' ? Colors.purple : Colors.purple[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: metodoPago == 'yape' ? Colors.purple : Colors.purple[200]!,
+                    width: 2,
                   ),
-                  const SizedBox(width: 10),
-                  const Text('Yape'),
-                ],
-              ),
-              value: 'yape',
-              groupValue: metodoPago,
-              onChanged: (value) {
-                setState(() {
-                  metodoPago = value!;
-                  vuelto = null;
-                });
-              },
-            ),
-            RadioListTile(
-              title: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.teal,
-                      borderRadius: BorderRadius.circular(4),
+                  boxShadow: metodoPago == 'yape' ? [
+                    BoxShadow(
+                      color: Colors.purple.withOpacity(0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
                     ),
-                    child: const Text('Plin', style: TextStyle(color: Colors.white, fontSize: 12)),
-                  ),
-                  const SizedBox(width: 10),
-                  const Text('Plin'),
-                ],
+                  ] : null,
+                ),
+                child: Row(
+                  children: [
+                    // Logo real de Yape
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.purple.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Image.asset(
+                          'assets/images/logos/yape_logo.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            // Fallback si no encuentra la imagen
+                            return Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.purple,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Y',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      'Yape',
+                      style: TextStyle(
+                        color: metodoPago == 'yape' ? Colors.white : Colors.purple,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const Spacer(),
+                    if (metodoPago == 'yape')
+                      const Icon(Icons.check_circle, color: Colors.white),
+                  ],
+                ),
               ),
-              value: 'plin',
-              groupValue: metodoPago,
-              onChanged: (value) {
-                setState(() {
-                  metodoPago = value!;
-                  vuelto = null;
-                });
-              },
+            ),
+
+            // PLIN - SEGUNDO
+            GestureDetector(
+              onTap: () => setState(() {
+                metodoPago = 'plin';
+                vuelto = null;
+              }),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: metodoPago == 'plin' ? Colors.teal : Colors.teal[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: metodoPago == 'plin' ? Colors.teal : Colors.teal[200]!,
+                    width: 2,
+                  ),
+                  boxShadow: metodoPago == 'plin' ? [
+                    BoxShadow(
+                      color: Colors.teal.withOpacity(0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ] : null,
+                ),
+                child: Row(
+                  children: [
+                    // Logo real de Plin
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.teal.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Image.asset(
+                          'assets/images/logos/plin_logo.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            // Fallback si no encuentra la imagen
+                            return Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.teal,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'P',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      'Plin',
+                      style: TextStyle(
+                        color: metodoPago == 'plin' ? Colors.white : Colors.teal,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const Spacer(),
+                    if (metodoPago == 'plin')
+                      const Icon(Icons.check_circle, color: Colors.white),
+                  ],
+                ),
+              ),
+            ),
+
+            // EFECTIVO - ÚLTIMO
+            GestureDetector(
+              onTap: () => setState(() {
+                metodoPago = 'efectivo';
+              }),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: metodoPago == 'efectivo' ? Colors.green : Colors.green[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: metodoPago == 'efectivo' ? Colors.green : Colors.green[200]!,
+                    width: 2,
+                  ),
+                  boxShadow: metodoPago == 'efectivo' ? [
+                    BoxShadow(
+                      color: Colors.green.withOpacity(0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ] : null,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: metodoPago == 'efectivo' ? Colors.white.withOpacity(0.2) : Colors.green,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.monetization_on,
+                        color: metodoPago == 'efectivo' ? Colors.white : Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      'Efectivo',
+                      style: TextStyle(
+                        color: metodoPago == 'efectivo' ? Colors.white : Colors.green,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const Spacer(),
+                    if (metodoPago == 'efectivo')
+                      const Icon(Icons.check_circle, color: Colors.white),
+                  ],
+                ),
+              ),
             ),
 
             // Campo para pago en efectivo
             if (metodoPago == 'efectivo') ...[
-              const SizedBox(height: 15),
+              const SizedBox(height: 20),
               Container(
-                padding: const EdgeInsets.all(15),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green),
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.green[50],
+                  gradient: LinearGradient(
+                    colors: [Colors.green[50]!, Colors.green[100]!],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green[200]!),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Pago en Efectivo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    const SizedBox(height: 10),
+                    const Text(
+                      'Detalles del Pago en Efectivo', 
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold, 
+                        fontSize: 16,
+                        color: Colors.green,
+                      )
+                    ),
+                    const SizedBox(height: 12),
                     TextField(
                       controller: pagoConCuantoController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: '¿Con cuánto va a pagar?',
                         prefixText: 'S/ ',
-                        border: OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.monetization_on, color: Colors.green),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Colors.green, width: 2),
+                        ),
                         hintText: 'Ingrese el monto',
+                        filled: true,
+                        fillColor: Colors.white,
                       ),
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) => _calcularVuelto(),
                     ),
                     if (vuelto != null) ...[
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: PagoService.esPagoExacto(widget.total, double.parse(pagoConCuantoController.text)) 
                               ? Colors.green[100] 
                               : Colors.blue[100],
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: PagoService.esPagoExacto(widget.total, double.parse(pagoConCuantoController.text)) 
                                 ? Colors.green 
@@ -372,7 +911,7 @@ class _PagoScreenState extends State<PagoScreen> {
                                   ? Colors.green 
                                   : Colors.blue,
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 PagoService.esPagoExacto(widget.total, double.parse(pagoConCuantoController.text))
@@ -380,6 +919,7 @@ class _PagoScreenState extends State<PagoScreen> {
                                     : 'Su vuelto será: S/ ${vuelto!.toStringAsFixed(2)}',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 14,
                                   color: PagoService.esPagoExacto(widget.total, double.parse(pagoConCuantoController.text)) 
                                       ? Colors.green[800] 
                                       : Colors.blue[800],
@@ -393,21 +933,27 @@ class _PagoScreenState extends State<PagoScreen> {
                     if (pagoConCuantoController.text.isNotEmpty && 
                         double.tryParse(pagoConCuantoController.text) != null &&
                         double.parse(pagoConCuantoController.text) < widget.total) ...[
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.red[100],
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: Colors.red),
                         ),
                         child: Row(
                           children: [
                             const Icon(Icons.error, color: Colors.red),
-                            const SizedBox(width: 10),
-                            Text(
-                              'El monto debe ser mayor o igual al total',
-                              style: TextStyle(color: Colors.red[800], fontWeight: FontWeight.bold),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'El monto debe ser mayor o igual al total',
+                                style: TextStyle(
+                                  color: Colors.red[800], 
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -417,21 +963,54 @@ class _PagoScreenState extends State<PagoScreen> {
                 ),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
 
-            const SizedBox(height: 30),
-
-            // Botón confirmar pedido
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _puedeConfirmarPedido() ? _confirmarPedido : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  disabledBackgroundColor: Colors.grey,
-                ),
-                child: const Text('CONFIRMAR PEDIDO', style: TextStyle(fontSize: 16)),
+  Widget _buildBotonConfirmar() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: _puedeConfirmarPedido() 
+              ? [Colors.red[600]!, Colors.red[700]!]
+              : [Colors.grey[400]!, Colors.grey[500]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: _puedeConfirmarPedido() ? [
+          BoxShadow(
+            color: Colors.red.withOpacity(0.4),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ] : null,
+      ),
+      child: ElevatedButton(
+        onPressed: _puedeConfirmarPedido() ? _confirmarPedido : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(vertical: 18),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.check_circle, size: 24),
+            const SizedBox(width: 12),
+            Text(
+              _puedeConfirmarPedido() ? 'CONFIRMAR PEDIDO' : 'COMPLETE TODOS LOS DATOS',
+              style: const TextStyle(
+                fontSize: 16, 
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1,
               ),
             ),
           ],
@@ -511,8 +1090,18 @@ class _PagoScreenState extends State<PagoScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(mensaje),
+          content: Row(
+            children: [
+              const Icon(Icons.error, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(child: Text(mensaje)),
+            ],
+          ),
           backgroundColor: Colors.red,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }
@@ -520,12 +1109,35 @@ class _PagoScreenState extends State<PagoScreen> {
 
   // 🔥 MÉTODO MEJORADO PARA CONFIRMAR PEDIDO CON ADICIONALES
   void _confirmarPedido() async {
-    // Mostrar loading
+    // Mostrar loading mejorado
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
+      builder: (context) => Container(
+        color: Colors.black.withOpacity(0.7),
+        child: const Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Enviando pedido...',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
 
@@ -544,18 +1156,27 @@ class _PagoScreenState extends State<PagoScreen> {
       // Cerrar loading
       Navigator.pop(context);
       
-      // Mostrar confirmación de envío
+      // Mostrar confirmación de envío mejorada
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
+        SnackBar(
+          content: const Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 10),
-              Text('¡Pedido enviado por WhatsApp! 🎉'),
+              Icon(FontAwesomeIcons.whatsapp, color: Colors.white),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  '¡Pedido enviado por WhatsApp! 🎉',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
             ],
           ),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
+          duration: const Duration(seconds: 3),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          behavior: SnackBarBehavior.floating,
         ),
       );
       
@@ -584,8 +1205,18 @@ class _PagoScreenState extends State<PagoScreen> {
       // Mostrar error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al enviar pedido: $e'),
+          content: Row(
+            children: [
+              const Icon(Icons.error, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(child: Text('Error al enviar pedido: $e')),
+            ],
+          ),
           backgroundColor: Colors.red,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }
