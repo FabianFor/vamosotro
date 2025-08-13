@@ -82,10 +82,10 @@ class ComboCard extends StatelessWidget {
 
                     const SizedBox(height: 0),
 
-                    // Descripción combo (como ingredientes)
+                    // Descripción combo (mostrando + original)
                     Expanded(
                       child: Text(
-                        combo.descripcion.replaceAll(' + ', ' • '),
+                        combo.descripcion,
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 12,
@@ -139,8 +139,7 @@ class ComboCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(18),
                               onTap: onAgregarAlCarrito,
                               child: const Padding(
-                                padding:
-                                    EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [

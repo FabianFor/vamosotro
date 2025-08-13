@@ -20,7 +20,7 @@ class MostritoCard extends StatelessWidget {
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        height: 140, // Altura fija igual que PizzaCard
+        height: 140,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -35,7 +35,7 @@ class MostritoCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Imagen sin cortar, tamaño fijo como PizzaCard
+            // Imagen
             Container(
               width: 130,
               height: 130,
@@ -44,7 +44,7 @@ class MostritoCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
                   mostrito.imagen,
-                  fit: BoxFit.contain, // Imagen completa sin recorte
+                  fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: const Color(0xFFF5F5F5),
@@ -61,14 +61,14 @@ class MostritoCard extends StatelessWidget {
 
             const SizedBox(width: 2),
 
-            // Contenido texto expandido
+            // Texto
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Título (nombre)
+                    // Nombre
                     Text(
                       mostrito.nombre,
                       style: const TextStyle(
@@ -82,10 +82,10 @@ class MostritoCard extends StatelessWidget {
 
                     const SizedBox(height: 0),
 
-                    // Descripción sin Expanded para controlar mejor altura
+                    // Descripción (ahora con el + original)
                     Expanded(
                       child: Text(
-                        mostrito.descripcion.replaceAll(' + ', ' • '),
+                        mostrito.descripcion,
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 12,

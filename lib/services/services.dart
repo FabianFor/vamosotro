@@ -84,35 +84,7 @@ class PagoService {
   static const String numeroYape = '944609326';
   static const String numeroPlin = '924802760';
   static const String numeroWhatsApp = '933214908';
-
-  // 🔥 MÉTODO SIMPLIFICADO - Solo abrir Yape (sin datos)
-  static Future<bool> abrirYape(double monto, String numeroPedido) async {
-    try {
-      final url = Uri.parse('yape://');
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-        return true;
-      }
-    } catch (e) {
-      print('Error al abrir Yape: $e');
-    }
-    return false;
-  }
-
-  // 🔥 MÉTODO SIMPLIFICADO - Solo abrir Plin (sin datos)
-  static Future<bool> abrirPlin(double monto, String numeroPedido) async {
-    try {
-      final url = Uri.parse('plin://');
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-        return true;
-      }
-    } catch (e) {
-      print('Error al abrir Plin: $e');
-    }
-    return false;
-  }
-
+  
   // Realizar llamada telefónica
   static Future<void> realizarLlamada(String numero) async {
     final Uri telUrl = Uri.parse('tel:$numero');
