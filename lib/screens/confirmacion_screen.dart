@@ -459,7 +459,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
     );
   }
 
-  // 🔥 TARJETA DE PAGO COMPLETAMENTE REDISEÑADA - MÁS BONITA Y ORGANIZADA
+  // 🔥 TARJETA DE PAGO COMPLETAMENTE REDISEÑADA - CON ÍCONOS YAPE/PLIN
   Widget _buildTarjetaPagoMejorada() {
     Color colorPrincipal = widget.metodoPago == 'yape' ? Colors.purple : Colors.teal;
     String nombreMetodo = widget.metodoPago == 'yape' ? 'Yape' : 'Plin';
@@ -566,43 +566,8 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              // Logo real de Yape/Plin
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: Image.asset(
-                                    widget.metodoPago == 'yape' 
-                                        ? 'assets/images/logos/yape_logo.png'
-                                        : 'assets/images/logos/plin_logo.png',
-                                    fit: BoxFit.contain,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      // Fallback si no encuentra la imagen
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          color: widget.metodoPago == 'yape' ? Colors.purple[700] : Colors.teal[700],
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            widget.metodoPago == 'yape' ? 'Y' : 'P',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
+                              // Ícono Yape/Plin mejorado
+                              _buildLogoMetodoPago(widget.metodoPago, colorPrincipal),
                               const SizedBox(width: 8),
                               Text(
                                 nombreMetodo,
@@ -646,7 +611,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                           const SizedBox(height: 12),
                           _buildInfoPagoMejorada('Titular:', nombreTitular, Icons.account_circle),
                           const SizedBox(height: 12),
-                          _buildInfoPagoMejorada('Monto:', 'S/ ${widget.total.toStringAsFixed(2)}', widget.metodoPago == 'yape' ? Icons.account_balance_wallet : Icons.payment),
+                          _buildInfoPagoMejorada('Monto:', 'S/ ${widget.total.toStringAsFixed(2)}', Icons.account_balance_wallet),
                           const SizedBox(height: 12),
                           _buildInfoPagoMejorada('Concepto:', 'Pedido #${widget.numeroPedido}', Icons.shopping_cart),
                         ],
@@ -696,6 +661,50 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
         ),
       ),
     );
+  }
+
+  // 🆕 WIDGET PARA LOGO DE MÉTODO DE PAGO
+  Widget _buildLogoMetodoPago(String metodo, Color colorPrincipal) {
+    if (metodo == 'yape') {
+      return Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          color: Colors.purple[700],
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: const Center(
+          child: Text(
+            'Y',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      );
+    } else {
+      // Plin
+      return Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          color: Colors.teal[700],
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: const Center(
+          child: Text(
+            'P',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildInfoPagoMejorada(String label, String value, IconData icono) {
@@ -772,7 +781,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.monetization_on, color: Colors.white, size: 24),
+                    child: const Icon(Icons.payments, color: Colors.white, size: 24), 
                   ),
                   const SizedBox(width: 16),
                   const Expanded(
@@ -829,52 +838,6 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                     const SizedBox(height: 16),
                     
                     if (widget.vuelto != null && widget.vuelto! > 0) ...[
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Colors.blue[100]!, Colors.blue[200]!],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.blue[300]!),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.blue,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(Icons.monetization_on, color: Colors.white, size: 20),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Su vuelto será:',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    'S/ ${widget.vuelto!.toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blue[800],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ] else if (widget.vuelto != null) ...[
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(

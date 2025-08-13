@@ -820,7 +820,7 @@ class _PagoScreenState extends State<PagoScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
-                        Icons.monetization_on,
+                        Icons.payments,
                         color: metodoPago == 'efectivo' ? Colors.white : Colors.white,
                         size: 20,
                       ),
@@ -871,7 +871,6 @@ class _PagoScreenState extends State<PagoScreen> {
                       decoration: InputDecoration(
                         labelText: '¿Con cuánto va a pagar?',
                         prefixText: 'S/ ',
-                        prefixIcon: const Icon(Icons.monetization_on, color: Colors.green),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),

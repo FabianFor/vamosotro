@@ -458,7 +458,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      isExpanded ? Icons.expand_less : Icons.expand_more, // 🔥 FLECHA VERTICAL CORRECTA
+                      Icons.keyboard_arrow_down, // 🔥 FLECHA VERTICAL CORRECTA
                       color: colorAcento,
                       size: 16,
                     ),

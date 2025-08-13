@@ -30,6 +30,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/logo/
+    - assets/images/logos/
     - assets/images/pizzas/
     - assets/images/mostritos/
     - assets/images/combos/
