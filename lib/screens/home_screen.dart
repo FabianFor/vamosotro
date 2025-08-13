@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
-import '../data/pizza_data.dart';
+import '../data/pizza_data.dart'; // ✅ IMPORT CORRECTO
 import '../widgets/pizza_card.dart';
 import '../widgets/combo_card.dart';
 import '../widgets/mostrito_card.dart';
@@ -583,7 +583,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // 🔥 DETERMINAR TAMAÑO ESPECIAL PARA COMBOS ESPECIALES
             String tamanoEspecial = 'Fusión';
             if (fusion.nombre.toLowerCase().contains('combo estrella')) {
-              tamanoEspecial = 'Combo Estrella';
+              tamanoEspecial = 'Estrella';
             }
             
             return Padding(

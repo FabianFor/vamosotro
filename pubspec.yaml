@@ -35,7 +35,6 @@ flutter:
     - assets/images/mostritos/
     - assets/images/combos/
     - assets/icon.png 
-    - assets/icons/
   
 flutter_icons:
   android: true     

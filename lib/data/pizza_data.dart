@@ -29,7 +29,7 @@ class PizzaData {
     ),
     Pizza(
       nombre: 'Extremo',
-      ingredientes: 'Queso mozzarella, tocino, pepperoni, jamon, chorizon, cabanossi',
+      ingredientes: 'Mozzarella, tocino, pepperoni, jamon, chorizon, cabanossi',
       precioFamiliar: 32.0,
       precioPersonal: 13.0,
       precioExtraGrande: 55.0,
@@ -45,10 +45,10 @@ class PizzaData {
     ),
     Pizza(
       nombre: 'Africana',
-      ingredientes: 'Queso mozzarella, salchichón, jamón, pepperoni, tocino. (todos en tiras)',
+      ingredientes: 'Mozzarella, salchichón, jamón, pepperoni, tocino. (En tiras)',
       precioFamiliar: 30.0,
       precioPersonal: 13.0,
-      precioExtraGrande: 55.0,
+      precioExtraGrande: 55.0,  
       imagen: 'assets/images/pizzas/africana.png',
     ),
   ];
@@ -251,7 +251,7 @@ class PizzaData {
     // 🍞 PANES AL AJO Y OTROS
     adicionales.addAll([
       Adicional(nombre: '5 panes al ajo clásico', precio: 5.0, icono: '🍞'),
-      Adicional(nombre: '1 papas adicionales', precio: 7.0, icono: '🍟'),
+      Adicional(nombre: 'papa adicional', precio: 7.0, icono: '🍟'),
       Adicional(nombre: '5 panes al ajo con queso', precio: 8.0, icono: '🧄'),
       Adicional(nombre: '2 alas adicionales', precio: 9.0, icono: '🍗'),
       Adicional(nombre: '10 panes al ajo clásico', precio: 9.0, icono: '🍞'),
@@ -286,7 +286,7 @@ class PizzaData {
         List<Adicional> adicionales = _crearAdicionalesBase(precioQueso: precioQuesoCombo);
         // Agregar opción gratuita al inicio
         adicionales.insert(0, Adicional(
-          nombre: 'Cambiar a solo Americana',
+          nombre: 'Solo Americana',
           precio: 0.0,
           icono: '🔄',
         ));
@@ -310,7 +310,7 @@ class PizzaData {
            nombreLower.contains('oferta dúo') ||
            nombreLower.contains('fusión junior') ||
            nombreLower.contains('familiar + broaster') ||
-           nombreLower.contains('combo estrella') ||
+           nombreLower.contains('estrella') ||
            nombreLower.contains('fusión familiar');
   }
 
@@ -327,7 +327,7 @@ class PizzaData {
         nombreLower.contains('combo familiar') ||     // pizza familiar
         nombreLower.contains('oferta dúo') ||         // 2 pizzas familiares
         nombreLower.contains('familiar + broaster') ||// pizza familiar
-        nombreLower.contains('combo estrella') ||     // pizza familiar
+        nombreLower.contains('estrella') ||     // pizza familiar
         nombreLower.contains('fusión familiar')) {    // pizza familiar
       return 8.0;
     }
@@ -378,7 +378,7 @@ class PizzaData {
   // 🔥 VERIFICAR SI ES COMBO ESPECIAL CON OPCIONES GRATUITAS
   static bool esComboEspecial(String nombre) {
     final nombreLower = nombre.toLowerCase();
-    return nombreLower.contains('combo estrella') || 
+    return nombreLower.contains('estrella') || 
            nombreLower.contains('oferta dúo');
   }
 
@@ -414,7 +414,7 @@ class PizzaData {
       return ['Pizza Familiar (Sabor a elegir)'];
     }
     
-    if (nombreLower.contains('combo estrella')) {
+    if (nombreLower.contains('estrella')) {
       return ['Pizza Familiar 2 Sabores (Sabores a elegir)'];
     }
     
@@ -440,7 +440,7 @@ class PizzaData {
     }
     
     final nombreLower = nombre.toLowerCase();
-    if (nombreLower.contains('combo estrella')) {
+    if (nombreLower.contains('estrella')) {
       return ' (Cambio gratis a solo Americana)';
     }
     if (nombreLower.contains('oferta dúo')) {

@@ -51,15 +51,15 @@ class _CarritoScreenState extends State<CarritoScreen> {
     _coloresCache = {
       'Personal': colorSecundario,
       'Familiar': colorPrimario,
-      'Extra Grande': const Color(0xFF8B4513), // Color café
+      'Extra Grande': const Color.fromARGB(255, 225, 0, 255), // Color café
       'Mostrito': Colors.orange,
       'Broaster': Colors.brown,
       '2 Sabores': Colors.purple,
       '4 Sabores': Colors.purple,
       'Combo Broaster': Colors.brown,
       'Fusión': Colors.deepPurple,
-      'Combo Pizza': Colors.indigo,
-      'Combo Estrella': Colors.deepPurple,
+      'Combo': Colors.indigo,
+      'Estrella': Colors.deepPurple,
       'Oferta Dúo': Colors.indigo,
     };
   }
@@ -370,13 +370,13 @@ class _CarritoScreenState extends State<CarritoScreen> {
     return Icons.local_pizza;
   }
 
-  // ℹ️ INFORMACIÓN DEL ITEM
+// ℹ️ INFORMACIÓN DEL ITEM
   Widget _buildInfoItem(ItemPedido item) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          item.descripcionCompleta,
+          item.nombre,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -407,36 +407,37 @@ class _CarritoScreenState extends State<CarritoScreen> {
         ),
         const SizedBox(height: 6),
         // 💰 PRECIO
-        Row(
-          children: [
-            Text(
-              'S/${item.precioTotal.toStringAsFixed(2)}',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
+        Text(
+          'S/${item.precioTotal.toStringAsFixed(2)}',
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.green,
+          ),
+        ),
+        
+        // 🔥 INDICADOR DE EXTRAS MOVIDO AQUÍ (ARRIBA DE LOS CONTROLES)
+        if (item.adicionales.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.orange.withOpacity(0.5)),
+            ),
+            child: Text(
+              '+${item.adicionales.length} extra${item.adicionales.length > 1 ? 's' : ''}',
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.orange[700],
+                fontWeight: FontWeight.w600,
               ),
             ),
-            if (item.adicionales.isNotEmpty) ...[
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  '+${item.adicionales.length} extra${item.adicionales.length > 1 ? 's' : ''}',
-                  style: TextStyle(
-                    fontSize: 9,
-                    color: Colors.orange[700],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
+          ),
+        ],
+        
+        // 🔥 DETALLES DE ADICIONALES (OPCIONAL - MANTENER O QUITAR)
         if (item.adicionales.isNotEmpty) ...[
           const SizedBox(height: 6),
           Wrap(
@@ -466,7 +467,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🎛️ CONTROLES DEL ITEM
+  // 🎛️ CONTROLES DEL ITEM (SIN EL INDICADOR DE EXTRAS)
   Widget _buildControlesItem(ItemPedido item, int index) {
     final isExpanded = itemsExpandidos.contains(index);
     final esPersonalizable = item.tamano != 'Combo Broaster' && item.tamano != 'Mostrito';
