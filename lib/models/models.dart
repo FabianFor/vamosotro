@@ -1,9 +1,10 @@
-// 🍕 MODELO DE PIZZA
+// 🍕 MODELO DE PIZZA ACTUALIZADO
 class Pizza {
   final String nombre;
   final String ingredientes;
   final double precioFamiliar;
   final double precioPersonal;
+  final double precioExtraGrande; // 🔥 NUEVO CAMPO
   final String imagen;
 
   Pizza({
@@ -11,6 +12,7 @@ class Pizza {
     required this.ingredientes,
     required this.precioFamiliar,
     required this.precioPersonal,
+    required this.precioExtraGrande, // 🔥 NUEVO CAMPO REQUERIDO
     required this.imagen,
   });
 }
@@ -98,7 +100,7 @@ class Adicional {
   int get hashCode => nombre.hashCode;
 }
 
-// 🛒 MODELO DE ITEM DEL PEDIDO
+// 🛒 MODELO DE ITEM DEL PEDIDO ACTUALIZADO
 class ItemPedido {
   final String nombre;
   final double precio;
@@ -106,6 +108,7 @@ class ItemPedido {
   final String tamano;
   final String imagen;
   final List<Adicional> adicionales;
+  final bool tienePrimeraGaseosa; // 🔥 NUEVO CAMPO
 
   ItemPedido({
     required this.nombre,
@@ -114,12 +117,40 @@ class ItemPedido {
     required this.tamano,
     required this.imagen,
     this.adicionales = const [],
+    this.tienePrimeraGaseosa = false, // 🔥 NUEVO CAMPO
   });
 
-  // Método para obtener precio total incluyendo adicionales
+  // 🔥 MÉTODO ACTUALIZADO PARA OBTENER PRECIO TOTAL CON LÓGICA ESPECIAL
   double get precioTotal {
-    double precioAdicionales = adicionales.fold(0.0, (sum, adicional) => sum + adicional.precio);
+    double precioAdicionales = 0.0;
+    bool yaAplicoPrimeraGaseosa = false;
+    
+    for (Adicional adicional in adicionales) {
+      // 🔥 LÓGICA ESPECIAL PARA PRIMERA GASEOSA EN PIZZAS PERSONALES
+      if (tamano == 'Personal' && 
+          adicional.nombre == 'Pepsi 350ml (primera)' && 
+          !yaAplicoPrimeraGaseosa) {
+        precioAdicionales += 1.0; // Solo +1 sol
+        yaAplicoPrimeraGaseosa = true;
+      } else {
+        precioAdicionales += adicional.precio;
+      }
+    }
+    
     return precio + precioAdicionales;
+  }
+
+  // 🔥 MÉTODO PARA VERIFICAR SI PUEDE AGREGAR PRIMERA GASEOSA
+  bool get puedeAgregarPrimeraGaseosa {
+    if (tamano != 'Personal') return false;
+    return !adicionales.any((a) => a.nombre == 'Pepsi 350ml (primera)');
+  }
+
+  // 🔥 MÉTODO PARA CONTAR GASEOSAS NORMALES
+  int get cantidadGasesosasNormales {
+    return adicionales.where((a) => 
+      a.nombre == 'Pepsi 350ml' || a.nombre == 'Pepsi 750ml'
+    ).length;
   }
 
   // Descripción completa del item
@@ -129,7 +160,7 @@ class ItemPedido {
     return '$nombre + $adicionalesTexto';
   }
 
-  // Método para crear copia del item con modificaciones
+  // 🔥 MÉTODO ACTUALIZADO PARA CREAR COPIA CON MODIFICACIONES
   ItemPedido copyWith({
     String? nombre,
     double? precio,
@@ -137,6 +168,7 @@ class ItemPedido {
     String? tamano,
     String? imagen,
     List<Adicional>? adicionales,
+    bool? tienePrimeraGaseosa,
   }) {
     return ItemPedido(
       nombre: nombre ?? this.nombre,
@@ -145,6 +177,7 @@ class ItemPedido {
       tamano: tamano ?? this.tamano,
       imagen: imagen ?? this.imagen,
       adicionales: adicionales ?? List.from(this.adicionales),
+      tienePrimeraGaseosa: tienePrimeraGaseosa ?? this.tienePrimeraGaseosa,
     );
   }
 
@@ -214,6 +247,7 @@ class Pedido {
         'cantidad': item.cantidad,
         'tamano': item.tamano,
         'imagen': item.imagen,
+        'tienePrimeraGaseosa': item.tienePrimeraGaseosa, // 🔥 NUEVO CAMPO
         'adicionales': item.adicionales.map((a) => {
           'nombre': a.nombre,
           'precio': a.precio,
@@ -238,6 +272,7 @@ class Pedido {
         cantidad: item['cantidad'] ?? 1,
         tamano: item['tamano'] ?? '',
         imagen: item['imagen'] ?? '',
+        tienePrimeraGaseosa: item['tienePrimeraGaseosa'] ?? false, // 🔥 NUEVO CAMPO
         adicionales: (item['adicionales'] as List<dynamic>?)?.map((a) => Adicional(
           nombre: a['nombre'] ?? '',
           precio: (a['precio'] ?? 0.0).toDouble(),
@@ -253,7 +288,7 @@ class Pedido {
   }
 }
 
-//Modelo de datos del cliente (sin cambios)
+// Modelo de datos del cliente (sin cambios)
 class DatosCliente {
   final String nombre;
   final String telefono;
@@ -263,7 +298,7 @@ class DatosCliente {
     required this.telefono,
   });
 
-Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
     'nombre': nombre,
     'telefono': telefono,
   };

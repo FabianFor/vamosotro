@@ -16,7 +16,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<ItemPedido> carrito = [];
-  String categoriaSeleccionada = 'Pizza Familiar';
+  String categoriaSeleccionada = 'Pizza Familiar (30cm)';
 
   // 🎨 PALETA DE COLORES INSPIRADA EN EL LOGO  
   static const Color colorPrimario = Color(0xFFD4332A); 
@@ -25,10 +25,11 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color colorFondo = Color(0xFFF8F9FA);
   static const Color colorTarjeta = Colors.white;
 
-
+  // 🔥 CATEGORÍAS ACTUALIZADAS EN HOME SCREEN
   static const List<Map<String, dynamic>> categorias = [
     {'nombre': 'Pizza Familiar (30cm)', 'icono': Icons.local_pizza},
     {'nombre': 'Pizza Personal (18cm)', 'icono': Icons.local_pizza_outlined},
+    {'nombre': 'Pizza Extra Grande (45cm)', 'icono': Icons.local_pizza}, // 🔥 NUEVA CATEGORÍA
     {'nombre': 'Combo Pizza', 'icono': Icons.local_pizza},
     {'nombre': 'Pizza 2 sabores', 'icono': Icons.star},
     {'nombre': 'Fusión', 'icono': Icons.auto_awesome},
@@ -36,37 +37,52 @@ class _HomeScreenState extends State<HomeScreen> {
     {'nombre': 'Mostritos', 'icono': Icons.restaurant_menu}, 
   ];
 
-
   int _totalItems = 0;
 
   void _recalcularTotalItems() {
     _totalItems = carrito.fold(0, (sum, item) => sum + item.cantidad);
   }
 
+  // 🔥 MÉTODO ACTUALIZADO PARA AGREGAR AL CARRITO CON LÓGICAS ESPECIALES
   void agregarAlCarrito(String nombre, double precio, String tamano, String imagen) {
     setState(() {
+      // 🔥 VERIFICAR SI YA EXISTE EL ITEM EXACTO
       int index = carrito.indexWhere((item) => 
         item.nombre == nombre && item.tamano == tamano && item.adicionales.isEmpty);
       
       if (index != -1) {
         carrito[index] = carrito[index].copyWith(cantidad: carrito[index].cantidad + 1);
       } else {
+        // 🔥 CREAR NUEVO ITEM CON LÓGICAS ESPECIALES
+        bool tienePrimeraGaseosa = PizzaData.puedeSerPrimeraGaseosa(nombre, tamano);
+        
         carrito.add(ItemPedido(
           nombre: nombre,
           precio: precio,
           cantidad: 1,
           tamano: tamano,
           imagen: imagen,
+          tienePrimeraGaseosa: tienePrimeraGaseosa,
         ));
       }
       _recalcularTotalItems(); 
     });
 
+    // 🔥 MOSTRAR SNACKBAR CON INFORMACIÓN ESPECIAL
+    String mensajeExtra = '';
+    if (tamano == 'Personal') {
+      mensajeExtra = ' (Primera gaseosa 350ml solo +S/1)';
+    } else if (nombre.toLowerCase().contains('combo estrella')) {
+      mensajeExtra = ' (Cambio gratis a solo Americana)';
+    } else if (nombre.toLowerCase().contains('oferta dúo')) {
+      mensajeExtra = ' (Cambio gratis a 2 Americanas)';
+    }
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$nombre agregado'),
-          duration: const Duration(milliseconds: 800),
+          content: Text('$nombre agregado$mensajeExtra'),
+          duration: const Duration(milliseconds: 1200),
           backgroundColor: colorPrimario,
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(16),
@@ -84,7 +100,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
-
       data: MediaQuery.of(context).copyWith(
         textScaleFactor: 1.0, 
         devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
@@ -103,7 +118,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
 
   Widget _buildSliverAppBar() {
     return SliverAppBar(
@@ -320,13 +334,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // 🚀 DEVOLVER SLIVERS EN VEZ DE WIDGET ÚNICO
+  // 🔥 MÉTODO ACTUALIZADO PARA CONTENIDO POR CATEGORÍA
   List<Widget> _buildContenidoPorCategoria() {
     switch (categoriaSeleccionada) {
       case 'Pizza Familiar (30cm)':
         return _buildPizzasFamiliares();
       case 'Pizza Personal (18cm)':
         return _buildPizzasPersonales();
+      case 'Pizza Extra Grande (45cm)': // 🔥 NUEVA CATEGORÍA
+        return _buildPizzasExtraGrandes();
       case 'Combo Pizza':
         return _buildCombosPizza();
       case 'Pizza 2 sabores':
@@ -415,6 +431,43 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
+  // 🔥 NUEVO MÉTODO PARA PIZZAS EXTRA GRANDES
+  List<Widget> _buildPizzasExtraGrandes() {
+    return [
+      _buildSliverSectionHeader(
+        'Extra Grandes',
+        'Para los más hambrientos - 45cm',
+        Icons.local_pizza,
+        const Color(0xFF8B4513), // Color café/marrón
+        PizzaData.pizzasExtraGrandesOrdenadas.length,
+      ),
+      
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final pizza = PizzaData.pizzasExtraGrandesOrdenadas[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: PizzaCard(
+                pizza: pizza,
+                tamano: 'Extra Grande',
+                precio: pizza.precioExtraGrande,
+                onAgregarAlCarrito: () => agregarAlCarrito(
+                  pizza.nombre,
+                  pizza.precioExtraGrande,
+                  'Extra Grande',
+                  pizza.imagen,
+                ),
+              ),
+            );
+          },
+          childCount: PizzaData.pizzasExtraGrandesOrdenadas.length,
+          addAutomaticKeepAlives: true,
+        ),
+      ),
+    ];
+  }
+
   List<Widget> _buildMostritos() {
     return [
       _buildSliverSectionHeader(
@@ -483,6 +536,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
+  // 🔥 MÉTODO ACTUALIZADO PARA COMBOS BROASTER CON TAMANO CORRECTO
   List<Widget> _buildCombosBroaster() {
     return [
       _buildSliverSectionHeader(
@@ -504,7 +558,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onAgregarAlCarrito: () => agregarAlCarrito(
                   combo.nombre,
                   combo.precio,
-                  'Broaster',
+                  'Broaster', // 🔥 CAMBIAR A 'Broaster' para que use adicionales correctos
                   combo.imagen,
                 ),
               ),
@@ -517,6 +571,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
+  // 🔥 MÉTODO ACTUALIZADO PARA FUSIONES CON LÓGICAS ESPECIALES
   List<Widget> _buildFusiones() {
     return [
       _buildSliverSectionHeader(
@@ -531,6 +586,12 @@ class _HomeScreenState extends State<HomeScreen> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final fusion = PizzaData.fusionesOrdenadas[index];
+            // 🔥 DETERMINAR TAMAÑO ESPECIAL PARA COMBOS ESPECIALES
+            String tamanoEspecial = 'Fusión';
+            if (fusion.nombre.toLowerCase().contains('combo estrella')) {
+              tamanoEspecial = 'Combo Estrella';
+            }
+            
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: ComboCard(
@@ -538,7 +599,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onAgregarAlCarrito: () => agregarAlCarrito(
                   fusion.nombre,
                   fusion.precio,
-                  'Fusión',
+                  tamanoEspecial, // 🔥 USAR TAMAÑO ESPECIAL
                   fusion.imagen,
                 ),
               ),
@@ -551,6 +612,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
+  // 🔥 MÉTODO ACTUALIZADO PARA COMBOS PIZZA CON LÓGICAS ESPECIALES
   List<Widget> _buildCombosPizza() {
     return [
       _buildSliverSectionHeader(
@@ -565,6 +627,12 @@ class _HomeScreenState extends State<HomeScreen> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final comboPizza = PizzaData.combosPizzaOrdenados[index];
+            // 🔥 DETERMINAR TAMAÑO ESPECIAL PARA COMBOS ESPECIALES
+            String tamanoEspecial = 'Combo';
+            if (comboPizza.nombre.toLowerCase().contains('oferta dúo')) {
+              tamanoEspecial = 'Oferta Dúo';
+            }
+            
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: ComboCard(
@@ -572,7 +640,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onAgregarAlCarrito: () => agregarAlCarrito(
                   comboPizza.nombre,
                   comboPizza.precio,
-                  'Combo',
+                  tamanoEspecial, // 🔥 USAR TAMAÑO ESPECIAL
                   comboPizza.imagen,
                 ),
               ),

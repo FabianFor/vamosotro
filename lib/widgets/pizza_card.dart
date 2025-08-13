@@ -70,7 +70,7 @@ class PizzaCard extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(width:2),
+            const SizedBox(width: 2),
 
             // 📄 CONTENIDO TEXTO - EXPANDIDO
             Expanded(
@@ -102,10 +102,30 @@ class PizzaCard extends StatelessWidget {
                           fontSize: 12, // TAMAÑO FIJO
                           height: 1.4,
                         ),
-                        maxLines: 4,
+                        maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
+
+                    // 🔥 INFORMACIÓN ESPECIAL SEGÚN TAMAÑO
+                    if (tamano == 'Personal')
+                      Container(
+                        margin: const EdgeInsets.only(top: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.green.withOpacity(0.3)),
+                        ),
+                        child: const Text(
+                          '🥤 Primera gaseosa 350ml solo +S/1',
+                          style: TextStyle(
+                            fontSize: 9,
+                            color: Colors.green,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
 
                     const SizedBox(height: 8),
 
@@ -127,14 +147,14 @@ class PizzaCard extends StatelessWidget {
                                 color: colorSecundario,
                               ),
                             ),
-                            if (tamano == 'Familiar')
-                              Text(
-                                'Para compartir',
-                                style: TextStyle(
-                                  fontSize: 0, // TAMAÑO FIJO
-                                  color: Colors.grey[500],
-                                ),
+                            // 🔥 DESCRIPCIÓN ESPECIAL SEGÚN TAMAÑO
+                            Text(
+                              _getDescripcionTamano(tamano),
+                              style: TextStyle(
+                                fontSize: 9, // TAMAÑO FIJO MÁS PEQUEÑO
+                                color: Colors.grey[500],
                               ),
+                            ),
                           ],
                         ),
                         
@@ -202,5 +222,19 @@ class PizzaCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // 🔥 MÉTODO PARA OBTENER DESCRIPCIÓN SEGÚN TAMAÑO
+  String _getDescripcionTamano(String tamano) {
+    switch (tamano) {
+      case 'Personal':
+        return '4 tajadas - 18cm';
+      case 'Familiar':
+        return '8 tajadas - 30cm';
+      case 'Extra Grande':
+        return '12 tajadas - 45cm';
+      default:
+        return 'Para compartir';
+    }
   }
 }

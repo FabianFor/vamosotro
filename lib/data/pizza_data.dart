@@ -1,13 +1,14 @@
 import '../models/models.dart';
 
 class PizzaData {
-  // 🍕 PIZZAS EXISTENTES (Solo las 6 de la carta)
+  // 🍕 PIZZAS EXISTENTES CON NUEVO PRECIO EXTRA GRANDE (sin cambios)
   static final List<Pizza> pizzas = [
     Pizza(
       nombre: 'Americana',
       ingredientes: 'Queso mozzarella, jamón, salchichón',
       precioFamiliar: 26.0,
       precioPersonal: 10.0,
+      precioExtraGrande: 48.0,
       imagen: 'assets/images/pizzas/americana.png',
     ),
     Pizza(
@@ -15,6 +16,7 @@ class PizzaData {
       ingredientes: 'Queso mozzarella, jamón, piña',
       precioFamiliar: 28.0,
       precioPersonal: 11.0,
+      precioExtraGrande: 50.0,
       imagen: 'assets/images/pizzas/hawaiana.png',
     ),
     Pizza(
@@ -22,6 +24,7 @@ class PizzaData {
       ingredientes: 'Queso mozzarella, pepperoni',
       precioFamiliar: 30.0,
       precioPersonal: 13.0,
+      precioExtraGrande: 54.0,
       imagen: 'assets/images/pizzas/pepperoni.png',
     ),
     Pizza(
@@ -29,6 +32,7 @@ class PizzaData {
       ingredientes: 'Queso mozzarella, tocino, pepperoni, jamon, chorizon, cabanossi',
       precioFamiliar: 32.0,
       precioPersonal: 13.0,
+      precioExtraGrande: 55.0,
       imagen: 'assets/images/pizzas/extremo.png',
     ),
     Pizza(
@@ -36,6 +40,7 @@ class PizzaData {
       ingredientes: 'Queso mozzarella, tocino, jamón',
       precioFamiliar: 29.0,
       precioPersonal: 12.0,
+      precioExtraGrande: 52.0,
       imagen: 'assets/images/pizzas/tocino.png',
     ),
     Pizza(
@@ -43,11 +48,12 @@ class PizzaData {
       ingredientes: 'Queso mozzarella, salchichón, jamón, pepperoni, tocino. (todos en tiras)',
       precioFamiliar: 30.0,
       precioPersonal: 13.0,
+      precioExtraGrande: 55.0,
       imagen: 'assets/images/pizzas/africana.png',
     ),
   ];
 
-  // 🍗 MOSTRITOS (Broaster Ala, Pecho, Pierna)
+  // 🍗 MOSTRITOS (sin cambios)
   static final List<Mostrito> mostritos = [
     Mostrito(
       nombre: 'Mostrito ala',
@@ -69,7 +75,7 @@ class PizzaData {
     ),
   ];
 
-  // 🍕 PIZZAS ESPECIALES 2 SABORES (Según carta completa)
+  // 🍕 PIZZAS ESPECIALES 2 SABORES (sin cambios)
   static final List<PizzaEspecial> pizzasEspeciales = [
     PizzaEspecial(
       nombre: 'Americana y pepperoni',
@@ -115,7 +121,7 @@ class PizzaData {
     ),
   ];
 
-  // COMBOS BROASTER (Según carta completa)
+  // COMBOS BROASTER (sin cambios)
   static final List<Combo> combosBroaster = [
     Combo(
       nombre: 'Combo 1',
@@ -149,7 +155,7 @@ class PizzaData {
     ),
   ];
 
-  // 🍕 COMBOS PIZZA - NUEVA CATEGORÍA
+  // 🍕 COMBOS PIZZA
   static final List<Combo> combosPizza = [
     Combo(
       nombre: 'Combo clásico',
@@ -183,7 +189,6 @@ class PizzaData {
     ),
   ];
 
-
   static final List<Combo> fusiones = [
     Combo(
       nombre: 'Fusión junior',
@@ -211,119 +216,326 @@ class PizzaData {
     ),
   ];
 
-  // 🔥 ADICIONALES DISPONIBLES PARA PIZZAS FAMILIARES (30cm - 8 tajadas)
-  static final List<Adicional> adicionalesFamiliar = [
+  // 🔥 ADICIONALES ACTUALIZADOS PARA PIZZAS PERSONALES
+  static final List<Adicional> adicionalesPersonal = [
+    // 🍞 PANES AL AJO
     Adicional(
-      nombre: 'Queso adicional',
-      precio: 8.0,
-      icono: '🧀',
+      nombre: '5 panes al ajo clásico',
+      precio: 5.0,
+      icono: '🍞',
     ),
     Adicional(
-      nombre: 'Brazitos de pollo',
-      precio: 6.0,
+      nombre: '10 panes al ajo clásico',
+      precio: 9.0,
+      icono: '🍞',
+    ),
+    Adicional(
+      nombre: '5 panes al ajo con queso',
+      precio: 8.0,
+      icono: '🧄',
+    ),
+    Adicional(
+      nombre: '10 panes al ajo con queso',
+      precio: 15.0,
+      icono: '🧄',
+    ),
+    // 🧀 QUESO ADICIONAL
+    Adicional(
+      nombre: 'Queso adicional',
+      precio: 4.0,
+      icono: '🧀',
+    ),
+    // 🍗 ALAS Y PAPAS
+    Adicional(
+      nombre: '2 alas adicionales',
+      precio: 9.0,
       icono: '🍗',
     ),
     Adicional(
-      nombre: 'Gaseosa jumbo',
+      nombre: '1 papas adicionales',
+      precio: 7.0,
+      icono: '🍟',
+    ),
+    // 🥤 GASEOSAS
+    Adicional(
+      nombre: 'Pepsi 350ml (primera)',
+      precio: 1.0, // 🔥 PRECIO ESPECIAL PARA LA PRIMERA
+      icono: '🥤',
+    ),
+    Adicional(
+      nombre: 'Pepsi 350ml',
+      precio: 2.0,
+      icono: '🥤',
+    ),
+    Adicional(
+      nombre: 'Pepsi 750ml',
       precio: 4.0,
       icono: '🥤',
     ),
   ];
 
-  // 🔥 ADICIONALES DISPONIBLES PARA PIZZAS PERSONALES (18cm - 4 tajadas)
-  static final List<Adicional> adicionalesPersonal = [
+  // 🔥 ADICIONALES PARA PIZZAS FAMILIARES
+  static final List<Adicional> adicionalesFamiliar = [
+    // 🍞 PANES AL AJO
     Adicional(
-      nombre: 'Queso extra',
-      precio: 4.0,
-      icono: '🧀',
+      nombre: '5 panes al ajo clásico',
+      precio: 5.0,
+      icono: '🍞',
     ),
     Adicional(
-      nombre: 'Brazitos de pollo',
-      precio: 3.0,
+      nombre: '10 panes al ajo clásico',
+      precio: 9.0,
+      icono: '🍞',
+    ),
+    Adicional(
+      nombre: '5 panes al ajo con queso',
+      precio: 8.0,
+      icono: '🧄',
+    ),
+    Adicional(
+      nombre: '10 panes al ajo con queso',
+      precio: 15.0,
+      icono: '🧄',
+    ),
+    // 🧀 QUESO ADICIONAL
+    Adicional(
+      nombre: 'Queso adicional',
+      precio: 8.0,
+      icono: '🧀',
+    ),
+    // 🍗 ALAS Y PAPAS
+    Adicional(
+      nombre: '2 alas adicionales',
+      precio: 9.0,
       icono: '🍗',
     ),
     Adicional(
-      nombre: 'Gaseosa personal',
+      nombre: '1 papas adicionales',
+      precio: 7.0,
+      icono: '🍟',
+    ),
+    // 🥤 GASEOSAS
+    Adicional(
+      nombre: 'Pepsi 350ml',
       precio: 2.0,
+      icono: '🥤',
+    ),
+    Adicional(
+      nombre: 'Pepsi 750ml',
+      precio: 4.0,
+      icono: '🥤',
+    ),
+  ];
+
+  // 🔥 ADICIONALES PARA PIZZAS EXTRA GRANDES
+  static final List<Adicional> adicionalesExtraGrande = [
+    // 🍞 PANES AL AJO
+    Adicional(
+      nombre: '5 panes al ajo clásico',
+      precio: 5.0,
+      icono: '🍞',
+    ),
+    Adicional(
+      nombre: '10 panes al ajo clásico',
+      precio: 9.0,
+      icono: '🍞',
+    ),
+    Adicional(
+      nombre: '5 panes al ajo con queso',
+      precio: 8.0,
+      icono: '🧄',
+    ),
+    Adicional(
+      nombre: '10 panes al ajo con queso',
+      precio: 15.0,
+      icono: '🧄',
+    ),
+    // 🧀 QUESO ADICIONAL
+    Adicional(
+      nombre: 'Queso adicional',
+      precio: 15.0, // 🔥 PRECIO MAYOR PARA EXTRA GRANDE
+      icono: '🧀',
+    ),
+    // 🍗 ALAS Y PAPAS
+    Adicional(
+      nombre: '2 alas adicionales',
+      precio: 9.0,
+      icono: '🍗',
+    ),
+    Adicional(
+      nombre: '1 papas adicionales',
+      precio: 7.0,
+      icono: '🍟',
+    ),
+    // 🥤 GASEOSAS
+    Adicional(
+      nombre: 'Pepsi 350ml',
+      precio: 2.0,
+      icono: '🥤',
+    ),
+    Adicional(
+      nombre: 'Pepsi 750ml',
+      precio: 4.0,
+      icono: '🥤',
+    ),
+  ];
+
+  // 🔥 ADICIONALES PARA MOSTRITOS Y COMBOS BROASTER (SIN QUESO)
+  static final List<Adicional> adicionalesBroaster = [
+    // 🍞 PANES AL AJO
+    Adicional(
+      nombre: '5 panes al ajo clásico',
+      precio: 5.0,
+      icono: '🍞',
+    ),
+    Adicional(
+      nombre: '10 panes al ajo clásico',
+      precio: 9.0,
+      icono: '🍞',
+    ),
+    Adicional(
+      nombre: '5 panes al ajo con queso',
+      precio: 8.0,
+      icono: '🧄',
+    ),
+    Adicional(
+      nombre: '10 panes al ajo con queso',
+      precio: 15.0,
+      icono: '🧄',
+    ),
+    // 🍗 ALAS Y PAPAS (SIN QUESO ADICIONAL)
+    Adicional(
+      nombre: '2 alas adicionales',
+      precio: 9.0,
+      icono: '🍗',
+    ),
+    Adicional(
+      nombre: '1 papas adicionales',
+      precio: 7.0,
+      icono: '🍟',
+    ),
+    // 🥤 GASEOSAS
+    Adicional(
+      nombre: 'Pepsi 350ml',
+      precio: 2.0,
+      icono: '🥤',
+    ),
+    Adicional(
+      nombre: 'Pepsi 750ml',
+      precio: 4.0,
       icono: '🥤',
     ),
   ];
 
   // 🔥 ADICIONALES PARA COMBOS CON PIZZAS (FUSIONES Y PIZZAS ESPECIALES)
   static final List<Adicional> adicionalesCombo = [
+    // 🍞 PANES AL AJO
     Adicional(
-      nombre: 'Queso extra',
+      nombre: '5 panes al ajo clásico',
+      precio: 5.0,
+      icono: '🍞',
+    ),
+    Adicional(
+      nombre: '10 panes al ajo clásico',
+      precio: 9.0,
+      icono: '🍞',
+    ),
+    Adicional(
+      nombre: '5 panes al ajo con queso',
+      precio: 8.0,
+      icono: '🧄',
+    ),
+    Adicional(
+      nombre: '10 panes al ajo con queso',
+      precio: 15.0,
+      icono: '🧄',
+    ),
+    // 🧀 QUESO ADICIONAL
+    Adicional(
+      nombre: 'Queso adicional',
       precio: 6.0,
       icono: '🧀',
     ),
+    // 🍗 ALAS Y PAPAS
     Adicional(
-      nombre: 'Brazitos de pollo extra',
-      precio: 5.0,
+      nombre: '2 alas adicionales',
+      precio: 9.0,
       icono: '🍗',
     ),
     Adicional(
-      nombre: 'Gaseosa extra',
-      precio: 3.0,
+      nombre: '1 papas adicionales',
+      precio: 7.0,
+      icono: '🍟',
+    ),
+    // 🥤 GASEOSAS
+    Adicional(
+      nombre: 'Pepsi 350ml',
+      precio: 2.0,
+      icono: '🥤',
+    ),
+    Adicional(
+      nombre: 'Pepsi 750ml',
+      precio: 4.0,
       icono: '🥤',
     ),
   ];
 
-  // 🎯 MÉTODO PARA OBTENER ADICIONALES SEGÚN EL TIPO DE PRODUCTO
-  static List<Adicional> getAdicionalesDisponibles(String tamano) {
-    switch (tamano) {
-      case 'Familiar':
-        return adicionalesFamiliar;
-      case 'Personal':
-        return adicionalesPersonal;
-      case '2 Sabores':
-      case '4 Sabores':
-      case 'Fusión':
-      case 'Combo':
-        return adicionalesCombo;
-      default:
-        return []; 
-    }
-  }
-
-  static List<Pizza> get pizzasFamiliaresOrdenadas {
-    List<Pizza> lista = List.from(pizzas);
-    lista.sort((a, b) => a.precioFamiliar.compareTo(b.precioFamiliar));
-    return lista;
-  }
-
-  static List<Pizza> get pizzasPersonalesOrdenadas {
-    List<Pizza> lista = List.from(pizzas);
-    lista.sort((a, b) => a.precioPersonal.compareTo(b.precioPersonal));
-    return lista;
-  }
-
-  static List<Mostrito> get mostritosOrdenados {
-    List<Mostrito> lista = List.from(mostritos);
-    lista.sort((a, b) => a.precio.compareTo(b.precio));
-    return lista;
-  }
-
-  static List<PizzaEspecial> get pizzasEspecialesOrdenadas {
-    List<PizzaEspecial> lista = List.from(pizzasEspeciales);
-    lista.sort((a, b) => a.precio.compareTo(b.precio));
-    return lista;
-  }
-
-  static List<Combo> get combosBroasterOrdenados {
-    List<Combo> lista = List.from(combosBroaster);
-    lista.sort((a, b) => a.precio.compareTo(b.precio));
-    return lista;
-  }
-
-  static List<Combo> get combosPizzaOrdenados {
-    List<Combo> lista = List.from(combosPizza);
-    lista.sort((a, b) => a.precio.compareTo(b.precio));
-    return lista;
-  }
-
-  static List<Combo> get fusionesOrdenadas {
-    List<Combo> lista = List.from(fusiones);
-    lista.sort((a, b) => a.precio.compareTo(b.precio));
-    return lista;
-  }
+  // 🔥 ADICIONALES ESPECIALES PARA COMBO ESTRELLA Y OFERTA DÚO
+  static final List<Adicional> adicionalesEspeciales = [
+    // 🍞 PANES AL AJO
+    Adicional(
+      nombre: '5 panes al ajo clásico',
+      precio: 5.0,
+      icono: '🍞',
+    ),
+    Adicional(
+      nombre: '10 panes al ajo clásico',
+      precio: 9.0,
+      icono: '🍞',
+    ),
+    Adicional(
+      nombre: '5 panes al ajo con queso',
+      precio: 8.0,
+      icono: '🧄',
+    ),
+    Adicional(
+      nombre: '10 panes al ajo con queso',
+      precio: 15.0,
+      icono: '🧄',
+    ),
+    // 🧀 QUESO ADICIONAL
+    Adicional(
+      nombre: 'Queso adicional',
+      precio: 6.0,
+      icono: '🧀',
+    ),
+    // 🔄 CAMBIOS GRATUITOS ESPECIALES
+    Adicional(
+      nombre: 'Cambiar a solo Americana',
+      precio: 0.0, // 🔥 GRATUITO
+      icono: '🔄',
+    ),
+    // 🍗 ALAS Y PAPAS
+    Adicional(
+      nombre: '2 alas adicionales',
+      precio: 9.0,
+      icono: '🍗',
+    ),
+    Adicional(
+      nombre: '1 papas adicionales',
+      precio: 7.0,
+      icono: '🍟',
+    ),
+    // 🥤 GASEOSAS
+    Adicional(
+      nombre: 'Pepsi 350ml',
+      precio: 2.0,
+      icono: '🥤',
+    ),
+    Adicional(
+      nombre: 'Pepsi 750ml',
+      precio: 4.0,
+      icono: '🥤',
+    ),
+  ];
 }

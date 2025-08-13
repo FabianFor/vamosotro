@@ -35,20 +35,27 @@ class _CarritoScreenState extends State<CarritoScreen> {
     carritoLocal = List.from(widget.carrito);
     _inicializarCaches();
     _calcularTotal();
-}
+  }
 
-  // 🔥 INICIALIZAR TODOS LOS CACHES AL INICIO
+  // 🔥 MÉTODO ACTUALIZADO PARA INICIALIZAR CACHES EN CARRITO
   void _inicializarCaches() {
     _adicionalesCache = {
-      'Familiar': PizzaData.getAdicionalesDisponibles('Familiar'),
       'Personal': PizzaData.getAdicionalesDisponibles('Personal'),
+      'Familiar': PizzaData.getAdicionalesDisponibles('Familiar'),
+      'Extra Grande': PizzaData.getAdicionalesDisponibles('Extra Grande'),
+      'Mostrito': PizzaData.getAdicionalesDisponibles('Mostrito'),
+      'Broaster': PizzaData.getAdicionalesDisponibles('Broaster'),
       'Fusión': PizzaData.getAdicionalesDisponibles('Fusión'),
+      'Combo Estrella': PizzaData.getAdicionalesDisponibles('Combo Estrella'),
+      'Oferta Dúo': PizzaData.getAdicionalesDisponibles('Oferta Dúo'),
     };
 
     _coloresCache = {
-      'Familiar': colorPrimario,
       'Personal': colorSecundario,
+      'Familiar': colorPrimario,
+      'Extra Grande': const Color(0xFF8B4513), // Color café
       'Mostrito': Colors.orange,
+      'Broaster': Colors.brown,
       '2 Sabores': Colors.purple,
       '4 Sabores': Colors.purple,
       'Combo Broaster': Colors.brown,
@@ -74,32 +81,166 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🔥 OPTIMIZAR TOGGLE DE ADICIONAL
+  // 🔥 MÉTODO ESPECIAL PARA TOGGLE DE ADICIONAL CON LÓGICA DE PRIMERA GASEOSA
   void _toggleAdicional(int itemIndex, Adicional adicional) {
     setState(() {
       ItemPedido item = carritoLocal[itemIndex];
       List<Adicional> nuevosAdicionales = List.from(item.adicionales);
 
-      if (nuevosAdicionales.any((a) => a.nombre == adicional.nombre)) {
-        nuevosAdicionales.removeWhere((a) => a.nombre == adicional.nombre);
-      } else {
-        nuevosAdicionales.add(adicional);
+      // 🔥 LÓGICA ESPECIAL PARA PRIMERA GASEOSA EN PIZZAS PERSONALES
+      if (item.tamano == 'Personal' && adicional.nombre == 'Pepsi 350ml (primera)') {
+        // Verificar si ya tiene primera gaseosa
+        bool yaHayPrimera = nuevosAdicionales.any((a) => a.nombre == 'Pepsi 350ml (primera)');
+        
+        if (yaHayPrimera) {
+          // Quitar la primera gaseosa
+          nuevosAdicionales.removeWhere((a) => a.nombre == 'Pepsi 350ml (primera)');
+        } else {
+          // Añadir la primera gaseosa (solo si no hay otra primera)
+          nuevosAdicionales.add(adicional);
+        }
+      } 
+      // 🔥 LÓGICA ESPECIAL PARA CAMBIOS GRATUITOS EN COMBOS ESPECIALES
+      else if (adicional.nombre == 'Cambiar a solo Americana') {
+        bool yaTieneCambio = nuevosAdicionales.any((a) => a.nombre == 'Cambiar a solo Americana');
+        
+        if (yaTieneCambio) {
+          nuevosAdicionales.removeWhere((a) => a.nombre == 'Cambiar a solo Americana');
+        } else {
+          nuevosAdicionales.add(adicional);
+        }
+      }
+      // 🔥 LÓGICA NORMAL PARA OTROS ADICIONALES
+      else {
+        if (nuevosAdicionales.any((a) => a.nombre == adicional.nombre)) {
+          nuevosAdicionales.removeWhere((a) => a.nombre == adicional.nombre);
+        } else {
+          nuevosAdicionales.add(adicional);
+        }
       }
 
       carritoLocal[itemIndex] = item.copyWith(adicionales: nuevosAdicionales);
-      _calcularTotal(); // 🔥 RECALCULAR SOLO CUANDO CAMBIE
+      _calcularTotal();
       widget.onActualizar(carritoLocal);
     });
   }
 
-  // 🎯 USAR CACHE PARA ADICIONALES
+  // 🔥 MÉTODO ACTUALIZADO PARA OBTENER ADICIONALES CON FILTROS ESPECIALES
   List<Adicional> _getAdicionalesDisponibles(String tamano) {
-    return _adicionalesCache[tamano] ?? [];
+    List<Adicional> adicionales = _adicionalesCache[tamano] ?? [];
+    
+    // 🔥 FILTRAR ADICIONALES SEGÚN EL CONTEXTO
+    // Por ejemplo, si es Mostrito o Broaster, no mostrar queso adicional
+    if (tamano == 'Mostrito' || tamano == 'Broaster') {
+      adicionales = adicionales.where((a) => !a.nombre.contains('Queso adicional')).toList();
+    }
+    
+    return adicionales;
   }
 
   // 🎨 USAR CACHE PARA COLORES
   Color _getTamanoColor(String tamano) {
     return _coloresCache[tamano] ?? colorAcento;
+  }
+
+  // 🔥 MÉTODO PARA MOSTRAR SELECTOR DE PIZZA EN COMBOS MÚLTIPLES
+  void _mostrarSelectorPizza(BuildContext context, ItemPedido item, int index, Adicional adicional) {
+    // Solo para combos con múltiples pizzas
+    if (!PizzaData.esComboMultiplePizzas(item.nombre)) {
+      _toggleAdicional(index, adicional);
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('¿En qué pizza aplicar ${adicional.nombre}?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (item.nombre.toLowerCase().contains('brother')) ...[
+              ListTile(
+                title: const Text('Pizza Pepperoni'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _aplicarAdicionalEspecifico(index, adicional, 'Pepperoni');
+                },
+              ),
+              ListTile(
+                title: const Text('Pizza Hawaiana'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _aplicarAdicionalEspecifico(index, adicional, 'Hawaiana');
+                },
+              ),
+              ListTile(
+                title: const Text('Pizza Americana'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _aplicarAdicionalEspecifico(index, adicional, 'Americana');
+                },
+              ),
+            ] else ...[
+              ListTile(
+                title: const Text('Pizza 1'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _aplicarAdicionalEspecifico(index, adicional, 'Pizza 1');
+                },
+              ),
+              ListTile(
+                title: const Text('Pizza 2'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _aplicarAdicionalEspecifico(index, adicional, 'Pizza 2');
+                },
+              ),
+            ],
+            ListTile(
+              title: const Text('Todas las pizzas'),
+              onTap: () {
+                Navigator.pop(context);
+                _aplicarAdicionalEspecifico(index, adicional, 'Todas');
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 🔥 MÉTODO PARA APLICAR ADICIONAL A PIZZA ESPECÍFICA
+  void _aplicarAdicionalEspecifico(int index, Adicional adicional, String pizzaEspecifica) {
+    setState(() {
+      ItemPedido item = carritoLocal[index];
+      List<Adicional> nuevosAdicionales = List.from(item.adicionales);
+
+      // Crear adicional con especificación de pizza
+      Adicional adicionalEspecifico = Adicional(
+        nombre: '${adicional.nombre} (${pizzaEspecifica})',
+        precio: adicional.precio,
+        icono: adicional.icono,
+      );
+
+      // Verificar si ya existe
+      bool yaExiste = nuevosAdicionales.any((a) => a.nombre == adicionalEspecifico.nombre);
+      
+      if (yaExiste) {
+        nuevosAdicionales.removeWhere((a) => a.nombre == adicionalEspecifico.nombre);
+      } else {
+        nuevosAdicionales.add(adicionalEspecifico);
+      }
+
+      carritoLocal[index] = item.copyWith(adicionales: nuevosAdicionales);
+      _calcularTotal();
+      widget.onActualizar(carritoLocal);
+    });
   }
 
   @override
@@ -458,7 +599,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      Icons.keyboard_arrow_down, // 🔥 FLECHA VERTICAL CORRECTA
+                      isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                       color: colorAcento,
                       size: 16,
                     ),
@@ -466,7 +607,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                     Text(
                       isExpanded ? 'Ocultar' : 'Adicionales',
                       style: TextStyle(
-                        color: const Color.fromARGB(255, 255, 136, 0),
+                        color: colorAcento,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -559,22 +700,37 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🔥 TILE DE ADICIONAL COMO WIDGET SEPARADO
+  // 🔥 MÉTODO MEJORADO PARA CONSTRUIR TILES DE ADICIONALES
   Widget _buildAdicionalTile(Adicional adicional, ItemPedido item, int index) {
     final isSelected = item.adicionales.any((a) => a.nombre == adicional.nombre);
+    
+    // 🔥 LÓGICA ESPECIAL PARA MOSTRAR INFORMACIÓN ADICIONAL
+    String descripcionExtra = '';
+    Color colorEspecial = colorSecundario;
+    
+    if (adicional.nombre == 'Pepsi 350ml (primera)' && item.tamano == 'Personal') {
+      descripcionExtra = ' (Solo +S/1 en personal)';
+      colorEspecial = Colors.green;
+    } else if (adicional.nombre == 'Cambiar a solo Americana') {
+      descripcionExtra = ' (Cambio gratuito)';
+      colorEspecial = Colors.blue;
+    } else if (adicional.precio == 0.0) {
+      descripcionExtra = ' (Gratis)';
+      colorEspecial = Colors.green;
+    }
     
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: isSelected ? colorSecundario.withOpacity(0.1) : Colors.white,
+        color: isSelected ? colorEspecial.withOpacity(0.1) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isSelected ? colorSecundario : Colors.grey[300]!,
+          color: isSelected ? colorEspecial : Colors.grey[300]!,
           width: isSelected ? 2 : 1,
         ),
         boxShadow: isSelected ? [
           BoxShadow(
-            color: colorSecundario.withOpacity(0.2),
+            color: colorEspecial.withOpacity(0.2),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -586,30 +742,48 @@ class _CarritoScreenState extends State<CarritoScreen> {
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: isSelected ? colorSecundario.withOpacity(0.2) : Colors.grey[100],
+                color: isSelected ? colorEspecial.withOpacity(0.2) : Colors.grey[100],
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(adicional.icono, style: const TextStyle(fontSize: 16)),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: Text(
-                adicional.nombre,
-                style: TextStyle(
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? colorSecundario : Colors.black87,
-                  fontSize: 13,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    adicional.nombre,
+                    style: TextStyle(
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      color: isSelected ? colorEspecial : Colors.black87,
+                      fontSize: 13,
+                    ),
+                  ),
+                  if (descripcionExtra.isNotEmpty)
+                    Text(
+                      descripcionExtra,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: colorEspecial.withOpacity(0.7),
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                ],
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: isSelected ? colorSecundario : colorAcento,
+                color: isSelected ? colorEspecial : colorAcento,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                '+S/${adicional.precio.toStringAsFixed(0)}',
+                adicional.precio == 0.0 
+                  ? 'GRATIS' 
+                  : (adicional.nombre == 'Pepsi 350ml (primera)' && item.tamano == 'Personal')
+                    ? '+S/1'
+                    : '+S/${adicional.precio.toStringAsFixed(0)}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -621,7 +795,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
         ),
         value: isSelected,
         onChanged: (bool? value) => _toggleAdicional(index, adicional),
-        activeColor: colorSecundario,
+        activeColor: colorEspecial,
         contentPadding: const EdgeInsets.symmetric(horizontal: 8),
       ),
     );
