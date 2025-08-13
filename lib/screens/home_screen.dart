@@ -95,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
-        textScaleFactor: 1.0, 
+        textScaler: const TextScaler.linear(1.0), 
         devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
       ),
       child: Scaffold(

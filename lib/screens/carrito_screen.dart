@@ -142,13 +142,16 @@ class _CarritoScreenState extends State<CarritoScreen> {
     return _coloresCache[tamano] ?? colorAcento;
   }
 
-  // 🔥 MÉTODO PARA MOSTRAR SELECTOR DE PIZZA EN COMBOS MÚLTIPLES
+  // 🔥 MÉTODO MEJORADO PARA MOSTRAR SELECTOR DE PIZZA EN COMBOS MÚLTIPLES
   void _mostrarSelectorPizza(BuildContext context, ItemPedido item, int index, Adicional adicional) {
     // Solo para combos con múltiples pizzas
     if (!PizzaData.esComboMultiplePizzas(item.nombre)) {
       _toggleAdicional(index, adicional);
       return;
     }
+
+    // 🔥 OBTENER PIZZAS ESPECÍFICAS DEL COMBO
+    List<String> pizzasEnCombo = PizzaData.getPizzasEnCombo(item.nombre);
 
     showDialog(
       context: context,
@@ -157,49 +160,19 @@ class _CarritoScreenState extends State<CarritoScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (item.nombre.toLowerCase().contains('brother')) ...[
-              ListTile(
-                title: const Text('Pizza Pepperoni'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _aplicarAdicionalEspecifico(index, adicional, 'Pepperoni');
-                },
-              ),
-              ListTile(
-                title: const Text('Pizza Hawaiana'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _aplicarAdicionalEspecifico(index, adicional, 'Hawaiana');
-                },
-              ),
-              ListTile(
-                title: const Text('Pizza Americana'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _aplicarAdicionalEspecifico(index, adicional, 'Americana');
-                },
-              ),
-            ] else ...[
-              ListTile(
-                title: const Text('Pizza 1'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _aplicarAdicionalEspecifico(index, adicional, 'Pizza 1');
-                },
-              ),
-              ListTile(
-                title: const Text('Pizza 2'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _aplicarAdicionalEspecifico(index, adicional, 'Pizza 2');
-                },
-              ),
-            ],
-            ListTile(
-              title: const Text('Todas las pizzas'),
+            ...pizzasEnCombo.map((pizzaNombre) => ListTile(
+              title: Text(pizzaNombre),
               onTap: () {
                 Navigator.pop(context);
-                _aplicarAdicionalEspecifico(index, adicional, 'Todas');
+                _aplicarAdicionalEspecifico(index, adicional, pizzaNombre);
+              },
+            )).toList(),
+            ListTile(
+              title: const Text('Todas las pizzas'),
+              leading: const Icon(Icons.select_all),
+              onTap: () {
+                Navigator.pop(context);
+                _aplicarAdicionalEspecifico(index, adicional, 'Todas las pizzas');
               },
             ),
           ],
