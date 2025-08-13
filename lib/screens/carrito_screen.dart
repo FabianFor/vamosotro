@@ -17,7 +17,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
   List<ItemPedido> carritoLocal = [];
   List<int> itemsExpandidos = [];
   
-  // 🔥 CACHE PARA ADICIONALES Y COLORES
+  // 🔥 CACHE PARA ADICIONALES Y COLORES - CORREGIDO
   late Map<String, List<Adicional>> _adicionalesCache;
   late Map<String, Color> _coloresCache;
   
@@ -37,19 +37,17 @@ class _CarritoScreenState extends State<CarritoScreen> {
     _calcularTotal();
   }
 
-  // 🔥 MÉTODO ACTUALIZADO PARA INICIALIZAR CACHES EN CARRITO
+  // 🔥 MÉTODO CORREGIDO PARA INICIALIZAR CACHES EN CARRITO
   void _inicializarCaches() {
-    _adicionalesCache = {
-      'Personal': PizzaData.getAdicionalesDisponibles('Personal'),
-      'Familiar': PizzaData.getAdicionalesDisponibles('Familiar'),
-      'Extra Grande': PizzaData.getAdicionalesDisponibles('Extra Grande'),
-      'Mostrito': PizzaData.getAdicionalesDisponibles('Mostrito'),
-      'Broaster': PizzaData.getAdicionalesDisponibles('Broaster'),
-      'Fusión': PizzaData.getAdicionalesDisponibles('Fusión'),
-      'Combo Estrella': PizzaData.getAdicionalesDisponibles('Combo Estrella'),
-      'Oferta Dúo': PizzaData.getAdicionalesDisponibles('Oferta Dúo'),
-    };
-
+    _adicionalesCache = {};
+    
+    // Inicializar cache para cada item del carrito
+    for (var item in carritoLocal) {
+      String key = '${item.nombre}_${item.tamano}';
+      _adicionalesCache[key] = PizzaData.getAdicionalesParaItem(item.nombre, item.tamano);
+    }
+    
+    // Cache de colores
     _coloresCache = {
       'Personal': colorSecundario,
       'Familiar': colorPrimario,
@@ -61,6 +59,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
       'Combo Broaster': Colors.brown,
       'Fusión': Colors.deepPurple,
       'Combo Pizza': Colors.indigo,
+      'Combo Estrella': Colors.deepPurple,
+      'Oferta Dúo': Colors.indigo,
     };
   }
 
@@ -125,17 +125,16 @@ class _CarritoScreenState extends State<CarritoScreen> {
     });
   }
 
-  // 🔥 MÉTODO ACTUALIZADO PARA OBTENER ADICIONALES CON FILTROS ESPECIALES
-  List<Adicional> _getAdicionalesDisponibles(String tamano) {
-    List<Adicional> adicionales = _adicionalesCache[tamano] ?? [];
+  // 🔥 MÉTODO CORREGIDO PARA OBTENER ADICIONALES CON FILTROS ESPECIALES
+  List<Adicional> _getAdicionalesDisponibles(String tamano, String nombre) {
+    String key = '${nombre}_${tamano}';
     
-    // 🔥 FILTRAR ADICIONALES SEGÚN EL CONTEXTO
-    // Por ejemplo, si es Mostrito o Broaster, no mostrar queso adicional
-    if (tamano == 'Mostrito' || tamano == 'Broaster') {
-      adicionales = adicionales.where((a) => !a.nombre.contains('Queso adicional')).toList();
+    // Si no está en cache, crearlo
+    if (!_adicionalesCache.containsKey(key)) {
+      _adicionalesCache[key] = PizzaData.getAdicionalesParaItem(nombre, tamano);
     }
     
-    return adicionales;
+    return _adicionalesCache[key] ?? [];
   }
 
   // 🎨 USAR CACHE PARA COLORES
@@ -648,9 +647,9 @@ class _CarritoScreenState extends State<CarritoScreen> {
     });
   }
 
-  // 🍕 SECCIÓN DE ADICIONALES
+  // 🍕 SECCIÓN DE ADICIONALES CORREGIDA
   Widget _buildSeccionAdicionales(ItemPedido item, int index) {
-    final adicionalesDisponibles = _getAdicionalesDisponibles(item.tamano);
+    final adicionalesDisponibles = _getAdicionalesDisponibles(item.tamano, item.nombre);
     
     return Container(
       width: double.infinity,
@@ -794,7 +793,14 @@ class _CarritoScreenState extends State<CarritoScreen> {
           ],
         ),
         value: isSelected,
-        onChanged: (bool? value) => _toggleAdicional(index, adicional),
+        onChanged: (bool? value) {
+          // 🔥 DETECTAR SI REQUIERE SELECTOR ESPECIAL PARA QUESO EN COMBOS MÚLTIPLES
+          if (PizzaData.esComboMultiplePizzas(item.nombre) && adicional.nombre.contains('Queso adicional')) {
+            _mostrarSelectorPizza(context, item, index, adicional);
+          } else {
+            _toggleAdicional(index, adicional);
+          }
+        },
         activeColor: colorEspecial,
         contentPadding: const EdgeInsets.symmetric(horizontal: 8),
       ),

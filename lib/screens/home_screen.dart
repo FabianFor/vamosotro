@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _totalItems = carrito.fold(0, (sum, item) => sum + item.cantidad);
   }
 
-  // 🔥 MÉTODO ACTUALIZADO PARA AGREGAR AL CARRITO CON LÓGICAS ESPECIALES
+  // 🔥 MÉTODO CORREGIDO PARA AGREGAR AL CARRITO CON LÓGICAS ESPECIALES
   void agregarAlCarrito(String nombre, double precio, String tamano, String imagen) {
     setState(() {
       // 🔥 VERIFICAR SI YA EXISTE EL ITEM EXACTO
@@ -68,24 +68,18 @@ class _HomeScreenState extends State<HomeScreen> {
       _recalcularTotalItems(); 
     });
 
-    // 🔥 MOSTRAR SNACKBAR CON INFORMACIÓN ESPECIAL
-    String mensajeExtra = '';
-    if (tamano == 'Personal') {
-      mensajeExtra = ' (Primera gaseosa 350ml solo +S/1)';
-    } else if (nombre.toLowerCase().contains('combo estrella')) {
-      mensajeExtra = ' (Cambio gratis a solo Americana)';
-    } else if (nombre.toLowerCase().contains('oferta dúo')) {
-      mensajeExtra = ' (Cambio gratis a 2 Americanas)';
-    }
+    // 🔥 MOSTRAR SNACKBAR CON INFORMACIÓN ESPECIAL USANDO EL MÉTODO CORREGIDO
+    String mensajeExtra = PizzaData.getMensajeEspecial(nombre, tamano);
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('$nombre agregado$mensajeExtra'),
-          duration: const Duration(milliseconds: 1200),
+          duration: const Duration(milliseconds: 1500),
           backgroundColor: colorPrimario,
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }

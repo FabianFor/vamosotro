@@ -538,4 +538,127 @@ class PizzaData {
       icono: '🥤',
     ),
   ];
+
+  // 🔥 MÉTODOS FALTANTES PARA LÓGICAS ESPECIALES
+
+  // Obtener listas ordenadas (getters estáticos)
+  static List<Pizza> get pizzasFamiliaresOrdenadas => pizzas;
+  static List<Pizza> get pizzasPersonalesOrdenadas => pizzas;
+  static List<Pizza> get pizzasExtraGrandesOrdenadas => pizzas;
+  static List<Mostrito> get mostritosOrdenados => mostritos;
+  static List<PizzaEspecial> get pizzasEspecialesOrdenadas => pizzasEspeciales;
+  static List<Combo> get combosBroasterOrdenados => combosBroaster;
+  static List<Combo> get combosPizzaOrdenados => combosPizza;
+  static List<Combo> get fusionesOrdenadas => fusiones;
+
+  // 🔥 MÉTODO CORREGIDO PARA EL PROBLEMA DE ADICIONALES ESPECIALES
+  static List<Adicional> getAdicionalesParaItem(String nombre, String tamano) {
+    // Si es pizza personal, incluir primera gaseosa
+    if (tamano.toLowerCase() == 'personal') {
+      List<Adicional> adicionales = List.from(adicionalesPersonal);
+      // Asegurar que tenga la opción de primera gaseosa
+      if (!adicionales.any((a) => a.nombre.contains('primera'))) {
+        adicionales.insert(7, Adicional(
+          nombre: 'Pepsi 350ml (primera)',
+          precio: 1.0,
+          icono: '🥤',
+        ));
+      }
+      return adicionales;
+    }
+    
+    // Si es combo especial, incluir opciones gratuitas
+    if (esComboEspecial(nombre)) {
+      List<Adicional> adicionales = List.from(adicionalesEspeciales);
+      return adicionales;
+    }
+    
+    // Para otros casos, usar método normal
+    return getAdicionalesDisponibles(tamano);
+  }
+
+  // 🔥 MÉTODO PRINCIPAL PARA OBTENER ADICIONALES SEGÚN EL TIPO
+  static List<Adicional> getAdicionalesDisponibles(String tamano) {
+    switch (tamano.toLowerCase()) {
+      case 'personal':
+        return adicionalesPersonal;
+      case 'familiar':
+        return adicionalesFamiliar;
+      case 'extra grande':
+        return adicionalesExtraGrande;
+      case 'mostrito':
+        return adicionalesBroaster; // Mostritos usan los mismos que broaster
+      case 'broaster':
+        return adicionalesBroaster;
+      case 'combo broaster':
+        return adicionalesBroaster;
+      case 'fusión':
+        return adicionalesCombo;
+      case 'combo':
+        return adicionalesCombo;
+      case 'combo estrella':
+        return adicionalesEspeciales; // Tiene opciones especiales
+      case 'oferta dúo':
+        return adicionalesEspeciales; // Tiene opciones especiales
+      case '2 sabores':
+        return adicionalesCombo;
+      case '4 sabores':
+        return adicionalesCombo;
+      default:
+        return adicionalesCombo; // Por defecto
+    }
+  }
+
+  // 🔥 VERIFICAR SI UN PRODUCTO PUEDE TENER PRIMERA GASEOSA
+  static bool puedeSerPrimeraGaseosa(String nombre, String tamano) {
+    return tamano.toLowerCase() == 'personal';
+  }
+
+  // 🔥 VERIFICAR SI ES COMBO CON MÚLTIPLES PIZZAS
+  static bool esComboMultiplePizzas(String nombre) {
+    final nombreLower = nombre.toLowerCase();
+    return nombreLower.contains('brother') || 
+           nombreLower.contains('compartir') || 
+           nombreLower.contains('oferta dúo') ||
+           nombreLower.contains('dúo 4 sabores');
+  }
+
+  // 🔥 VERIFICAR SI ES COMBO ESPECIAL CON OPCIONES GRATUITAS
+  static bool esComboEspecial(String nombre) {
+    final nombreLower = nombre.toLowerCase();
+    return nombreLower.contains('combo estrella') || 
+           nombreLower.contains('oferta dúo');
+  }
+
+  // 🔥 OBTENER MENSAJE ESPECIAL PARA SNACKBAR
+  static String getMensajeEspecial(String nombre, String tamano) {
+    if (tamano.toLowerCase() == 'personal') {
+      return ' (Primera gaseosa 350ml solo +S/1)';
+    }
+    
+    final nombreLower = nombre.toLowerCase();
+    if (nombreLower.contains('combo estrella')) {
+      return ' (Cambio gratis a solo Americana)';
+    }
+    if (nombreLower.contains('oferta dúo')) {
+      return ' (Cambio gratis a 2 Americanas)';
+    }
+    
+    return '';
+  }
+
+  // 🔥 VERIFICAR SI UN ADICIONAL ES ESPECIAL
+  static bool esAdicionalEspecial(String nombreAdicional) {
+    return nombreAdicional.contains('primera') || 
+           nombreAdicional.contains('Cambiar a') ||
+           nombreAdicional.contains('(primera)');
+  }
+
+  // 🔥 OBTENER COLOR ESPECIAL PARA ADICIONAL
+  static String getColorEspecialAdicional(String nombreAdicional) {
+    if (nombreAdicional.contains('primera')) return 'green';
+    if (nombreAdicional.contains('Cambiar a')) return 'blue';
+    if (nombreAdicional.contains('Gratis') || nombreAdicional.contains('0.0')) return 'green';
+    return 'normal';
+  }
 }
