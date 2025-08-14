@@ -53,9 +53,11 @@ class _PagoScreenState extends State<PagoScreen> {
   void _calcularVuelto() {
     if (pagoConCuantoController.text.isNotEmpty && metodoPago == 'efectivo') {
       double pagoConCuanto = double.tryParse(pagoConCuantoController.text) ?? 0;
-      if (pagoConCuanto >= widget.total) {
+      double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
+      
+      if (pagoConCuanto >= totalFinal) {
         setState(() {
-          vuelto = PagoService.calcularVuelto(widget.total, pagoConCuanto);
+          vuelto = PagoService.calcularVuelto(totalFinal, pagoConCuanto);
         });
       } else {
         setState(() {
@@ -115,7 +117,7 @@ class _PagoScreenState extends State<PagoScreen> {
     );
   }
 
-// 1. Actualizar el método _buildResumenPedido() para mostrar total correcto
+// Resumen del pedido simplificado
 Widget _buildResumenPedido() {
   final double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
   
@@ -132,28 +134,28 @@ Widget _buildResumenPedido() {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: Colors.blue,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.receipt_long, color: Colors.white, size: 20),
+                  child: const Icon(Icons.receipt_long, color: Colors.white, size: 16),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 const Text(
                   'Resumen del Pedido', 
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -165,26 +167,26 @@ Widget _buildResumenPedido() {
                 children: [
                   // Lista de productos
                   ...widget.carrito.map((item) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    padding: const EdgeInsets.symmetric(vertical: 3),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(3),
                           decoration: BoxDecoration(
                             color: Colors.red,
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
                             '${item.cantidad}x',
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                              fontSize: 10,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,15 +195,15 @@ Widget _buildResumenPedido() {
                                 '${item.nombre} (${item.tamano})',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 14,
+                                  fontSize: 12,
                                 ),
                               ),
                               if (item.adicionales.isNotEmpty) ...[
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 1),
                                 Text(
                                   '+ ${item.adicionales.map((a) => '${a.icono} ${a.nombre}').join(', ')}',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 10,
                                     color: Colors.green[700],
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -215,7 +217,7 @@ Widget _buildResumenPedido() {
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.red,
-                            fontSize: 14,
+                            fontSize: 12,
                           ),
                         ),
                       ],
@@ -224,14 +226,14 @@ Widget _buildResumenPedido() {
                   
                   // Mostrar delivery si aplica
                   if (tipoEntrega == 'delivery') ...[
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [Colors.orange[100]!, Colors.orange[200]!],
                         ),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: Colors.orange[300]!),
                       ),
                       child: Row(
@@ -239,14 +241,14 @@ Widget _buildResumenPedido() {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.delivery_dining, color: Colors.orange[800], size: 20),
-                              const SizedBox(width: 8),
+                              Icon(Icons.delivery_dining, color: Colors.orange[800], size: 16),
+                              const SizedBox(width: 6),
                               Text(
-                                'Delivery agregado:',
+                                'Delivery:',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.orange[800],
-                                  fontSize: 14,
+                                  fontSize: 12,
                                 ),
                               ),
                             ],
@@ -256,7 +258,7 @@ Widget _buildResumenPedido() {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.orange[800],
-                              fontSize: 14,
+                              fontSize: 12,
                             ),
                           ),
                         ],
@@ -264,7 +266,7 @@ Widget _buildResumenPedido() {
                     ),
                   ],
                   
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
                     height: 2,
@@ -275,7 +277,7 @@ Widget _buildResumenPedido() {
                       borderRadius: BorderRadius.circular(1),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   
                   // SOLO EL TOTAL FINAL
                   Row(
@@ -285,15 +287,15 @@ Widget _buildResumenPedido() {
                         'TOTAL A PAGAR:',
                         style: TextStyle(
                           fontWeight: FontWeight.bold, 
-                          fontSize: 18,
+                          fontSize: 14,
                           color: Colors.black87,
                         )
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.red,
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.red.withOpacity(0.3),
@@ -306,7 +308,7 @@ Widget _buildResumenPedido() {
                           'S/ ${totalFinal.toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold, 
-                            fontSize: 18, 
+                            fontSize: 14, 
                             color: Colors.white,
                           )
                         ),
@@ -322,7 +324,6 @@ Widget _buildResumenPedido() {
     ),
   );
 }
-
 
   Widget _buildDatosCliente() {
     return Card(
@@ -912,7 +913,7 @@ Widget _buildSeccionDelivery() {
     );
   }
 
-// 3. Actualizar _buildCampoEfectivo() para usar total correcto
+// Campo efectivo corregido
 Widget _buildCampoEfectivo() {
   final double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
   
@@ -954,7 +955,7 @@ Widget _buildCampoEfectivo() {
             fillColor: Colors.white,
           ),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          onChanged: (value) => _calcularVueltoCorregido(),
+          onChanged: (value) => _calcularVuelto(),
         ),
         if (vuelto != null) ...[
           const SizedBox(height: 12),
@@ -1033,26 +1034,6 @@ Widget _buildCampoEfectivo() {
     ),
   );
 }
-void _calcularVueltoCorregido() {
-  if (pagoConCuantoController.text.isNotEmpty && metodoPago == 'efectivo') {
-    double pagoConCuanto = double.tryParse(pagoConCuantoController.text) ?? 0;
-    double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
-    
-    if (pagoConCuanto >= totalFinal) {
-      setState(() {
-        vuelto = PagoService.calcularVuelto(totalFinal, pagoConCuanto);
-      });
-    } else {
-      setState(() {
-        vuelto = null;
-      });
-    }
-  } else {
-    setState(() {
-      vuelto = null;
-    });
-  }
-}
 
   Widget _buildBotonConfirmar() {
     bool puedeConfirmar = _puedeConfirmarPedido();
@@ -1128,7 +1109,6 @@ bool _puedeConfirmarPedido() {
   
   return datosCompletos && ubicacionOk && pagoOk;
 }
-
 
   Future<void> _obtenerUbicacion() async {
     setState(() {
@@ -1314,7 +1294,7 @@ bool _puedeConfirmarPedido() {
 📍 *UBICACIÓN DEL CLIENTE:*
 $linkUbicacion
 
-🚚 *DELIVERY:* Se cobrará S/2.00 - S/4.00 según ubicación''';
+🚚 *DELIVERY:* Se cobrará S/2.00''';
     }
 
     String mensaje = '''🍕 *NUEVO PEDIDO FABICHELO* 🍕
@@ -1335,8 +1315,8 @@ ${widget.carrito.map((item) {
   return linea;
 }).join('\n')}
 
-💰 *SUBTOTAL:* S/${widget.total.toStringAsFixed(2)}
-${tipoEntrega == 'delivery' ? '🚚 *DELIVERY:* S/2.00 - S/4.00 (según ubicación)' : ''}
+💰 *TOTAL:* S/${widget.total.toStringAsFixed(2)}
+${tipoEntrega == 'delivery' ? '🚚 *DELIVERY:* S/2.00' : ''}
 
 🚚 *TIPO DE ENTREGA:*
 ${tipoEntrega == 'delivery' ? '🏠 *DELIVERY*' : '🏪 *RECOJO EN TIENDA*'}$infoDelivery
@@ -1348,7 +1328,7 @@ ${_obtenerTextoPago()}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-✅ Cliente realizará el pago completo (${tipoEntrega == 'delivery' ? 'subtotal + delivery' : 'total'})
+✅ Cliente realizará el pago completo (${tipoEntrega == 'delivery' ? 'total + delivery S/2.00' : 'total'})
 
 ¡Gracias! 🍕❤️''';
 
@@ -1360,10 +1340,11 @@ ${_obtenerTextoPago()}
       case 'efectivo':
         if (pagoConCuantoController.text.isNotEmpty) {
           double pagoConCuanto = double.parse(pagoConCuantoController.text);
+          double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
           if (vuelto != null && vuelto! > 0) {
             return '💵 *EFECTIVO*\n   • Paga con: S/${pagoConCuanto.toStringAsFixed(2)}\n   • Vuelto: S/${vuelto!.toStringAsFixed(2)}';
           } else {
-            return '💵 *EFECTIVO* - Pago exacto: S/${widget.total.toStringAsFixed(2)}';
+            return '💵 *EFECTIVO* - Pago exacto: S/${totalFinal.toStringAsFixed(2)}';
           }
         }
         return '💵 *EFECTIVO*';
