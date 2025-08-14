@@ -65,7 +65,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
 
   void _calcularTotal() {
     _totalCacheado = carritoLocal.fold(0.0, (sum, item) {
-      // 🔥 USAR EL NUEVO MÉTODO QUE CALCULA CORRECTAMENTE
       return sum + item.precioTotalCarrito;
     });
   }
@@ -114,13 +113,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
         int maxPrimerasGaseosas = item.cantidad;
         
         if (primerasGaseosasActuales >= maxPrimerasGaseosas) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Ya tienes $maxPrimerasGaseosas primera(s) gaseosa(s). Solo 1 primera gaseosa por pizza personal.'),
-              backgroundColor: Colors.orange,
-              duration: const Duration(seconds: 3),
-            ),
-          );
+          _mostrarError('Ya tienes $maxPrimerasGaseosas primera(s) gaseosa(s). Solo 1 primera gaseosa por pizza personal.');
           return;
         }
         
@@ -148,20 +141,34 @@ class _CarritoScreenState extends State<CarritoScreen> {
           }
         }
       } 
-      // 2️⃣ PARA OTROS ADICIONALES CON PIZZAS ESPECÍFICAS
+      // 2️⃣ PARA CAMBIOS GRATUITOS (Solo Americana)
+      else if (_esAdicionalEspecialGratuito(adicional)) {
+        for (String pizzaEspecifica in pizzasSeleccionadas) {
+          Adicional nuevoAdicional = Adicional(
+            nombre: adicional.nombre,
+            precio: adicional.precio,
+            icono: adicional.icono,
+            imagen: adicional.imagen,
+            cantidad: 1,
+            pizzaEspecifica: _convertirNombrePizzaCambiada(pizzaEspecifica),
+          );
+
+          int indiceExistente = nuevosAdicionales.indexWhere((a) => 
+              a.nombre == nuevoAdicional.nombre && a.pizzaEspecifica == nuevoAdicional.pizzaEspecifica);
+          
+          if (indiceExistente == -1) {
+            nuevosAdicionales.add(nuevoAdicional);
+          }
+        }
+      }
+      // 3️⃣ PARA OTROS ADICIONALES CON PIZZAS ESPECÍFICAS
       else if (pizzasSeleccionadas.isNotEmpty) {
         for (String pizzaEspecifica in pizzasSeleccionadas) {
           // 🔥 VALIDACIÓN ESPECIAL PARA QUESO
           if (_esQuesoAdicional(adicional)) {
             int quesosActuales = _contarQuesosPorPizza(item, pizzaEspecifica);
             if (quesosActuales >= 1) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Ya tienes queso para $pizzaEspecifica. Solo 1 queso por pizza.'),
-                  backgroundColor: Colors.orange,
-                  duration: const Duration(seconds: 2),
-                ),
-              );
+              _mostrarError('Ya tienes queso para $pizzaEspecifica. Solo 1 queso por pizza.');
               continue;
             }
           }
@@ -171,7 +178,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
             precio: adicional.precio,
             icono: adicional.icono,
             imagen: adicional.imagen,
-            cantidad: _esQuesoAdicional(adicional) || _esAdicionalEspecialGratuito(adicional) ? 1 : cantidad,
+            cantidad: _esQuesoAdicional(adicional) ? 1 : cantidad,
             pizzaEspecifica: pizzaEspecifica,
           );
 
@@ -180,7 +187,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
               a.pizzaEspecifica == pizzaEspecifica);
 
           if (indiceExistente != -1) {
-            if (!_esQuesoAdicional(adicional) && !_esAdicionalEspecialGratuito(adicional)) {
+            if (!_esQuesoAdicional(adicional)) {
               Adicional existente = nuevosAdicionales[indiceExistente];
               nuevosAdicionales[indiceExistente] = existente.copyWith(
                 cantidad: existente.cantidad + cantidad
@@ -191,7 +198,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
           }
         }
       }
-      // 3️⃣ PARA ADICIONALES SIN SELECCIÓN DE PIZZAS (CANTIDAD LIBRE)
+      // 4️⃣ PARA ADICIONALES SIN SELECCIÓN DE PIZZAS (CANTIDAD LIBRE)
       else {
         Adicional nuevoAdicional = Adicional(
           nombre: adicional.nombre,
@@ -224,14 +231,18 @@ class _CarritoScreenState extends State<CarritoScreen> {
           ? '✅ Agregado: ${adicional.nombre} para ${pizzasSeleccionadas.length} pizza(s)'
           : '✅ Agregado: ${adicional.nombre} x$cantidad';
       
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(mensaje),
-          backgroundColor: colorSecundario,
-          duration: const Duration(seconds: 1),
-        ),
-      );
+      _mostrarExito(mensaje);
     });
+  }
+
+  // 🔥 NUEVA FUNCIÓN: Convertir nombre de pizza cuando se cambia a americana
+  String _convertirNombrePizzaCambiada(String nombreOriginal) {
+    if (nombreOriginal.contains('Pizza Hawaiana (Cambiar a Americana)')) {
+      return nombreOriginal.replaceAll('Pizza Hawaiana (Cambiar a Americana)', 'Pizza Hawaiana (Americana)');
+    } else if (nombreOriginal.contains('Pizza 2 sabores (Cambiar a Americana)')) {
+      return nombreOriginal.replaceAll('Pizza 2 sabores (Cambiar a Americana)', 'Pizza 2 sabores (Americana)');
+    }
+    return nombreOriginal;
   }
 
   // 🔥 VERIFICACIONES DE TIPOS DE ADICIONALES
@@ -269,11 +280,14 @@ class _CarritoScreenState extends State<CarritoScreen> {
       ItemPedido item = carritoLocal[itemIndex];
       List<Adicional> nuevosAdicionales = List.from(item.adicionales);
       
+      String nombreAdicional = nuevosAdicionales[adicionalIndex].nombre;
       nuevosAdicionales.removeAt(adicionalIndex);
 
       carritoLocal[itemIndex] = item.copyWith(adicionales: nuevosAdicionales);
       _calcularTotal();
       widget.onActualizar(carritoLocal);
+
+      _mostrarInfo('🗑️ Eliminado: $nombreAdicional');
     });
   }
 
@@ -303,10 +317,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
     String key = '${nombre}_${tamano}';
     
     if (!_adicionalesCache.containsKey(key)) {
-      // 🔥 GENERAR ADICIONALES ESPECIALES SEGÚN EL PRODUCTO
       List<Adicional> adicionales = List.from(PizzaData.getAdicionalesParaItem(nombre, tamano));
       
-      // 🔥 AGREGAR OPCIONES ESPECIALES GRATUITAS
       if (_esComboEstrella(nombre)) {
         adicionales.insert(0, Adicional(
           nombre: 'Solo Americana',
@@ -367,6 +379,61 @@ class _CarritoScreenState extends State<CarritoScreen> {
         itemsExpandidos.add(index);
       }
     });
+  }
+
+  // 🔥 MENSAJES MEJORADOS
+  void _mostrarError(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(child: Text(mensaje, style: const TextStyle(fontSize: 13))),
+          ],
+        ),
+        backgroundColor: Colors.red[600],
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _mostrarExito(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(child: Text(mensaje, style: const TextStyle(fontSize: 13))),
+          ],
+        ),
+        backgroundColor: colorSecundario,
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _mostrarInfo(String mensaje) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.info, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(child: Text(mensaje, style: const TextStyle(fontSize: 13))),
+          ],
+        ),
+        backgroundColor: Colors.orange[600],
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   @override
@@ -456,7 +523,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
             ),
           ),
 
-          // 🔥 ADICIONALES AGREGADOS (SIEMPRE VISIBLE CON CONTROLES)
+          // 🔥 ADICIONALES AGREGADOS (SIEMPRE VISIBLE CON CONTROLES MEJORADOS)
           if (item.adicionales.isNotEmpty)
             _buildAdicionalesActualesConControles(item, index),
 
@@ -568,7 +635,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🔥 NUEVA SECCIÓN - ADICIONALES CON CONTROLES SIEMPRE VISIBLE
+  // 🔥 SECCIÓN DE ADICIONALES CON CONTROLES MEJORADOS (INCLUYE BOTÓN BORRAR)
   Widget _buildAdicionalesActualesConControles(ItemPedido item, int index) {
     return Container(
       width: double.infinity,
@@ -683,8 +750,9 @@ class _CarritoScreenState extends State<CarritoScreen> {
                     ),
                   ),
                   
-                  // 🔥 CONTROLES DE CANTIDAD
+                  // 🔥 CONTROLES DE CANTIDAD Y BORRAR
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       // CANTIDAD
                       Container(
@@ -732,18 +800,44 @@ class _CarritoScreenState extends State<CarritoScreen> {
                           width: 24,
                           height: 24,
                           decoration: BoxDecoration(
-                            color: adicional.cantidad > 1 ? Colors.orange : Colors.red,
+                            color: adicional.cantidad > 1 ? Colors.orange : Colors.grey,
                             borderRadius: BorderRadius.circular(4),
                             boxShadow: [
                               BoxShadow(
-                                color: (adicional.cantidad > 1 ? Colors.orange : Colors.red).withOpacity(0.3),
+                                color: (adicional.cantidad > 1 ? Colors.orange : Colors.grey).withOpacity(0.3),
                                 blurRadius: 2,
                                 offset: const Offset(0, 1),
                               ),
                             ],
                           ),
                           child: Icon(
-                            adicional.cantidad > 1 ? Icons.remove : Icons.delete,
+                            Icons.remove,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      
+                      // 🔥 BOTÓN BORRAR COMPLETO (NUEVO)
+                      GestureDetector(
+                        onTap: () => _mostrarConfirmacionBorrar(index, adicionalIndex, adicional.nombre),
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(4),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.red.withOpacity(0.3),
+                                blurRadius: 2,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.delete,
                             size: 14,
                             color: Colors.white,
                           ),
@@ -757,6 +851,46 @@ class _CarritoScreenState extends State<CarritoScreen> {
           }).toList(),
         ],
       ),
+    );
+  }
+
+  // 🔥 CONFIRMACIÓN ANTES DE BORRAR ADICIONAL COMPLETO
+  void _mostrarConfirmacionBorrar(int itemIndex, int adicionalIndex, String nombreAdicional) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: Row(
+            children: [
+              Icon(Icons.delete_forever, color: Colors.red[600], size: 24),
+              const SizedBox(width: 8),
+              const Text('Confirmar eliminación', style: TextStyle(fontSize: 16)),
+            ],
+          ),
+          content: Text(
+            '¿Estás seguro de que quieres eliminar completamente "$nombreAdicional"?',
+            style: const TextStyle(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancelar', style: TextStyle(color: Colors.grey[600])),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _eliminarAdicionalCompleto(itemIndex, adicionalIndex);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1186,7 +1320,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
   }
 }
 
-// 🔥 DIALOG MEJORADO CON SELECCIÓN ESPECÍFICA DE PIZZAS Y LÓGICA INTELIGENTE
+// 🔥 DIALOG MEJORADO CON LÓGICA CORREGIDA PARA COMBOS MÚLTIPLES
 class _DialogAdicional extends StatefulWidget {
   final Adicional adicional;
   final ItemPedido itemPedido;
@@ -1239,28 +1373,24 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
            widget.adicional.nombre.contains('Cambiar Hawaiana');
   }
 
-  // 🔥 OBTENER PIZZAS EXPANDIDAS POR CANTIDAD CON LÓGICA ESPECÍFICA
+  // 🔥 OBTENER PIZZAS EXPANDIDAS POR CANTIDAD CON LÓGICA ESPECÍFICA CORREGIDA
   List<String> _getPizzasExpandidas() {
     List<String> pizzasBase = [];
     
     // 🔥 LÓGICA ESPECÍFICA SEGÚN EL TIPO DE ADICIONAL
     if (_esAdicionalEspecialGratuito()) {
       if (widget.adicional.nombre.contains('Solo Americana')) {
-        // Para Combo Estrella - cada combo es una "pizza 2 sabores"
-        pizzasBase = ['2 sabores → Solo Americana)'];
+        // Para Combo Estrella - solo mostrar las pizzas que NO son americana
+        pizzasBase = ['Pizza 2 sabores (Cambiar a Americana)'];
       } else if (widget.adicional.nombre.contains('Cambiar Hawaiana')) {
         // Para Oferta Dúo - solo las hawaianas pueden cambiarse
-        int cantidadDuos = widget.itemPedido.cantidad;
-        for (int i = 1; i <= cantidadDuos; i++) {
-          pizzasBase.add('Pizza Hawaiana del Dúo #$i');
-        }
-        return pizzasBase; // Retornar directamente sin expandir más
+        pizzasBase = ['Pizza Hawaiana (Cambiar a Americana)'];
       }
     } else if (_esPrimeraGaseosa()) {
       // Para primera gaseosa: una por cada pizza personal
       pizzasBase = ['Pizza Personal'];
     } else {
-      // Para queso y otros: usar lógica existente
+      // Para queso y otros: usar lógica existente MEJORADA
       if (PizzaData.esComboMultiplePizzas(widget.itemPedido.nombre)) {
         pizzasBase = PizzaData.getPizzasEnCombo(widget.itemPedido.nombre);
       } else {
@@ -1268,11 +1398,51 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
       }
     }
     
-    // 🔥 EXPANDIR SEGÚN CANTIDAD DEL ITEM
+    // 🔥 EXPANDIR SEGÚN CANTIDAD DEL ITEM - LÓGICA CORREGIDA
     List<String> pizzasExpandidas = [];
-    for (int i = 1; i <= widget.itemPedido.cantidad; i++) {
-      for (String pizza in pizzasBase) {
-        pizzasExpandidas.add('$pizza #$i');
+    
+    // 🔥 CASO ESPECIAL: Para cambios gratuitos, solo expandir las pizzas que se pueden cambiar
+    if (_esAdicionalEspecialGratuito()) {
+      if (widget.adicional.nombre.contains('Solo Americana')) {
+        // Combo Estrella: Solo 1 por combo (la pizza de 2 sabores)
+        for (int i = 1; i <= widget.itemPedido.cantidad; i++) {
+          pizzasExpandidas.add('Pizza 2 sabores (Cambiar a Americana) #$i');
+        }
+      } else if (widget.adicional.nombre.contains('Cambiar Hawaiana')) {
+        // Oferta Dúo: Solo las hawaianas (1 por dúo)
+        for (int i = 1; i <= widget.itemPedido.cantidad; i++) {
+          pizzasExpandidas.add('Pizza Hawaiana (Cambiar a Americana) del Dúo #$i');
+        }
+      }
+    }
+    // 🔥 CASO ESPECIAL: Combo Compartir (2 americanas familiar y personal)
+    else if (widget.itemPedido.nombre.toLowerCase().contains('combo compartir')) {
+      for (int i = 1; i <= widget.itemPedido.cantidad; i++) {
+        pizzasExpandidas.add('Pizza Americana (Familiar) del Combo #$i');
+        pizzasExpandidas.add('Pizza Americana (Personal) del Combo #$i');
+      }
+    }
+    // 🔥 CASO ESPECIAL: Combo Brother (3 pizzas personales)  
+    else if (widget.itemPedido.nombre.toLowerCase().contains('combo brother')) {
+      for (int i = 1; i <= widget.itemPedido.cantidad; i++) {
+        pizzasExpandidas.add('Pizza Pepperoni del Combo #$i');
+        pizzasExpandidas.add('Pizza Hawaiana del Combo #$i');
+        pizzasExpandidas.add('Pizza Americana del Combo #$i');
+      }
+    }
+    // 🔥 CASO ESPECIAL: Oferta Dúo (2 pizzas familiares)
+    else if (widget.itemPedido.nombre.toLowerCase().contains('oferta dúo')) {
+      for (int i = 1; i <= widget.itemPedido.cantidad; i++) {
+        pizzasExpandidas.add('Pizza Hawaiana del Dúo #$i');
+        pizzasExpandidas.add('Pizza Americana del Dúo #$i');
+      }
+    }
+    // 🔥 EXPANSIÓN NORMAL PARA OTROS CASOS
+    else {
+      for (int i = 1; i <= widget.itemPedido.cantidad; i++) {
+        for (String pizza in pizzasBase) {
+          pizzasExpandidas.add('$pizza #$i');
+        }
       }
     }
     
@@ -1480,7 +1650,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                           _esAdicionalEspecialGratuito()
                               ? 'Cambio gratuito: Selecciona específicamente qué pizzas cambiar.'
                               : _esPrimeraGaseosa() 
-                                  ? 'Primera gaseosa: Solo S/1.00 c/u. Máximo ${widget.itemPedido.cantidad} para tus ${widget.itemPedido.cantidad} pizza(s) personal(es).'
+                                  ? 'Primera gaseosa: Solo S/1.00 c/u. Selecciona a cuáles pizzas aplicar.'
                                   : 'Selecciona específicamente a qué pizzas aplicar el queso. Solo 1 queso por pizza.',
                           style: TextStyle(
                             fontSize: 12,
@@ -1499,7 +1669,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                 const SizedBox(height: 16),
               ],
 
-              // 🔥 SELECTOR DE PIZZAS ESPECÍFICAS (PARA ADICIONALES QUE VAN POR PIZZA)
+              // 🔥 SELECTOR DE PIZZAS ESPECÍFICAS CON LÓGICA MEJORADA
               if (requiereSeleccionPizzas) ...[
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -1516,7 +1686,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                           Icon(Icons.local_pizza, color: Colors.blue[600], size: 18),
                           const SizedBox(width: 6),
                           Text(
-                            '¿Para qué pizzas? (Selecciona específicamente)',
+                            '¿Para qué pizzas específicamente?',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.blue[600],
@@ -1525,9 +1695,18 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Marca solo las pizzas que quieres que tengan este adicional. No se cobrará por las no marcadas.',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.blue[600],
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
                       const SizedBox(height: 10),
                       
-                      // 🔥 LISTA SCROLLEABLE DE PIZZAS CON CHECKBOXES Y ESTADO
+                      // 🔥 LISTA SCROLLEABLE DE PIZZAS CON CHECKBOXES MEJORADA
                       ConstrainedBox(
                         constraints: const BoxConstraints(maxHeight: 200),
                         child: SingleChildScrollView(
@@ -1561,16 +1740,28 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                                       fontSize: 12,
                                       color: yaOcupada ? Colors.grey[600] : Colors.black87,
                                       decoration: yaOcupada ? TextDecoration.lineThrough : null,
+                                      fontWeight: yaSeleccionada ? FontWeight.w600 : FontWeight.normal,
                                     ),
                                   ),
-                                  subtitle: yaOcupada ? Text(
-                                    'Ya tiene este adicional',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.grey[600],
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ) : null,
+                                  subtitle: yaOcupada 
+                                      ? Text(
+                                          'Ya tiene este adicional',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.grey[600],
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        ) 
+                                      : yaSeleccionada 
+                                          ? Text(
+                                              '✅ Se aplicará este adicional',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: colorSecundario,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            )
+                                          : null,
                                   value: yaSeleccionada,
                                   onChanged: !disponible ? null : (bool? value) {
                                     setState(() {
@@ -1594,41 +1785,51 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                       
                       const SizedBox(height: 8),
                       
-                      // 🔥 CONTADOR DE SELECCIONADAS
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: pizzasSeleccionadas.isNotEmpty ? colorSecundario.withOpacity(0.1) : Colors.grey[100],
-                              borderRadius: BorderRadius.circular(6),
+                      // 🔥 RESUMEN DE SELECCIÓN MEJORADO
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: pizzasSeleccionadas.isNotEmpty ? colorSecundario.withOpacity(0.1) : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: pizzasSeleccionadas.isNotEmpty ? colorSecundario.withOpacity(0.3) : Colors.grey[300]!,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              pizzasSeleccionadas.isNotEmpty ? Icons.check_circle : Icons.info,
+                              color: pizzasSeleccionadas.isNotEmpty ? colorSecundario : Colors.grey[600],
+                              size: 16,
                             ),
-                            child: Text(
-                              'Seleccionadas: ${pizzasSeleccionadas.length}',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: pizzasSeleccionadas.isNotEmpty ? colorSecundario : Colors.grey[600],
-                                fontWeight: FontWeight.w600,
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                'Seleccionadas: ${pizzasSeleccionadas.length} pizza(s)',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: pizzasSeleccionadas.isNotEmpty ? colorSecundario : Colors.grey[600],
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
-                          ),
-                          const Spacer(),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              'Disponibles: ${pizzasLibres.length}',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.blue[600],
-                                fontWeight: FontWeight.w600,
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                'Disponibles: ${pizzasLibres.length}',
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  color: Colors.blue[600],
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -1752,7 +1953,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                 const SizedBox(height: 20),
               ],
 
-              // 💰 PRECIO TOTAL
+              // 💰 PRECIO TOTAL CON LÓGICA CORREGIDA
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -1850,8 +2051,10 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                         child: Text(
                           requiereSeleccionPizzas 
                               ? pizzasSeleccionadas.isEmpty
-                                  ? 'Selecciona pizzas'
-                                  : 'Agregar a ${pizzasSeleccionadas.length} pizza(s)'
+                                  ? 'Selecciona pizzas primero'
+                                  : pizzasSeleccionadas.length == 1
+                                      ? 'Agregar a 1 pizza'
+                                      : 'Agregar a ${pizzasSeleccionadas.length} pizzas'
                               : 'Agregar x$cantidad',
                           style: const TextStyle(
                             fontSize: 14,
