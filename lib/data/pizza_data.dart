@@ -283,127 +283,101 @@ class PizzaData {
     return adicionales;
   }
 
-  // 🔥 NUEVO MÉTODO PARA CREAR ADICIONALES ESPECÍFICOS PARA COMBOS MÚLTIPLES
-  static List<Adicional> _crearAdicionalesParaComboMultiple(String nombre, double precioQuesoBase) {
-    List<Adicional> adicionales = [];
-    
-    // 🔥 OBTENER PIZZAS ESPECÍFICAS DEL COMBO
-    List<String> pizzasEnCombo = getPizzasEnCombo(nombre);
-    
-    // 🥤 GASEOSAS NORMALES PRIMERO
-    adicionales.addAll([
-      Adicional(
-        nombre: 'Pepsi 350ml', 
-        precio: 2.0, 
-        icono: '🥤',
-        imagen: 'assets/images/adicionales/pepsi_350.png'
-      ),
-      Adicional(
-        nombre: 'Pepsi 750ml', 
-        precio: 4.0, 
-        icono: '🥤',
-        imagen: 'assets/images/adicionales/pepsi_750.png'
-      ),
-    ]);
-    
-    // 🧀 QUESO ADICIONAL ESPECÍFICO PARA CADA PIZZA
-    for (int i = 0; i < pizzasEnCombo.length; i++) {
-      String pizzaNombre = pizzasEnCombo[i];
-      String nombreCorto = _obtenerNombreCorto(pizzaNombre);
-      
-      // 🔥 DETERMINAR PRECIO SEGÚN EL TAMAÑO DE LA PIZZA ESPECÍFICA
-      double precioQueso = _obtenerPrecioQuesoPorPizza(pizzaNombre, precioQuesoBase);
-      
-      adicionales.add(Adicional(
-        nombre: 'Queso adicional - $nombreCorto',
-        precio: precioQueso,
-        icono: '🧀',
-        imagen: 'assets/images/adicionales/queso_extra.png',
-      ));
+  // 🍗 MOSTRITOS
+  static final List<Mostrito> mostritos = [
+    Mostrito(
+      nombre: 'Mostrito ala',
+      descripcion: 'Broaster ala + chaufa + papas fritas + gaseosa 355ml',
+      precio: 11.0,
+      imagen: 'assets/images/mostritos/mostrito_ala.png',
+    ),
+    Mostrito(
+      nombre: 'Mostrito pecho',
+      descripcion: 'Broaster pecho + chaufa + papas fritas + gaseosa 355ml',
+      precio: 14.0,
+      imagen: 'assets/images/mostritos/mostrito_pecho.png',
+    ),
+    Mostrito(
+      nombre: 'Mostrito pierna',
+      descripcion: 'Broaster pierna + chaufa + papas fritas + gaseosa 355ml',
+      precio: 12.0,
+      imagen: 'assets/images/mostritos/mostrito_pierna.png',
+    ),
+  ];
+
+  // 🔥 MÉTODO SIMPLIFICADO PARA OBTENER ADICIONALES
+  static List<Adicional> getAdicionalesParaItem(String nombre, String tamano) {
+    final nombreLower = nombre.toLowerCase();
+
+    // 🔥 Detectar si es mostrito
+    if (nombreLower.contains('mostrito')) {
+      return _crearAdicionalesMostrito();
     }
-    
-    // 🍞 PANES AL AJO Y OTROS
-    adicionales.addAll([
-      Adicional(
-        nombre: '5 panes al ajo clásico', 
-        precio: 5.0, 
-        icono: '🍞',
-        imagen: 'assets/images/adicionales/pan_ajo_clasico_5.png'
-      ),
-      Adicional(
-        nombre: 'papa adicional', 
-        precio: 7.0, 
-        icono: '🍟',
-        imagen: 'assets/images/adicionales/papa_extra.png'
-      ),
-      Adicional(
-        nombre: '5 panes al ajo con queso', 
-        precio: 8.0, 
-        icono: '🧄',
-        imagen: 'assets/images/adicionales/pan_ajo_queso_5.png'
-      ),
-      Adicional(
-        nombre: '2 alas adicionales', 
-        precio: 9.0, 
-        icono: '🍗',
-        imagen: 'assets/images/adicionales/alas_extra.png'
-      ),
-      Adicional(
-        nombre: '10 panes al ajo clásico', 
-        precio: 9.0, 
-        icono: '🍞',
-        imagen: 'assets/images/adicionales/pan_ajo_clasico_10.png'
-      ),
-      Adicional(
-        nombre: '10 panes al ajo con queso', 
-        precio: 15.0, 
-        icono: '🧄',
-        imagen: 'assets/images/adicionales/pan_ajo_queso_10.png'
-      ),
-    ]);
-    
-    // 🔥 ORDENAR POR PRECIO
-    adicionales.sort((a, b) => a.precio.compareTo(b.precio));
-    return adicionales;
+
+    // 🔥 Detectar si es combo con pizzas
+    if (_esComboConPizzas(nombreLower)) {
+      double precioQuesoCombo = _obtenerPrecioQuesoCombo(nombreLower);
+      
+      // 🔥 Para combos especiales, agregar opciones gratuitas
+      if (esComboEspecial(nombre)) {
+        List<Adicional> adicionales = _crearAdicionalesBase(precioQueso: precioQuesoCombo);
+        adicionales.insert(0, Adicional(
+          nombre: 'Solo Americana',
+          precio: 0.0,
+          icono: '🔄',
+          imagen: 'assets/images/adicionales/cambio_americana.png',
+        ));
+        adicionales.sort((a, b) => a.precio.compareTo(b.precio));
+        return adicionales;
+      }
+
+      return _crearAdicionalesBase(precioQueso: precioQuesoCombo);
+    }
+
+    // 🔥 Lógica normal para otros productos
+    return getAdicionalesDisponibles(tamano);
   }
 
-  // 🔥 OBTENER NOMBRE CORTO PARA MOSTRAR EN ADICIONALES
-  static String _obtenerNombreCorto(String pizzaNombre) {
-    if (pizzaNombre.contains('Pizza 1: Hawaiana + Americana')) return 'Pizza 1 (Hawaiana + Americana)';
-    if (pizzaNombre.contains('Pizza 2: Pepperoni + Tocino')) return 'Pizza 2 (Pepperoni + Tocino)';
-    if (pizzaNombre.contains('Americana')) return 'Americana';
-    if (pizzaNombre.contains('Hawaiana')) return 'Hawaiana';
-    if (pizzaNombre.contains('Pepperoni')) return 'Pepperoni';
-    if (pizzaNombre.contains('Tocino')) return 'Tocino';
-    if (pizzaNombre.contains('Personal')) return 'Personal';
-    if (pizzaNombre.contains('Familiar')) return 'Familiar';
-    if (pizzaNombre.contains('Pizza 1')) return 'Pizza 1';
-    if (pizzaNombre.contains('Pizza 2')) return 'Pizza 2';
-    return 'Pizza';
+  // 🔥 DETECTAR SI ES COMBO CON PIZZAS
+  static bool _esComboConPizzas(String nombreLower) {
+    return nombreLower.contains('combo clásico') ||
+           nombreLower.contains('combo clasico') ||
+           nombreLower.contains('combo compartir') ||
+           nombreLower.contains('combo brother') ||
+           nombreLower.contains('combo familiar') ||
+           nombreLower.contains('oferta dúo') ||
+           nombreLower.contains('dúo 4 sabores') ||
+           nombreLower.contains('duo 4 sabores') ||
+           nombreLower.contains('fusión junior') ||
+           nombreLower.contains('familiar + broaster') ||
+           nombreLower.contains('estrella') ||
+           nombreLower.contains('fusión familiar');
   }
 
-  // 🔥 OBTENER PRECIO DE QUESO SEGÚN EL TAMAÑO ESPECÍFICO DE CADA PIZZA
-  static double _obtenerPrecioQuesoPorPizza(String pizzaNombre, double precioBase) {
-    // Si la pizza es personal = 4 soles
-    if (pizzaNombre.toLowerCase().contains('personal')) {
+  // 🔥 OBTENER PRECIO ESPECÍFICO DE QUESO SEGÚN EL COMBO
+  static double _obtenerPrecioQuesoCombo(String nombreLower) {
+    // COMBOS CON PIZZAS PERSONALES = 4 SOLES
+    if (nombreLower.contains('combo brother') ||
+        nombreLower.contains('fusión junior')) {
       return 4.0;
     }
-    // Si la pizza es familiar = 8 soles
-    if (pizzaNombre.toLowerCase().contains('familiar')) {
+    
+    // COMBOS CON PIZZAS FAMILIARES = 8 SOLES  
+    if (nombreLower.contains('combo clásico') ||
+        nombreLower.contains('combo familiar') ||
+        nombreLower.contains('oferta dúo') ||
+        nombreLower.contains('familiar + broaster') ||
+        nombreLower.contains('estrella') ||
+        nombreLower.contains('fusión familiar')) {
       return 8.0;
     }
     
-    // 🔥 LÓGICA ESPECIAL PARA COMBOS ESPECÍFICOS
-    String pizzaLower = pizzaNombre.toLowerCase();
-    
-    // Combo brother tiene 3 pizzas personales
-    if (pizzaLower.contains('pepperoni') || pizzaLower.contains('hawaiana') || pizzaLower.contains('americana')) {
-      if (pizzaLower.contains('personal')) return 4.0;
-      if (pizzaLower.contains('familiar')) return 8.0;
+    // COMBO COMPARTIR (familiar + personal) = 8 SOLES
+    if (nombreLower.contains('combo compartir')) {
+      return 8.0;
     }
     
-    // Por defecto usar precio base
-    return precioBase;
+    return 8.0; // Por defecto familiar
   }
 
   // 🔥 OBTENER LISTAS ORDENADAS POR PRECIO DE MENOR A MAYOR
@@ -455,108 +429,6 @@ class PizzaData {
     return fusionesOrdenadas;
   }
 
-static List<Adicional> getAdicionalesParaItem(String nombre, String tamano) {
-  final nombreLower = nombre.toLowerCase();
-
-  // 🔥 Detectar si es mostrito (para mostrar sus adicionales especiales)
-  if (nombreLower.contains('mostrito')) {
-    return _crearAdicionalesMostrito();
-  }
-
-  // 🔥 Detectar si es combo con pizzas y obtener precio específico
-  if (_esComboConPizzas(nombreLower)) {
-    double precioQuesoCombo = _obtenerPrecioQuesoCombo(nombreLower);
-
-    // 🔥 Nueva lógica: Si es combo con múltiples pizzas, crear adicionales específicos
-    if (esComboMultiplePizzas(nombre)) {
-      return _crearAdicionalesParaComboMultiple(nombre, precioQuesoCombo);
-    }
-
-    // Si es combo especial, agregar opciones gratuitas
-    if (esComboEspecial(nombre)) {
-      List<Adicional> adicionales = _crearAdicionalesBase(precioQueso: precioQuesoCombo);
-      // Agregar opción gratuita al inicio
-      adicionales.insert(0, Adicional(
-        nombre: 'Solo Americana',
-        precio: 0.0,
-        icono: '🔄',
-        imagen: 'assets/images/adicionales/cambio_americana.png',
-      ));
-      adicionales.sort((a, b) => a.precio.compareTo(b.precio));
-      return adicionales;
-    }
-
-    return _crearAdicionalesBase(precioQueso: precioQuesoCombo);
-  }
-
-  // 🔥 Lógica normal para otros productos
-  return getAdicionalesDisponibles(tamano);
-}
-
-  // 🔥 DETECTAR SI ES COMBO CON PIZZAS
-  static bool _esComboConPizzas(String nombreLower) {
-    return nombreLower.contains('combo clásico') ||
-           nombreLower.contains('combo clasico') ||
-           nombreLower.contains('combo compartir') ||
-           nombreLower.contains('combo brother') ||
-           nombreLower.contains('combo familiar') ||
-           nombreLower.contains('oferta dúo') ||
-           nombreLower.contains('dúo 4 sabores') ||
-           nombreLower.contains('duo 4 sabores') ||
-           nombreLower.contains('fusión junior') ||
-           nombreLower.contains('familiar + broaster') ||
-           nombreLower.contains('estrella') ||
-           nombreLower.contains('fusión familiar');
-  }
-
-  // 🔥 OBTENER PRECIO ESPECÍFICO DE QUESO SEGÚN EL COMBO
-  static double _obtenerPrecioQuesoCombo(String nombreLower) {
-    // COMBOS CON PIZZAS PERSONALES = 4 SOLES
-    if (nombreLower.contains('combo brother') ||    // 3 pizzas personales
-        nombreLower.contains('fusión junior')) {    // pizza personal
-      return 4.0;
-    }
-    
-    // COMBOS CON PIZZAS FAMILIARES = 8 SOLES  
-    if (nombreLower.contains('combo clásico') ||      // pizza familiar
-        nombreLower.contains('combo familiar') ||     // pizza familiar
-        nombreLower.contains('oferta dúo') ||         // 2 pizzas familiares
-        nombreLower.contains('familiar + broaster') ||// pizza familiar
-        nombreLower.contains('estrella') ||     // pizza familiar
-        nombreLower.contains('fusión familiar')) {    // pizza familiar
-      return 8.0;
-    }
-    
-    // COMBO COMPARTIR (familiar + personal) = 8 SOLES (precio más alto)
-    if (nombreLower.contains('combo compartir')) {
-      return 8.0;
-    }
-    
-    return 8.0; // Por defecto familiar
-  }
-
-  // 🍗 MOSTRITOS
-  static final List<Mostrito> mostritos = [
-    Mostrito(
-      nombre: 'Mostrito ala',
-      descripcion: 'Broaster ala + chaufa + papas fritas + gaseosa 355ml',
-      precio: 11.0,
-      imagen: 'assets/images/mostritos/mostrito_ala.png',
-    ),
-    Mostrito(
-      nombre: 'Mostrito pecho',
-      descripcion: 'Broaster pecho + chaufa + papas fritas + gaseosa 355ml',
-      precio: 14.0,
-      imagen: 'assets/images/mostritos/mostrito_pecho.png',
-    ),
-    Mostrito(
-      nombre: 'Mostrito pierna',
-      descripcion: 'Broaster pierna + chaufa + papas fritas + gaseosa 355ml',
-      precio: 12.0,
-      imagen: 'assets/images/mostritos/mostrito_pierna.png',
-    ),
-  ];
-
   // 🔥 MÉTODO PARA OBTENER ADICIONALES SEGÚN TAMAÑO
   static List<Adicional> getAdicionalesDisponibles(String tamano) {
     switch (tamano.toLowerCase()) {
@@ -567,7 +439,7 @@ static List<Adicional> getAdicionalesParaItem(String nombre, String tamano) {
       case 'extra grande':
         return _crearAdicionalesBase(precioQueso: 15.0);
       case 'mostrito':
-      return _crearAdicionalesMostrito();
+        return _crearAdicionalesMostrito();
       case 'broaster':
       case 'combo broaster':
         return _crearAdicionalesBase(incluirQueso: false); // Sin queso
@@ -593,107 +465,107 @@ static List<Adicional> getAdicionalesParaItem(String nombre, String tamano) {
            nombreLower.contains('dúo 4 sabores') ||
            nombreLower.contains('duo 4 sabores') ||
            nombreLower.contains('combo clásico') ||
-           nombreLower.contains('combo clasico'); // Por si no tiene tilde
+           nombreLower.contains('combo clasico');
   }
 
-// 🔥 ADICIONALES ESPECÍFICOS PARA MOSTRITO - COMPLETADO
-static List<Adicional> _crearAdicionalesMostrito() {
-  List<Adicional> adicionales = [];
+  // 🔥 ADICIONALES ESPECÍFICOS PARA MOSTRITO
+  static List<Adicional> _crearAdicionalesMostrito() {
+    List<Adicional> adicionales = [];
 
-  // 🥤 Gaseosas
-  adicionales.addAll([
-    Adicional(
-      nombre: 'Pepsi 350ml', 
-      precio: 2.0, 
-      icono: '🥤',
-      imagen: 'assets/images/adicionales/pepsi_350.png'
-    ),
-    Adicional(
-      nombre: 'Pepsi 750ml', 
-      precio: 4.0, 
-      icono: '🥤',
-      imagen: 'assets/images/adicionales/pepsi_750.png'
-    ),
-  ]);
+    // 🥤 Gaseosas
+    adicionales.addAll([
+      Adicional(
+        nombre: 'Pepsi 350ml', 
+        precio: 2.0, 
+        icono: '🥤',
+        imagen: 'assets/images/adicionales/pepsi_350.png'
+      ),
+      Adicional(
+        nombre: 'Pepsi 750ml', 
+        precio: 4.0, 
+        icono: '🥤',
+        imagen: 'assets/images/adicionales/pepsi_750.png'
+      ),
+    ]);
 
-  // 🍞 Panes al ajo - AGREGADO PARA MOSTRITO
-  adicionales.addAll([
-    Adicional(
-      nombre: '3 panes al ajo clásico', 
-      precio: 3.0, 
-      icono: '🍞',
-      imagen: 'assets/images/adicionales/pan_ajo_clasico_3.png'
-    ),
-    Adicional(
-      nombre: '5 panes al ajo clásico', 
-      precio: 5.0, 
-      icono: '🍞',
-      imagen: 'assets/images/adicionales/pan_ajo_clasico_5.png'
-    ),
-    Adicional(
-      nombre: '3 panes al ajo con queso', 
-      precio: 5.0, 
-      icono: '🧄',
-      imagen: 'assets/images/adicionales/pan_ajo_queso_3.png'
-    ),
-  ]);
+    // 🍞 Panes al ajo
+    adicionales.addAll([
+      Adicional(
+        nombre: '3 panes al ajo clásico', 
+        precio: 3.0, 
+        icono: '🍞',
+        imagen: 'assets/images/adicionales/pan_ajo_clasico_3.png'
+      ),
+      Adicional(
+        nombre: '5 panes al ajo clásico', 
+        precio: 5.0, 
+        icono: '🍞',
+        imagen: 'assets/images/adicionales/pan_ajo_clasico_5.png'
+      ),
+      Adicional(
+        nombre: '3 panes al ajo con queso', 
+        precio: 5.0, 
+        icono: '🧄',
+        imagen: 'assets/images/adicionales/pan_ajo_queso_3.png'
+      ),
+    ]);
 
-  // 🍟 Papas extra
-  adicionales.add(
-    Adicional(
-      nombre: 'Papa adicional', 
-      precio: 7.0, 
-      icono: '🍟',
-      imagen: 'assets/images/adicionales/papa_extra.png'
-    ),
-  );
+    // 🍟 Papas extra
+    adicionales.add(
+      Adicional(
+        nombre: 'Papa adicional', 
+        precio: 7.0, 
+        icono: '🍟',
+        imagen: 'assets/images/adicionales/papa_extra.png'
+      ),
+    );
 
-  // 🍞 Más panes al ajo
-  adicionales.addAll([
-    Adicional(
-      nombre: '5 panes al ajo con queso', 
-      precio: 8.0, 
-      icono: '🧄',
-      imagen: 'assets/images/adicionales/pan_ajo_queso_5.png'
-    ),
-    Adicional(
-      nombre: '10 panes al ajo clásico', 
-      precio: 9.0, 
-      icono: '🍞',
-      imagen: 'assets/images/adicionales/pan_ajo_clasico_10.png'
-    ),
-  ]);
+    // 🍞 Más panes al ajo
+    adicionales.addAll([
+      Adicional(
+        nombre: '5 panes al ajo con queso', 
+        precio: 8.0, 
+        icono: '🧄',
+        imagen: 'assets/images/adicionales/pan_ajo_queso_5.png'
+      ),
+      Adicional(
+        nombre: '10 panes al ajo clásico', 
+        precio: 9.0, 
+        icono: '🍞',
+        imagen: 'assets/images/adicionales/pan_ajo_clasico_10.png'
+      ),
+    ]);
 
-  // 🍗 Pollo adicional
-  adicionales.addAll([
-    Adicional(
-      nombre: '2 alas adicionales', 
-      precio: 9.0, 
-      icono: '🍗',
-      imagen: 'assets/images/adicionales/alas_extra.png'
-    ),
-    Adicional(
-      nombre: '1 pieza de pollo extra', 
-      precio: 10.0, 
-      icono: '🍗',
-      imagen: 'assets/images/adicionales/pollo_extra.png'
-    ),
-  ]);
+    // 🍗 Pollo adicional
+    adicionales.addAll([
+      Adicional(
+        nombre: '2 alas adicionales', 
+        precio: 9.0, 
+        icono: '🍗',
+        imagen: 'assets/images/adicionales/alas_extra.png'
+      ),
+      Adicional(
+        nombre: '1 pieza de pollo extra', 
+        precio: 10.0, 
+        icono: '🍗',
+        imagen: 'assets/images/adicionales/pollo_extra.png'
+      ),
+    ]);
 
-  // 🍞 Panes al ajo grandes
-  adicionales.add(
-    Adicional(
-      nombre: '10 panes al ajo con queso', 
-      precio: 15.0, 
-      icono: '🧄',
-      imagen: 'assets/images/adicionales/pan_ajo_queso_10.png'
-    ),
-  );
+    // 🍞 Panes al ajo grandes
+    adicionales.add(
+      Adicional(
+        nombre: '10 panes al ajo con queso', 
+        precio: 15.0, 
+        icono: '🧄',
+        imagen: 'assets/images/adicionales/pan_ajo_queso_10.png'
+      ),
+    );
 
-  // Ordenar por precio
-  adicionales.sort((a, b) => a.precio.compareTo(b.precio));
-  return adicionales;
-}
+    // Ordenar por precio
+    adicionales.sort((a, b) => a.precio.compareTo(b.precio));
+    return adicionales;
+  }
 
   // 🔥 VERIFICAR SI ES COMBO ESPECIAL CON OPCIONES GRATUITAS
   static bool esComboEspecial(String nombre) {
@@ -702,12 +574,12 @@ static List<Adicional> _crearAdicionalesMostrito() {
            nombreLower.contains('oferta dúo');
   }
 
-  // 🔥 MÉTODO MEJORADO PARA OBTENER PIZZAS ESPECÍFICAS DE UN COMBO
+  // 🔥 OBTENER PIZZAS ESPECÍFICAS DE UN COMBO
   static List<String> getPizzasEnCombo(String nombre) {
     final nombreLower = nombre.toLowerCase();
     
     if (nombreLower.contains('combo brother')) {
-      return ['Pizza Pepperoni (Personal)', 'Pizza Hawaiana (Personal)', 'Pizza Americana (Personal)'];
+      return ['Pizza Pepperoni', 'Pizza Hawaiana', 'Pizza Americana'];
     }
     
     if (nombreLower.contains('combo compartir')) {
@@ -715,35 +587,35 @@ static List<Adicional> _crearAdicionalesMostrito() {
     }
     
     if (nombreLower.contains('combo clásico')) {
-      return ['Pizza Familiar (Mitad Americana + Mitad Hawaiana)'];
+      return ['Pizza Mitad Americana + Mitad Hawaiana'];
     }
     
     if (nombreLower.contains('combo familiar')) {
-      return ['Pizza Americana (Familiar)'];
+      return ['Pizza Americana'];
     }
     
     if (nombreLower.contains('oferta dúo')) {
-      return ['Pizza Hawaiana (Familiar)', 'Pizza Americana (Familiar)'];
+      return ['Pizza Hawaiana', 'Pizza Americana'];
     }
     
     if (nombreLower.contains('dúo 4 sabores') || nombreLower.contains('duo 4 sabores')) {
-      return ['Pizza 1: Hawaiana + Americana (Familiar)', 'Pizza 2: Pepperoni + Tocino (Familiar)'];
+      return ['Pizza 1: Hawaiana + Americana', 'Pizza 2: Pepperoni + Tocino'];
     }
     
     if (nombreLower.contains('fusión junior')) {
-      return ['Pizza Personal (A elegir)'];
+      return ['Pizza Personal'];
     }
     
     if (nombreLower.contains('familiar + broaster')) {
-      return ['Pizza Familiar (A elegir)'];
+      return ['Pizza Familiar'];
     }
     
     if (nombreLower.contains('estrella')) {
-      return ['Pizza Familiar 2 Sabores (A elegir)'];
+      return ['Pizza Familiar 2 Sabores'];
     }
     
     if (nombreLower.contains('fusión familiar')) {
-      return ['Pizza Familiar (A elegir)'];
+      return ['Pizza Familiar'];
     }
     
     if (nombreLower.contains(' y ')) {

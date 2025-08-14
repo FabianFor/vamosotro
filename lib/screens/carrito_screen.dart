@@ -17,7 +17,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
   List<ItemPedido> carritoLocal = [];
   List<int> itemsExpandidos = [];
   
-  // 🔥 CACHE PARA ADICIONALES Y COLORES - CORREGIDO
+  // 🔥 CACHE PARA ADICIONALES Y COLORES
   late Map<String, List<Adicional>> _adicionalesCache;
   late Map<String, Color> _coloresCache;
   
@@ -37,7 +37,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
     _calcularTotal();
   }
 
-  // 🔥 MÉTODO CORREGIDO PARA INICIALIZAR CACHES EN CARRITO
   void _inicializarCaches() {
     _adicionalesCache = {};
     
@@ -51,7 +50,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
     _coloresCache = {
       'Personal': colorSecundario,
       'Familiar': colorPrimario,
-      'Extra Grande': const Color.fromARGB(255, 225, 0, 255), // Color café
+      'Extra Grande': const Color.fromARGB(255, 225, 0, 255),
       'Mostrito': Colors.orange,
       'Broaster': Colors.brown,
       '2 Sabores': Colors.purple,
@@ -64,7 +63,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
     };
   }
 
-  // 🔥 CALCULAR TOTAL SOLO CUANDO SEA NECESARIO
   void _calcularTotal() {
     _totalCacheado = carritoLocal.fold(0.0, (sum, item) => sum + (item.precioTotal * item.cantidad));
   }
@@ -81,14 +79,16 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🔥 NUEVO MÉTODO PARA MANEJAR ADICIONALES CON CANTIDAD
+  // 🔥 MOSTRAR DIALOG PARA AGREGAR ADICIONAL CON CANTIDAD
   void _mostrarDialogAdicional(int itemIndex, Adicional adicional) {
+    final item = carritoLocal[itemIndex];
+    
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return _DialogAdicional(
           adicional: adicional,
-          itemPedido: carritoLocal[itemIndex],
+          itemPedido: item,
           onAgregar: (int cantidad, String? pizzaEspecifica) {
             _agregarAdicionalConCantidad(itemIndex, adicional, cantidad, pizzaEspecifica);
           },
@@ -97,17 +97,34 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🔥 MÉTODO PARA AGREGAR ADICIONAL CON CANTIDAD Y PIZZA ESPECÍFICA
+  // 🔥 AGREGAR ADICIONAL CON CANTIDAD Y VALIDACIÓN DE QUESO
   void _agregarAdicionalConCantidad(int itemIndex, Adicional adicional, int cantidad, String? pizzaEspecifica) {
     setState(() {
       ItemPedido item = carritoLocal[itemIndex];
       List<Adicional> nuevosAdicionales = List.from(item.adicionales);
 
-      // 🔥 CREAR NUEVO ADICIONAL CON CANTIDAD Y PIZZA ESPECÍFICA
+      // 🔥 VALIDACIÓN ESPECIAL PARA QUESO: MÁXIMO 1 POR PIZZA
+      if (_esQuesoAdicional(adicional)) {
+        if (_validarQuesoMaximo(item, pizzaEspecifica, cantidad)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                pizzaEspecifica != null 
+                    ? 'Ya agregaste queso para $pizzaEspecifica. Solo 1 queso por pizza.'
+                    : 'Ya agregaste queso para esta pizza. Solo 1 queso por pizza.',
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
+          return;
+        }
+        // Para queso, forzar cantidad = 1
+        cantidad = 1;
+      }
+
+      // 🔥 CREAR NUEVO ADICIONAL
       Adicional nuevoAdicional = Adicional(
-        nombre: pizzaEspecifica != null 
-            ? '${adicional.nombre} (${pizzaEspecifica})' 
-            : adicional.nombre,
+        nombre: adicional.nombre,
         precio: adicional.precio,
         icono: adicional.icono,
         imagen: adicional.imagen,
@@ -121,11 +138,14 @@ class _CarritoScreenState extends State<CarritoScreen> {
           a.pizzaEspecifica == pizzaEspecifica);
 
       if (indiceExistente != -1) {
-        // Si existe, actualizar cantidad
-        Adicional existente = nuevosAdicionales[indiceExistente];
-        nuevosAdicionales[indiceExistente] = existente.copyWith(
-          cantidad: existente.cantidad + cantidad
-        );
+        // Si existe y NO es queso, actualizar cantidad
+        if (!_esQuesoAdicional(adicional)) {
+          Adicional existente = nuevosAdicionales[indiceExistente];
+          nuevosAdicionales[indiceExistente] = existente.copyWith(
+            cantidad: existente.cantidad + cantidad
+          );
+        }
+        // Si es queso, no hacer nada (ya validado arriba)
       } else {
         // Si no existe, agregarlo
         nuevosAdicionales.add(nuevoAdicional);
@@ -134,7 +154,33 @@ class _CarritoScreenState extends State<CarritoScreen> {
       carritoLocal[itemIndex] = item.copyWith(adicionales: nuevosAdicionales);
       _calcularTotal();
       widget.onActualizar(carritoLocal);
+
+      // 🔥 MOSTRAR CONFIRMACIÓN
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('✅ Agregado: ${nuevoAdicional.nombreCompleto}'),
+          backgroundColor: colorSecundario,
+          duration: const Duration(seconds: 1),
+        ),
+      );
     });
+  }
+
+  // 🔥 VERIFICAR SI ES QUESO ADICIONAL
+  bool _esQuesoAdicional(Adicional adicional) {
+    return adicional.nombre.toLowerCase().contains('queso');
+  }
+
+  // 🔥 VALIDAR MÁXIMO DE QUESO POR PIZZA
+  bool _validarQuesoMaximo(ItemPedido item, String? pizzaEspecifica, int cantidadNueva) {
+    // Contar cuántos quesos ya tiene para esa pizza específica
+    int quesosExistentes = item.adicionales.where((a) => 
+        a.nombre.toLowerCase().contains('queso') && 
+        a.pizzaEspecifica == pizzaEspecifica
+    ).fold(0, (sum, a) => sum + a.cantidad);
+    
+    // Si ya tiene 1 o más, no permitir agregar más
+    return quesosExistentes >= 1;
   }
 
   // 🔥 MÉTODO PARA QUITAR ADICIONAL
@@ -145,12 +191,10 @@ class _CarritoScreenState extends State<CarritoScreen> {
       
       Adicional adicional = nuevosAdicionales[adicionalIndex];
       if (adicional.cantidad > 1) {
-        // Si tiene más de 1, reducir cantidad
         nuevosAdicionales[adicionalIndex] = adicional.copyWith(
           cantidad: adicional.cantidad - 1
         );
       } else {
-        // Si tiene 1, eliminar completamente
         nuevosAdicionales.removeAt(adicionalIndex);
       }
 
@@ -160,11 +204,10 @@ class _CarritoScreenState extends State<CarritoScreen> {
     });
   }
 
-  // 🔥 MÉTODO CORREGIDO PARA OBTENER ADICIONALES CON FILTROS ESPECIALES
+  // 🔥 OBTENER ADICIONALES DISPONIBLES
   List<Adicional> _getAdicionalesDisponibles(String tamano, String nombre) {
     String key = '${nombre}_${tamano}';
     
-    // Si no está en cache, crearlo
     if (!_adicionalesCache.containsKey(key)) {
       _adicionalesCache[key] = PizzaData.getAdicionalesParaItem(nombre, tamano);
     }
@@ -175,6 +218,32 @@ class _CarritoScreenState extends State<CarritoScreen> {
   // 🎨 USAR CACHE PARA COLORES
   Color _getTamanoColor(String tamano) {
     return _coloresCache[tamano] ?? colorAcento;
+  }
+
+  // 🔥 OPTIMIZAR CAMBIO DE CANTIDAD
+  void _modificarCantidad(int index, int nuevaCantidad) {
+    setState(() {
+      if (nuevaCantidad <= 0) {
+        carritoLocal.removeAt(index);
+        itemsExpandidos.remove(index);
+        itemsExpandidos = itemsExpandidos.map((i) => i > index ? i - 1 : i).toList();
+      } else {
+        carritoLocal[index] = carritoLocal[index].copyWith(cantidad: nuevaCantidad);
+      }
+      _calcularTotal();
+      widget.onActualizar(carritoLocal);
+    });
+  }
+
+  // 🔥 TOGGLE DE EXPANSIÓN
+  void _toggleExpansion(int index) {
+    setState(() {
+      if (itemsExpandidos.contains(index)) {
+        itemsExpandidos.remove(index);
+      } else {
+        itemsExpandidos.add(index);
+      }
+    });
   }
 
   @override
@@ -226,7 +295,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🔥 ITEM DEL CARRITO COMO WIDGET SEPARADO PARA MEJOR PERFORMANCE
   Widget _buildCarritoItem(int index) {
     final item = carritoLocal[index];
     final isExpanded = itemsExpandidos.contains(index);
@@ -252,23 +320,21 @@ class _CarritoScreenState extends State<CarritoScreen> {
       ),
       child: Column(
         children: [
-          // 🔥 INFORMACIÓN PRINCIPAL DEL ITEM
+          // INFORMACIÓN PRINCIPAL
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 _buildImagenItem(item),
                 const SizedBox(width: 16),
-                Expanded(
-                  child: _buildInfoItem(item),
-                ),
+                Expanded(child: _buildInfoItem(item)),
                 _buildControlesItem(item, index),
               ],
             ),
           ),
 
-          // 🔥 ADICIONALES ACTUALES (SIEMPRE VISIBLE SI HAY ADICIONALES)
-          if (item.adicionales.isNotEmpty)
+          // 🔥 ADICIONALES AGREGADOS (SOLO CUANDO NO ESTÁ EXPANDIDO)
+          if (item.adicionales.isNotEmpty && !isExpanded)
             _buildAdicionalesActuales(item, index),
 
           // 🔥 SECCIÓN EXPANDIBLE DE ADICIONALES DISPONIBLES
@@ -279,12 +345,11 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🖼️ IMAGEN DEL ITEM OPTIMIZADA
   Widget _buildImagenItem(ItemPedido item) {
     final esCircular = 
-    item.tamano == 'Familiar' || 
-    item.tamano == 'Personal' || 
-    item.tamano == 'Extra Grande';
+        item.tamano == 'Familiar' || 
+        item.tamano == 'Personal' || 
+        item.tamano == 'Extra Grande';
     
     return Container(
       width: 60,
@@ -327,7 +392,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🔥 OBTENER ICONO SEGÚN PRODUCTO
   IconData _getIconoProducto(String tamano) {
     if (tamano.contains('Combo')) return Icons.restaurant_menu;
     if (tamano == 'Mostrito') return Icons.restaurant_menu;
@@ -350,7 +414,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 6),
-        // 🏷️ ETIQUETA DE CATEGORÍA
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
@@ -370,7 +433,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
           ),
         ),
         const SizedBox(height: 6),
-        // 💰 PRECIO
         Text(
           'S/${item.precioTotal.toStringAsFixed(2)}',
           style: const TextStyle(
@@ -383,7 +445,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🔥 NUEVA SECCIÓN PARA MOSTRAR ADICIONALES ACTUALES
+  // 🔥 ADICIONALES ACTUALES (SOLO VISIBLE CUANDO NO ESTÁ EXPANDIDO)
   Widget _buildAdicionalesActuales(ItemPedido item, int index) {
     return Container(
       width: double.infinity,
@@ -402,7 +464,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
               Icon(Icons.add_circle_outline, color: colorSecundario, size: 16),
               const SizedBox(width: 4),
               Text(
-                'Adicionales agregados:',
+                'Adicionales:',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -426,10 +488,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
               ),
               child: Row(
                 children: [
-                  Text(
-                    adicional.icono,
-                    style: const TextStyle(fontSize: 16),
-                  ),
+                  Text(adicional.icono, style: const TextStyle(fontSize: 16)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
@@ -454,7 +513,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
                       ],
                     ),
                   ),
-                  // 🔢 CANTIDAD DEL ADICIONAL
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
@@ -471,7 +529,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  // 💰 PRECIO TOTAL DEL ADICIONAL
                   Text(
                     '+S/${(adicional.precio * adicional.cantidad).toStringAsFixed(1)}',
                     style: const TextStyle(
@@ -481,7 +538,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  // ❌ BOTÓN QUITAR
                   GestureDetector(
                     onTap: () => _quitarAdicional(index, adicionalIndex),
                     child: Container(
@@ -506,7 +562,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🎛️ CONTROLES DEL ITEM
   Widget _buildControlesItem(ItemPedido item, int index) {
     final isExpanded = itemsExpandidos.contains(index);
     final esPersonalizable = item.tamano != 'Combo Broaster';
@@ -516,7 +571,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 🔥 BOTÓN QUITAR/ELIMINAR
             Container(
               width: 32,
               height: 32,
@@ -542,7 +596,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
               ),
             ),
             
-            // 🔢 CANTIDAD
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 8),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -563,7 +616,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
               ),
             ),
             
-            // ➕ BOTÓN AGREGAR
             Container(
               width: 32,
               height: 32,
@@ -589,7 +641,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
         
         const SizedBox(height: 6),
         
-        // 🔥 BOTÓN PERSONALIZAR
         if (esPersonalizable)
           Container(
             decoration: BoxDecoration(
@@ -633,34 +684,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🔥 OPTIMIZAR CAMBIO DE CANTIDAD
-  void _modificarCantidad(int index, int nuevaCantidad) {
-    setState(() {
-      if (nuevaCantidad <= 0) {
-        carritoLocal.removeAt(index);
-        itemsExpandidos.remove(index);
-        // Reajustar índices expandidos
-        itemsExpandidos = itemsExpandidos.map((i) => i > index ? i - 1 : i).toList();
-      } else {
-        carritoLocal[index] = carritoLocal[index].copyWith(cantidad: nuevaCantidad);
-      }
-      _calcularTotal();
-      widget.onActualizar(carritoLocal);
-    });
-  }
-
-  // 🔥 OPTIMIZAR TOGGLE DE EXPANSIÓN
-  void _toggleExpansion(int index) {
-    setState(() {
-      if (itemsExpandidos.contains(index)) {
-        itemsExpandidos.remove(index);
-      } else {
-        itemsExpandidos.add(index);
-      }
-    });
-  }
-
-  // 🍕 SECCIÓN DE ADICIONALES DISPONIBLES MEJORADA
   Widget _buildSeccionAdicionales(ItemPedido item, int index) {
     final adicionalesDisponibles = _getAdicionalesDisponibles(item.tamano, item.nombre);
     
@@ -705,15 +728,17 @@ class _CarritoScreenState extends State<CarritoScreen> {
           ),
           const SizedBox(height: 12),
           
-          // 🔥 LISTA DE ADICIONALES DISPONIBLES
           ...adicionalesDisponibles.map((adicional) => _buildAdicionalDisponible(adicional, item, index)),
         ],
       ),
     );
   }
 
-  // 🔥 WIDGET PARA ADICIONAL DISPONIBLE (CLICKEABLE)
+  // 🔥 WIDGET MEJORADO PARA ADICIONAL DISPONIBLE
   Widget _buildAdicionalDisponible(Adicional adicional, ItemPedido item, int index) {
+    // 🔥 CALCULAR CANTIDAD ACTUAL DEL ADICIONAL
+    int cantidadActual = _getCantidadActualAdicional(item, adicional);
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -735,7 +760,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // 🖼️ IMAGEN DEL ADICIONAL
               Container(
                 width: 40,
                 height: 40,
@@ -773,13 +797,36 @@ class _CarritoScreenState extends State<CarritoScreen> {
                         fontSize: 13,
                       ),
                     ),
-                    Text(
-                      'Toca para agregar',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey[600],
-                        fontStyle: FontStyle.italic,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          'Toca para agregar',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey[600],
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        // 🔥 MOSTRAR CANTIDAD ACTUAL
+                        if (cantidadActual > 0) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'Ya tienes: $cantidadActual',
+                              style: const TextStyle(
+                                fontSize: 9,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
@@ -808,7 +855,12 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🔥 FOOTER DEL CARRITO OPTIMIZADO
+  // 🔥 OBTENER CANTIDAD ACTUAL DE UN ADICIONAL
+  int _getCantidadActualAdicional(ItemPedido item, Adicional adicional) {
+    return item.adicionales.where((a) => a.nombre == adicional.nombre)
+        .fold(0, (sum, a) => sum + a.cantidad);
+  }
+
   Widget _buildFooterCarrito() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -949,9 +1001,9 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
   @override
   void initState() {
     super.initState();
-    // Si es queso adicional y hay múltiples pizzas, no preseleccionar
-    if (!_esQuesoAdicional() || !_tieneMultiplesPizzas()) {
-      pizzaSeleccionada = null;
+    // 🔥 LÓGICA ESPECIAL PARA QUESO: CANTIDAD FIJA = 1
+    if (_esQuesoAdicional()) {
+      cantidad = 1;
     }
   }
 
@@ -972,6 +1024,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
   Widget build(BuildContext context) {
     final pizzasDisponibles = _getPizzasDisponibles();
     final requierePizzaEspecifica = _esQuesoAdicional() && pizzasDisponibles.isNotEmpty;
+    final esQueso = _esQuesoAdicional();
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -1053,6 +1106,35 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
             
             const SizedBox(height: 20),
 
+            // 🔥 ADVERTENCIA ESPECIAL PARA QUESO
+            if (esQueso) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.orange[700], size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Solo 1 queso por pizza. Si tienes varias pizzas, elige cuál.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.orange[700],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+
             // 🔥 SELECTOR DE PIZZA (SOLO PARA QUESO EN COMBOS MÚLTIPLES)
             if (requierePizzaEspecifica) ...[
               Container(
@@ -1067,7 +1149,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.info_outline, color: Colors.blue[600], size: 18),
+                        Icon(Icons.local_pizza, color: Colors.blue[600], size: 18),
                         const SizedBox(width: 6),
                         Text(
                           '¿Para qué pizza?',
@@ -1078,14 +1160,6 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Selecciona la pizza específica donde quieres agregar el queso:',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.blue[600],
-                      ),
                     ),
                     const SizedBox(height: 10),
                     ...pizzasDisponibles.map((pizza) {
@@ -1112,120 +1186,121 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
               const SizedBox(height: 16),
             ],
 
-            // 🔢 SELECTOR DE CANTIDAD
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: colorSecundario.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: colorSecundario.withOpacity(0.2)),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.shopping_cart, color: colorSecundario, size: 18),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Cantidad',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: colorSecundario,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // 🔥 BOTÓN QUITAR
-                      Container(
-                        decoration: BoxDecoration(
-                          color: cantidad > 1 ? colorPrimario : Colors.grey,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: (cantidad > 1 ? colorPrimario : Colors.grey).withOpacity(0.3),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.remove, color: Colors.white, size: 20),
-                          onPressed: cantidad > 1
-                              ? () {
-                                  setState(() {
-                                    cantidad--;
-                                  });
-                                }
-                              : null,
-                        ),
-                      ),
-                      
-                      const SizedBox(width: 20),
-                      
-                      // 🔢 CANTIDAD ACTUAL
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [colorAcento, colorAcento.withOpacity(0.8)],
-                          ),
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: colorAcento.withOpacity(0.3),
-                              blurRadius: 6,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          '$cantidad',
-                          style: const TextStyle(
-                            fontSize: 24,
+            // 🔢 SELECTOR DE CANTIDAD (SOLO SI NO ES QUESO)
+            if (!esQueso) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: colorSecundario.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: colorSecundario.withOpacity(0.2)),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.shopping_cart, color: colorSecundario, size: 18),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Cantidad',
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: colorSecundario,
+                            fontSize: 16,
                           ),
                         ),
-                      ),
-                      
-                      const SizedBox(width: 20),
-                      
-                      // ➕ BOTÓN AGREGAR
-                      Container(
-                        decoration: BoxDecoration(
-                          color: colorSecundario,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: colorSecundario.withOpacity(0.3),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // 🔥 BOTÓN QUITAR
+                        Container(
+                          decoration: BoxDecoration(
+                            color: cantidad > 1 ? colorPrimario : Colors.grey,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: (cantidad > 1 ? colorPrimario : Colors.grey).withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.remove, color: Colors.white, size: 20),
+                            onPressed: cantidad > 1
+                                ? () {
+                                    setState(() {
+                                      cantidad--;
+                                    });
+                                  }
+                                : null,
+                          ),
+                        ),
+                        
+                        const SizedBox(width: 20),
+                        
+                        // 🔢 CANTIDAD ACTUAL
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [colorAcento, colorAcento.withOpacity(0.8)],
                             ),
-                          ],
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: colorAcento.withOpacity(0.3),
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            '$cantidad',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
-                        child: IconButton(
-                          icon: const Icon(Icons.add, color: Colors.white, size: 20),
-                          onPressed: cantidad < 10
-                              ? () {
-                                  setState(() {
-                                    cantidad++;
-                                  });
-                                }
-                              : null,
+                        
+                        const SizedBox(width: 20),
+                        
+                        // ➕ BOTÓN AGREGAR
+                        Container(
+                          decoration: BoxDecoration(
+                            color: colorSecundario,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: colorSecundario.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.add, color: Colors.white, size: 20),
+                            onPressed: cantidad < 10
+                                ? () {
+                                    setState(() {
+                                      cantidad++;
+                                    });
+                                  }
+                                : null,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
+            ],
 
             // 💰 PRECIO TOTAL
             Container(
@@ -1241,7 +1316,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Precio total:',
+                    esQueso ? 'Precio (solo 1 queso):' : 'Precio total:',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -1251,7 +1326,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                   Text(
                     widget.adicional.precio == 0.0
                         ? 'GRATIS'
-                        : 'S/${(widget.adicional.precio * cantidad).toStringAsFixed(2)}',
+                        : 'S/${(widget.adicional.precio * (esQueso ? 1 : cantidad)).toStringAsFixed(2)}',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -1305,7 +1380,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                       onPressed: (requierePizzaEspecifica && pizzaSeleccionada == null)
                           ? null
                           : () {
-                              widget.onAgregar(cantidad, pizzaSeleccionada);
+                              widget.onAgregar(esQueso ? 1 : cantidad, pizzaSeleccionada);
                               Navigator.of(context).pop();
                             },
                       style: ElevatedButton.styleFrom(
@@ -1315,9 +1390,9 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text(
-                        'Agregar al carrito',
-                        style: TextStyle(
+                      child: Text(
+                        esQueso ? 'Agregar queso (1x)' : 'Agregar al carrito',
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1332,4 +1407,4 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
       ),
     );
   }
-  }
+}
