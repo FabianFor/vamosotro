@@ -64,28 +64,32 @@ class Combo {
   });
 }
 
-// 🔧 MODELO DE ADICIONAL
+// 🔧 MODELO DE ADICIONAL ACTUALIZADO CON ICONO E IMAGEN
 class Adicional {
   final String nombre;
   final double precio;
-  final String icono;
+  final String icono;  // 🔥 MANTENER ICONO PARA EL CARRITO
+  final String imagen; // 🔥 AGREGAR IMAGEN PARA LA VISTA DE ADICIONALES
 
   Adicional({
     required this.nombre,
     required this.precio,
-    required this.icono,
+    required this.icono,  // 🔥 REQUERIDO
+    required this.imagen, // 🔥 REQUERIDO
   });
 
   // Método para crear copia del adicional (útil para comparaciones)
   Adicional copyWith({
     String? nombre,
     double? precio,
-    String? icono,
+    String? icono,  // 🔥 MANTENER ICONO
+    String? imagen, // 🔥 MANTENER IMAGEN
   }) {
     return Adicional(
       nombre: nombre ?? this.nombre,
       precio: precio ?? this.precio,
-      icono: icono ?? this.icono,
+      icono: icono ?? this.icono,   // 🔥 MANTENER ICONO
+      imagen: imagen ?? this.imagen, // 🔥 MANTENER IMAGEN
     );
   }
 
@@ -196,7 +200,7 @@ class ItemPedido {
   int get hashCode => Object.hash(nombre, tamano, adicionales);
 }
 
-// 📱 MODELO DE PEDIDO COMPLETO
+// 📱 MODELO DE PEDIDO COMPLETO ACTUALIZADO
 class Pedido {
   final String numeroPedido;
   final List<ItemPedido> items;
@@ -237,7 +241,7 @@ class Pedido {
     );
   }
 
-  // Convertir a Map para almacenamiento
+  // 🔥 MÉTODO ACTUALIZADO - Convertir a Map para almacenamiento
   Map<String, dynamic> toMap() {
     return {
       'numeroPedido': numeroPedido,
@@ -251,7 +255,8 @@ class Pedido {
         'adicionales': item.adicionales.map((a) => {
           'nombre': a.nombre,
           'precio': a.precio,
-          'icono': a.icono,
+          'icono': a.icono,   // 🔥 GUARDAR ICONO
+          'imagen': a.imagen, // 🔥 GUARDAR IMAGEN
         }).toList(),
       }).toList(),
       'total': total,
@@ -262,7 +267,7 @@ class Pedido {
     };
   }
 
-  // Crear desde Map
+  // 🔥 MÉTODO ACTUALIZADO - Crear desde Map
   static Pedido fromMap(Map<String, dynamic> map) {
     return Pedido(
       numeroPedido: map['numeroPedido'] ?? '',
@@ -276,7 +281,8 @@ class Pedido {
         adicionales: (item['adicionales'] as List<dynamic>?)?.map((a) => Adicional(
           nombre: a['nombre'] ?? '',
           precio: (a['precio'] ?? 0.0).toDouble(),
-          icono: a['icono'] ?? '',
+          icono: a['icono'] ?? '🔧',    // 🔥 CARGAR ICONO (default si no existe)
+          imagen: a['imagen'] ?? 'assets/images/adicionales/default.png', // 🔥 CARGAR IMAGEN (default si no existe)
         )).toList() ?? [],
       )).toList() ?? [],
       total: (map['total'] ?? 0.0).toDouble(),

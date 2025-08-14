@@ -27,8 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 🔥 CATEGORÍAS ACTUALIZADAS EN HOME SCREEN
   static const List<Map<String, dynamic>> categorias = [
-    {'nombre': 'Pizza Familiar (30cm)', 'icono': Icons.local_pizza},
     {'nombre': 'Pizza Personal (18cm)', 'icono': Icons.local_pizza_outlined},
+    {'nombre': 'Pizza Familiar (30cm)', 'icono': Icons.local_pizza},
     {'nombre': 'Pizza Extra Grande (45cm)', 'icono': Icons.local_pizza}, // 🔥 NUEVA CATEGORÍA
     {'nombre': 'Combo Pizza', 'icono': Icons.local_pizza},
     {'nombre': 'Pizza 2 sabores', 'icono': Icons.star},
@@ -331,11 +331,11 @@ class _HomeScreenState extends State<HomeScreen> {
   // 🔥 MÉTODO ACTUALIZADO PARA CONTENIDO POR CATEGORÍA
   List<Widget> _buildContenidoPorCategoria() {
     switch (categoriaSeleccionada) {
-      case 'Pizza Familiar (30cm)':
-        return _buildPizzasFamiliares();
       case 'Pizza Personal (18cm)':
         return _buildPizzasPersonales();
-      case 'Pizza Extra Grande (45cm)': // 🔥 NUEVA CATEGORÍA
+      case 'Pizza Familiar (30cm)':
+        return _buildPizzasFamiliares();
+      case 'Pizza Extra Grande (45cm)': 
         return _buildPizzasExtraGrandes();
       case 'Combo Pizza':
         return _buildCombosPizza();
@@ -430,9 +430,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return [
       _buildSliverSectionHeader(
         'Extra Grandes',
-        'Para los más hambrientos - 45cm',
+        'Lista para conquistar tu hambre',
         Icons.local_pizza,
-        const Color(0xFF8B4513), // Color café/marrón
+        const Color.fromARGB(255, 255, 191, 0), // Morado eléctrico
         PizzaData.pizzasExtraGrandesOrdenadas.length,
       ),
       

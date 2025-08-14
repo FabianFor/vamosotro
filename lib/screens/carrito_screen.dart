@@ -81,7 +81,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🔥 MÉTODO ESPECIAL PARA TOGGLE DE ADICIONAL CON LÓGICA DE PRIMERA GASEOSA
+  // 🔥 MÉTODO SIMPLIFICADO PARA TOGGLE DE ADICIONAL
   void _toggleAdicional(int itemIndex, Adicional adicional) {
     setState(() {
       ItemPedido item = carritoLocal[itemIndex];
@@ -101,16 +101,16 @@ class _CarritoScreenState extends State<CarritoScreen> {
         }
       } 
       // 🔥 LÓGICA ESPECIAL PARA CAMBIOS GRATUITOS EN COMBOS ESPECIALES
-      else if (adicional.nombre == 'Cambiar a solo Americana') {
-        bool yaTieneCambio = nuevosAdicionales.any((a) => a.nombre == 'Cambiar a solo Americana');
+      else if (adicional.nombre == 'Cambiar a solo Americana' || adicional.nombre == 'Solo Americana') {
+        bool yaTieneCambio = nuevosAdicionales.any((a) => a.nombre == adicional.nombre);
         
         if (yaTieneCambio) {
-          nuevosAdicionales.removeWhere((a) => a.nombre == 'Cambiar a solo Americana');
+          nuevosAdicionales.removeWhere((a) => a.nombre == adicional.nombre);
         } else {
           nuevosAdicionales.add(adicional);
         }
       }
-      // 🔥 LÓGICA NORMAL PARA OTROS ADICIONALES
+      // 🔥 LÓGICA NORMAL PARA OTROS ADICIONALES (INCLUYE QUESO ESPECÍFICO)
       else {
         if (nuevosAdicionales.any((a) => a.nombre == adicional.nombre)) {
           nuevosAdicionales.removeWhere((a) => a.nombre == adicional.nombre);
@@ -140,79 +140,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
   // 🎨 USAR CACHE PARA COLORES
   Color _getTamanoColor(String tamano) {
     return _coloresCache[tamano] ?? colorAcento;
-  }
-
-  // 🔥 MÉTODO MEJORADO PARA MOSTRAR SELECTOR DE PIZZA EN COMBOS MÚLTIPLES
-  void _mostrarSelectorPizza(BuildContext context, ItemPedido item, int index, Adicional adicional) {
-    // Solo para combos con múltiples pizzas
-    if (!PizzaData.esComboMultiplePizzas(item.nombre)) {
-      _toggleAdicional(index, adicional);
-      return;
-    }
-
-    // 🔥 OBTENER PIZZAS ESPECÍFICAS DEL COMBO
-    List<String> pizzasEnCombo = PizzaData.getPizzasEnCombo(item.nombre);
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('¿En qué pizza aplicar ${adicional.nombre}?'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ...pizzasEnCombo.map((pizzaNombre) => ListTile(
-              title: Text(pizzaNombre),
-              onTap: () {
-                Navigator.pop(context);
-                _aplicarAdicionalEspecifico(index, adicional, pizzaNombre);
-              },
-            )).toList(),
-            ListTile(
-              title: const Text('Todas las pizzas'),
-              leading: const Icon(Icons.select_all),
-              onTap: () {
-                Navigator.pop(context);
-                _aplicarAdicionalEspecifico(index, adicional, 'Todas las pizzas');
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 🔥 MÉTODO PARA APLICAR ADICIONAL A PIZZA ESPECÍFICA
-  void _aplicarAdicionalEspecifico(int index, Adicional adicional, String pizzaEspecifica) {
-    setState(() {
-      ItemPedido item = carritoLocal[index];
-      List<Adicional> nuevosAdicionales = List.from(item.adicionales);
-
-      // Crear adicional con especificación de pizza
-      Adicional adicionalEspecifico = Adicional(
-        nombre: '${adicional.nombre} (${pizzaEspecifica})',
-        precio: adicional.precio,
-        icono: adicional.icono,
-      );
-
-      // Verificar si ya existe
-      bool yaExiste = nuevosAdicionales.any((a) => a.nombre == adicionalEspecifico.nombre);
-      
-      if (yaExiste) {
-        nuevosAdicionales.removeWhere((a) => a.nombre == adicionalEspecifico.nombre);
-      } else {
-        nuevosAdicionales.add(adicionalEspecifico);
-      }
-
-      carritoLocal[index] = item.copyWith(adicionales: nuevosAdicionales);
-      _calcularTotal();
-      widget.onActualizar(carritoLocal);
-    });
   }
 
   @override
@@ -271,8 +198,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
   Widget _buildCarritoItem(int index) {
     final item = carritoLocal[index];
     final isExpanded = itemsExpandidos.contains(index);
-    final esPersonalizable = item.tamano != 'Combo Broaster' && 
-                           item.tamano != 'Mostrito';
+    final esPersonalizable = item.tamano != 'Combo Broaster';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -319,7 +245,10 @@ class _CarritoScreenState extends State<CarritoScreen> {
 
   // 🖼️ IMAGEN DEL ITEM OPTIMIZADA
   Widget _buildImagenItem(ItemPedido item) {
-    final esCircular = item.tamano == 'Familiar' || item.tamano == 'Personal';
+    final esCircular = 
+    item.tamano == 'Familiar' || 
+    item.tamano == 'Personal' || 
+    item.tamano == 'Extra Grande';
     
     return Container(
       width: 60,
@@ -370,107 +299,86 @@ class _CarritoScreenState extends State<CarritoScreen> {
     return Icons.local_pizza;
   }
 
-// ℹ️ INFORMACIÓN DEL ITEM
-  Widget _buildInfoItem(ItemPedido item) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          item.nombre,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: Colors.black87,
-          ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
+Widget _buildInfoItem(ItemPedido item) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        item.nombre,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          color: Colors.black87,
         ),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      const SizedBox(height: 6),
+      // 🏷️ ETIQUETA DE CATEGORÍA
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: _getTamanoColor(item.tamano).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: _getTamanoColor(item.tamano).withOpacity(0.3),
+          ),
+        ),
+        child: Text(
+          item.tamano,
+          style: TextStyle(
+            color: _getTamanoColor(item.tamano),
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      const SizedBox(height: 6),
+      // 💰 PRECIO
+      Text(
+        'S/${item.precioTotal.toStringAsFixed(2)}',
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Colors.green,
+        ),
+      ),
+      
+      // 🔥 DETALLES DE ADICIONALES - SOLO ÍCONOS (DESCRIPCIÓN PEQUEÑA)
+      if (item.adicionales.isNotEmpty) ...[
         const SizedBox(height: 6),
-        // 🏷️ ETIQUETA DE CATEGORÍA
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(
-            color: _getTamanoColor(item.tamano).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: _getTamanoColor(item.tamano).withOpacity(0.3),
-            ),
-          ),
-          child: Text(
-            item.tamano,
-            style: TextStyle(
-              color: _getTamanoColor(item.tamano),
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-        // 💰 PRECIO
-        Text(
-          'S/${item.precioTotal.toStringAsFixed(2)}',
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: Colors.green,
-          ),
-        ),
-        
-        // 🔥 INDICADOR DE EXTRAS MOVIDO AQUÍ (ARRIBA DE LOS CONTROLES)
-        if (item.adicionales.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.orange.withOpacity(0.5)),
-            ),
-            child: Text(
-              '+${item.adicionales.length} extra${item.adicionales.length > 1 ? 's' : ''}',
-              style: TextStyle(
-                fontSize: 11,
-                color: Colors.orange[700],
-                fontWeight: FontWeight.w600,
+        Wrap(
+          spacing: 4,
+          runSpacing: 2,
+          children: item.adicionales.map((adicional) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+              decoration: BoxDecoration(
+                color: colorSecundario.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: colorSecundario.withOpacity(0.3)),
               ),
-            ),
-          ),
-        ],
-        
-        // 🔥 DETALLES DE ADICIONALES (OPCIONAL - MANTENER O QUITAR)
-        if (item.adicionales.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          Wrap(
-            spacing: 4,
-            runSpacing: 2,
-            children: item.adicionales.map((adicional) {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  color: colorSecundario.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: colorSecundario.withOpacity(0.3)),
+              child: Text(
+                '${adicional.icono} ${adicional.nombre}',
+                style: TextStyle(
+                  fontSize: 9,
+                  color: colorSecundario,
+                  fontWeight: FontWeight.w500,
                 ),
-                child: Text(
-                  '${adicional.icono} ${adicional.nombre}',
-                  style: TextStyle(
-                    fontSize: 9,
-                    color: colorSecundario,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
+              ),
+            );
+          }).toList(),
+        ),
       ],
-    );
-  }
+    ],
+  );
+}
+
 
   // 🎛️ CONTROLES DEL ITEM (SIN EL INDICADOR DE EXTRAS)
   Widget _buildControlesItem(ItemPedido item, int index) {
     final isExpanded = itemsExpandidos.contains(index);
-    final esPersonalizable = item.tamano != 'Combo Broaster' && item.tamano != 'Mostrito';
+    final esPersonalizable = item.tamano != 'Combo Broaster';
 
     return Column(
       children: [
@@ -621,7 +529,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
     });
   }
 
-  // 🍕 SECCIÓN DE ADICIONALES CORREGIDA
+  // 🍕 SECCIÓN DE ADICIONALES MEJORADA
   Widget _buildSeccionAdicionales(ItemPedido item, int index) {
     final adicionalesDisponibles = _getAdicionalesDisponibles(item.tamano, item.nombre);
     
@@ -673,113 +581,140 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🔥 MÉTODO MEJORADO PARA CONSTRUIR TILES DE ADICIONALES
-  Widget _buildAdicionalTile(Adicional adicional, ItemPedido item, int index) {
-    final isSelected = item.adicionales.any((a) => a.nombre == adicional.nombre);
-    
-    // 🔥 LÓGICA ESPECIAL PARA MOSTRAR INFORMACIÓN ADICIONAL
-    String descripcionExtra = '';
-    Color colorEspecial = colorSecundario;
-    
-    if (adicional.nombre == 'Pepsi 350ml (primera)' && item.tamano == 'Personal') {
-      descripcionExtra = ' (Solo +S/1 en personal)';
-      colorEspecial = Colors.green;
-    } else if (adicional.nombre == 'Cambiar a solo Americana') {
-      descripcionExtra = ' (Cambio gratuito)';
-      colorEspecial = Colors.blue;
-    } else if (adicional.precio == 0.0) {
-      descripcionExtra = ' (Gratis)';
-      colorEspecial = Colors.green;
-    }
-    
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? colorEspecial.withOpacity(0.1) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isSelected ? colorEspecial : Colors.grey[300]!,
-          width: isSelected ? 2 : 1,
-        ),
-        boxShadow: isSelected ? [
-          BoxShadow(
-            color: colorEspecial.withOpacity(0.2),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ] : null,
+// 🔥 MÉTODO MODIFICADO PARA CONSTRUIR TILES DE ADICIONALES CON IMÁGENES
+Widget _buildAdicionalTile(Adicional adicional, ItemPedido item, int index) {
+  final isSelected = item.adicionales.any((a) => a.nombre == adicional.nombre);
+  
+  // 🔥 LÓGICA ESPECIAL PARA MOSTRAR INFORMACIÓN ADICIONAL
+  String descripcionExtra = '';
+  Color colorEspecial = colorSecundario;
+  
+  if (adicional.nombre == 'Pepsi 350ml (primera)' && item.tamano == 'Personal') {
+    descripcionExtra = ' (Solo +S/1 en personal)';
+    colorEspecial = Colors.green;
+  } else if (adicional.nombre == 'Solo Americana') {
+    descripcionExtra = ' (Cambio gratuito)';
+    colorEspecial = Colors.blue;
+  } else if (adicional.precio == 0.0) {
+    descripcionExtra = ' (Gratis)';
+    colorEspecial = Colors.green;
+  } else if (adicional.nombre.contains('Queso adicional -')) {
+    descripcionExtra = ' (Pizza específica)';
+    colorEspecial = Colors.orange;
+  }
+  
+  return Container(
+    margin: const EdgeInsets.only(bottom: 8),
+    decoration: BoxDecoration(
+      color: isSelected ? colorEspecial.withOpacity(0.1) : Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(
+        color: isSelected ? colorEspecial : Colors.grey[300]!,
+        width: isSelected ? 2 : 1,
       ),
-      child: CheckboxListTile(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: isSelected ? colorEspecial.withOpacity(0.2) : Colors.grey[100],
-                borderRadius: BorderRadius.circular(6),
+      boxShadow: isSelected ? [
+        BoxShadow(
+          color: colorEspecial.withOpacity(0.2),
+          blurRadius: 4,
+          offset: const Offset(0, 2),
+        ),
+      ] : null,
+    ),
+    child: CheckboxListTile(
+      title: Row(
+        children: [
+          // 🖼️ IMAGEN DEL ADICIONAL (EN LA LISTA EXPANDIBLE)
+          Container(
+            width: 45,
+            height: 45,
+            padding: const EdgeInsets.all(4), // Padding interno para que no toque los bordes
+            decoration: BoxDecoration(
+              color: isSelected ? colorEspecial.withOpacity(0.1) : Colors.grey[50],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isSelected ? colorEspecial.withOpacity(0.3) : Colors.grey[300]!,
               ),
-              child: Text(adicional.icono, style: const TextStyle(fontSize: 16)),
             ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    adicional.nombre,
-                    style: TextStyle(
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                      color: isSelected ? colorEspecial : Colors.black87,
-                      fontSize: 13,
-                    ),
-                  ),
-                  if (descripcionExtra.isNotEmpty)
-                    Text(
-                      descripcionExtra,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: colorEspecial.withOpacity(0.7),
-                        fontStyle: FontStyle.italic,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: adicional.imagen.isNotEmpty
+                  ? Image.asset(
+                      adicional.imagen,
+                      fit: BoxFit.contain, // 🔥 CAMBIADO A CONTAIN PARA VER IMAGEN COMPLETA
+                      alignment: Alignment.center,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Si no se puede cargar la imagen, mostrar el ícono
+                        return Center(
+                          child: Text(
+                            adicional.icono,
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                        );
+                      },
+                    )
+                  : Center(
+                      child: Text(
+                        adicional.icono,
+                        style: const TextStyle(fontSize: 20),
                       ),
                     ),
-                ],
-              ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: isSelected ? colorEspecial : colorAcento,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                adicional.precio == 0.0 
-                  ? 'GRATIS' 
-                  : (adicional.nombre == 'Pepsi 350ml (primera)' && item.tamano == 'Personal')
-                    ? '+S/1'
-                    : '+S/${adicional.precio.toStringAsFixed(0)}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 11,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  adicional.nombre,
+                  style: TextStyle(
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    color: isSelected ? colorEspecial : Colors.black87,
+                    fontSize: 13,
+                  ),
                 ),
+                if (descripcionExtra.isNotEmpty)
+                  Text(
+                    descripcionExtra,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: colorEspecial.withOpacity(0.7),
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: isSelected ? colorEspecial : colorAcento,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              adicional.precio == 0.0 
+                ? 'GRATIS' 
+                : (adicional.nombre == 'Pepsi 350ml (primera)' && item.tamano == 'Personal')
+                  ? '+S/1'
+                  : '+S/${adicional.precio.toStringAsFixed(0)}',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 11,
               ),
             ),
-          ],
-        ),
-        value: isSelected,
-        onChanged: (bool? value) {
-          // 🔥 DETECTAR SI REQUIERE SELECTOR ESPECIAL PARA QUESO EN COMBOS MÚLTIPLES
-          if (PizzaData.esComboMultiplePizzas(item.nombre) && adicional.nombre.contains('Queso adicional')) {
-            _mostrarSelectorPizza(context, item, index, adicional);
-          } else {
-            _toggleAdicional(index, adicional);
-          }
-        },
-        activeColor: colorEspecial,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+          ),
+        ],
       ),
-    );
-  }
+      value: isSelected,
+      onChanged: (bool? value) {
+        _toggleAdicional(index, adicional);
+      },
+      activeColor: colorEspecial,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+    ),
+  );
+}
 
   // 🔥 FOOTER DEL CARRITO OPTIMIZADO
   Widget _buildFooterCarrito() {
@@ -852,7 +787,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
             width: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [colorSecundario, colorSecundario.withOpacity(0.8)],
+                colors: [const Color.fromARGB(255, 38, 139, 40), const Color.fromARGB(255, 29, 172, 32).withOpacity(0.8)],
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
