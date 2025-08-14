@@ -158,7 +158,7 @@ class Adicional {
   }
 }
 
-// 🛒 MODELO DE ITEM DEL PEDIDO ACTUALIZADO
+// 🛒 MODELO DE ITEM DEL PEDIDO CORREGIDO
 class ItemPedido {
   final String nombre;
   final double precio;
@@ -178,25 +178,49 @@ class ItemPedido {
     this.tienePrimeraGaseosa = false, // 🔥 CAMPO EXISTENTE
   });
 
-  // 🔥 MÉTODO ACTUALIZADO PARA OBTENER PRECIO TOTAL CON LÓGICA ESPECIAL
+  // 🔥 MÉTODO CORREGIDO - PRECIO TOTAL SIN MULTIPLICAR ADICIONALES POR CANTIDAD DE PIZZAS
   double get precioTotal {
+    // 🔥 PRECIO BASE: SOLO LA PIZZA (ESTE SÍ SE MULTIPLICA EN EL CÁLCULO FINAL)
+    double precioBase = precio;
+    
+    // 🔥 ADICIONALES: NO SE MULTIPLICAN POR CANTIDAD DE PIZZAS
     double precioAdicionales = 0.0;
     bool yaAplicoPrimeraGaseosa = false;
     
     for (Adicional adicional in adicionales) {
-      // 🔥 LÓGICA ESPECIAL PARA PRIMERA GASEOSA EN PIZZAS PERSONALES
-      if (tamano == 'Personal' && 
-          adicional.nombre == 'Pepsi 350ml (primera)' && 
-          !yaAplicoPrimeraGaseosa) {
+      // 🔥 LÓGICA ESPECIAL PARA PRIMERA GASEOSA
+      if (adicional.nombre.contains('primera') && !yaAplicoPrimeraGaseosa) {
         precioAdicionales += 1.0 * adicional.cantidad; // Solo +1 sol por cada una
         yaAplicoPrimeraGaseosa = true;
       } else {
-        // 🔥 USAR PRECIO TOTAL DEL ADICIONAL (PRECIO * CANTIDAD)
-        precioAdicionales += adicional.precioTotal;
+        // 🔥 ADICIONALES NORMALES: PRECIO × CANTIDAD DEL ADICIONAL
+        precioAdicionales += adicional.precio * adicional.cantidad;
       }
     }
     
-    return precio + precioAdicionales;
+    // 🔥 RETORNAR SOLO EL PRECIO UNITARIO (BASE + ADICIONALES)
+    return precioBase + precioAdicionales;
+  }
+
+  // 🔥 NUEVO MÉTODO - PRECIO TOTAL PARA EL CARRITO (CON MULTIPLICACIÓN CORRECTA)
+  double get precioTotalCarrito {
+    // 🔥 PRECIO BASE MULTIPLICADO POR CANTIDAD
+    double precioBasePorCantidad = precio * cantidad;
+    
+    // 🔥 ADICIONALES: NO SE MULTIPLICAN POR CANTIDAD DE PIZZAS
+    double precioAdicionales = 0.0;
+    bool yaAplicoPrimeraGaseosa = false;
+    
+    for (Adicional adicional in adicionales) {
+      if (adicional.nombre.contains('primera') && !yaAplicoPrimeraGaseosa) {
+        precioAdicionales += 1.0 * adicional.cantidad;
+        yaAplicoPrimeraGaseosa = true;
+      } else {
+        precioAdicionales += adicional.precio * adicional.cantidad;
+      }
+    }
+    
+    return precioBasePorCantidad + precioAdicionales;
   }
 
   // 🔥 MÉTODO PARA VERIFICAR SI PUEDE AGREGAR PRIMERA GASEOSA
