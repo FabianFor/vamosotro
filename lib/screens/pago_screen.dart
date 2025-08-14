@@ -115,244 +115,214 @@ class _PagoScreenState extends State<PagoScreen> {
     );
   }
 
-  Widget _buildResumenPedido() {
-    return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.grey[50]!],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+// 1. Actualizar el método _buildResumenPedido() para mostrar total correcto
+Widget _buildResumenPedido() {
+  final double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
+  
+  return Card(
+    elevation: 6,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    child: Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: [Colors.white, Colors.grey[50]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(Icons.receipt_long, color: Colors.white, size: 20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Resumen del Pedido', 
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.blue[100]!),
+                  child: const Icon(Icons.receipt_long, color: Colors.white, size: 20),
                 ),
-                child: Column(
-                  children: [
-                    // Lista de productos
-                    ...widget.carrito.map((item) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              '${item.cantidad}x',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Resumen del Pedido', 
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.blue[100]!),
+              ),
+              child: Column(
+                children: [
+                  // Lista de productos
+                  ...widget.carrito.map((item) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '${item.cantidad}x',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${item.nombre} (${item.tamano})',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              if (item.adicionales.isNotEmpty) ...[
+                                const SizedBox(height: 2),
                                 Text(
-                                  '${item.nombre} (${item.tamano})',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
+                                  '+ ${item.adicionales.map((a) => '${a.icono} ${a.nombre}').join(', ')}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.green[700],
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                if (item.adicionales.isNotEmpty) ...[
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '+ ${item.adicionales.map((a) => '${a.icono} ${a.nombre}').join(', ')}',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.green[700],
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
                               ],
-                            ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          'S/ ${item.precioTotalCarrito.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+                  
+                  // Mostrar delivery si aplica
+                  if (tipoEntrega == 'delivery') ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.orange[100]!, Colors.orange[200]!],
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.orange[300]!),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.delivery_dining, color: Colors.orange[800], size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Delivery agregado:',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orange[800],
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
                           Text(
-                            'S/ ${(item.precioTotal * item.cantidad).toStringAsFixed(2)}',
-                            style: const TextStyle(
+                            'S/ 2.00',
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.red,
+                              color: Colors.orange[800],
                               fontSize: 14,
                             ),
                           ),
                         ],
                       ),
-                    )),
-                    
-                    const SizedBox(height: 8),
-                    Container(
-                      width: double.infinity,
-                      height: 1,
-                      color: Colors.grey[300],
                     ),
-                    const SizedBox(height: 8),
-                    
-                    // Subtotal
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Subtotal:', 
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600, 
-                            fontSize: 16,
-                            color: Colors.black87,
-                          )
-                        ),
-                        Text(
-                          'S/ ${widget.total.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold, 
-                            fontSize: 16, 
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
+                  ],
+                  
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    height: 2,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.red[300]!, Colors.red[600]!],
+                      ),
+                      borderRadius: BorderRadius.circular(1),
                     ),
-                    
-                    // Aviso de delivery si es delivery
-                    if (tipoEntrega == 'delivery') ...[
-                      const SizedBox(height: 8),
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // SOLO EL TOTAL FINAL
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'TOTAL A PAGAR:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold, 
+                          fontSize: 18,
+                          color: Colors.black87,
+                        )
+                      ),
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Colors.orange[100]!, Colors.orange[200]!],
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.orange[300]!),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.delivery_dining, color: Colors.orange[800], size: 20),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Delivery: S/2.00 - S/4.00',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.orange[800],
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Costo final según ubicación',
-                                    style: TextStyle(
-                                      color: Colors.orange[700],
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.red.withOpacity(0.3),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                    
-                    const SizedBox(height: 8),
-                    Container(
-                      width: double.infinity,
-                      height: 2,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.red[300]!, Colors.red[600]!],
-                        ),
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    
-                    // Total
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          tipoEntrega == 'delivery' ? 'TOTAL + DELIVERY:' : 'TOTAL:',
+                        child: Text(
+                          'S/ ${totalFinal.toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold, 
-                            fontSize: 14,
-                            color: Colors.black87,
+                            fontSize: 18, 
+                            color: Colors.white,
                           )
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.red.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            tipoEntrega == 'delivery' 
-                                ? 'S/ ${widget.total.toStringAsFixed(2)} +'
-                                : 'S/ ${widget.total.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold, 
-                              fontSize: 16, 
-                              color: Colors.white,
-                            )
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildDatosCliente() {
     return Card(
@@ -555,163 +525,152 @@ class _PagoScreenState extends State<PagoScreen> {
     );
   }
 
-  Widget _buildSeccionDelivery() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.blue[50]!, Colors.blue[100]!],
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue[200]!),
+Widget _buildSeccionDelivery() {
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        colors: [Colors.blue[50]!, Colors.blue[100]!],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.blue[200]!),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Icon(Icons.info, color: Colors.blue, size: 24),
+            SizedBox(width: 10),
+            Text(
+              'Información de Delivery', 
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Colors.blue,
+              )
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.orange[100],
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.orange[300]!),
+          ),
+          child: Row(
             children: [
-              Icon(Icons.info, color: Colors.blue, size: 24),
-              SizedBox(width: 10),
-              Text(
-                'Información de Delivery', 
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Colors.blue,
-                )
+              Icon(Icons.info_outline, color: Colors.orange[800], size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Se añadirá S/ 2.00 por delivery al total',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange[800],
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ],
           ),
+        ),
+        
+        const SizedBox(height: 12),
+        
+        if (ubicacionActual == null) ...[
+          const Text(
+            'Necesitamos tu ubicación exacta para el delivery',
+            style: TextStyle(color: Colors.blue),
+          ),
           const SizedBox(height: 12),
-          
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: cargandoUbicacion ? null : _obtenerUbicacion,
+              icon: cargandoUbicacion 
+                  ? const SizedBox(
+                      width: 16, 
+                      height: 16, 
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
+                    )
+                  : const Icon(Icons.location_on, color: Colors.white),
+              label: Text(
+                cargandoUbicacion ? 'Obteniendo ubicación...' : 'Obtener mi ubicación',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
+        ] else ...[
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.orange[100],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.orange[300]!),
+              color: Colors.green[100],
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.green[300]!),
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                const Row(
                   children: [
-                    Icon(Icons.warning, color: Colors.orange[800], size:20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Costo de delivery: S/2.00 - S/4.00',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orange[800],
-                        ),
-                      ),
+                    Icon(Icons.check_circle, color: Colors.green, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Ubicación obtenida ✅', 
+                      style: TextStyle(
+                        color: Colors.green, 
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      )
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'El costo final depende de tu ubicación. Se cobrará junto con el pedido.',
-                  style: TextStyle(
-                    color: Colors.orange[700],
-                    fontSize: 13,
+                  'Lat: ${ubicacionActual!.latitude.toStringAsFixed(6)}',
+                  style: const TextStyle(fontSize: 12, color: Colors.green),
+                ),
+                Text(
+                  'Lng: ${ubicacionActual!.longitude.toStringAsFixed(6)}',
+                  style: const TextStyle(fontSize: 12, color: Colors.green),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () => UbicacionService.abrirEnMaps(
+                    ubicacionActual!.latitude, 
+                    ubicacionActual!.longitude
+                  ),
+                  icon: const Icon(Icons.map, color: Colors.white),
+                  label: const Text(
+                    'Ver en Maps',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          
-          const SizedBox(height: 12),
-          
-          if (ubicacionActual == null) ...[
-            const Text(
-              'Necesitamos tu ubicación exacta para el delivery',
-              style: TextStyle(color: Colors.blue),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: cargandoUbicacion ? null : _obtenerUbicacion,
-                icon: cargandoUbicacion 
-                    ? const SizedBox(
-                        width: 16, 
-                        height: 16, 
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
-                      )
-                    : const Icon(Icons.location_on, color: Colors.white),
-                label: Text(
-                  cargandoUbicacion ? 'Obteniendo ubicación...' : 'Obtener mi ubicación',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ),
-          ] else ...[
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.green[100],
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.green[300]!),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Ubicación obtenida ✅', 
-                        style: TextStyle(
-                          color: Colors.green, 
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        )
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Lat: ${ubicacionActual!.latitude.toStringAsFixed(6)}',
-                    style: const TextStyle(fontSize: 12, color: Colors.green),
-                  ),
-                  Text(
-                    'Lng: ${ubicacionActual!.longitude.toStringAsFixed(6)}',
-                    style: const TextStyle(fontSize: 12, color: Colors.green),
-                  ),
-                  const SizedBox(height: 12),
-                  ElevatedButton.icon(
-                    onPressed: () => UbicacionService.abrirEnMaps(
-                      ubicacionActual!.latitude, 
-                      ubicacionActual!.longitude
-                    ),
-                    icon: const Icon(Icons.map, color: Colors.white),
-                    label: const Text(
-                      'Ver en Maps',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
 
   Widget _buildSeccionRecojo() {
     return Container(
@@ -953,124 +912,147 @@ class _PagoScreenState extends State<PagoScreen> {
     );
   }
 
-  Widget _buildCampoEfectivo() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.green[50]!, Colors.green[100]!],
+// 3. Actualizar _buildCampoEfectivo() para usar total correcto
+Widget _buildCampoEfectivo() {
+  final double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
+  
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        colors: [Colors.green[50]!, Colors.green[100]!],
+      ),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.green[200]!),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Detalles del Pago en Efectivo', 
+          style: TextStyle(
+            fontWeight: FontWeight.bold, 
+            fontSize: 16,
+            color: Colors.green,
+          )
         ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green[200]!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Detalles del Pago en Efectivo', 
-            style: TextStyle(
-              fontWeight: FontWeight.bold, 
-              fontSize: 16,
-              color: Colors.green,
-            )
+        const SizedBox(height: 12),
+        TextField(
+          controller: pagoConCuantoController,
+          decoration: InputDecoration(
+            labelText: '¿Con cuánto va a pagar?',
+            prefixText: 'S/ ',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Colors.green, width: 2),
+            ),
+            hintText: 'Ingrese el monto',
+            filled: true,
+            fillColor: Colors.white,
           ),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          onChanged: (value) => _calcularVueltoCorregido(),
+        ),
+        if (vuelto != null) ...[
           const SizedBox(height: 12),
-          TextField(
-            controller: pagoConCuantoController,
-            decoration: InputDecoration(
-              labelText: '¿Con cuánto va a pagar?',
-              prefixText: 'S/ ',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: PagoService.esPagoExacto(totalFinal, double.parse(pagoConCuantoController.text)) 
+                  ? Colors.green[100] 
+                  : Colors.blue[100],
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: PagoService.esPagoExacto(totalFinal, double.parse(pagoConCuantoController.text)) 
+                    ? Colors.green 
+                    : Colors.blue
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Colors.green, width: 2),
-              ),
-              hintText: 'Ingrese el monto',
-              filled: true,
-              fillColor: Colors.white,
             ),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) => _calcularVuelto(),
-          ),
-          if (vuelto != null) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: PagoService.esPagoExacto(widget.total, double.parse(pagoConCuantoController.text)) 
-                    ? Colors.green[100] 
-                    : Colors.blue[100],
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: PagoService.esPagoExacto(widget.total, double.parse(pagoConCuantoController.text)) 
+            child: Row(
+              children: [
+                Icon(
+                  PagoService.esPagoExacto(totalFinal, double.parse(pagoConCuantoController.text)) 
+                      ? Icons.check_circle 
+                      : Icons.monetization_on,
+                  color: PagoService.esPagoExacto(totalFinal, double.parse(pagoConCuantoController.text)) 
                       ? Colors.green 
-                      : Colors.blue
+                      : Colors.blue,
                 ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    PagoService.esPagoExacto(widget.total, double.parse(pagoConCuantoController.text)) 
-                        ? Icons.check_circle 
-                        : Icons.monetization_on,
-                    color: PagoService.esPagoExacto(widget.total, double.parse(pagoConCuantoController.text)) 
-                        ? Colors.green 
-                        : Colors.blue,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      PagoService.esPagoExacto(widget.total, double.parse(pagoConCuantoController.text))
-                          ? 'Pago exacto ✅'
-                          : 'Su vuelto será: S/ ${vuelto!.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: PagoService.esPagoExacto(widget.total, double.parse(pagoConCuantoController.text)) 
-                            ? Colors.green[800] 
-                            : Colors.blue[800],
-                      ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    PagoService.esPagoExacto(totalFinal, double.parse(pagoConCuantoController.text))
+                        ? 'Pago exacto ✅'
+                        : 'Su vuelto será: S/ ${vuelto!.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: PagoService.esPagoExacto(totalFinal, double.parse(pagoConCuantoController.text)) 
+                          ? Colors.green[800] 
+                          : Colors.blue[800],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-          if (pagoConCuantoController.text.isNotEmpty && 
-              double.tryParse(pagoConCuantoController.text) != null &&
-              double.parse(pagoConCuantoController.text) < widget.total) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red[100],
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.red),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.error, color: Colors.red),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'El monto debe ser mayor o igual al total',
-                      style: TextStyle(
-                        color: Colors.red[800], 
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ],
-      ),
-    );
+        if (pagoConCuantoController.text.isNotEmpty && 
+            double.tryParse(pagoConCuantoController.text) != null &&
+            double.parse(pagoConCuantoController.text) < totalFinal) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.red[100],
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.red),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.red),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'El monto debe ser mayor o igual al total',
+                    style: TextStyle(
+                      color: Colors.red[800], 
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    ),
+  );
+}
+void _calcularVueltoCorregido() {
+  if (pagoConCuantoController.text.isNotEmpty && metodoPago == 'efectivo') {
+    double pagoConCuanto = double.tryParse(pagoConCuantoController.text) ?? 0;
+    double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
+    
+    if (pagoConCuanto >= totalFinal) {
+      setState(() {
+        vuelto = PagoService.calcularVuelto(totalFinal, pagoConCuanto);
+      });
+    } else {
+      setState(() {
+        vuelto = null;
+      });
+    }
+  } else {
+    setState(() {
+      vuelto = null;
+    });
   }
+}
 
   Widget _buildBotonConfirmar() {
     bool puedeConfirmar = _puedeConfirmarPedido();
@@ -1124,26 +1106,29 @@ class _PagoScreenState extends State<PagoScreen> {
     );
   }
 
-  bool _puedeConfirmarPedido() {
-    bool datosCompletos = nombreController.text.isNotEmpty &&
-                         telefonoController.text.isNotEmpty &&
-                         tipoEntrega.isNotEmpty &&
-                         metodoPago.isNotEmpty;
-    
-    bool ubicacionOk = tipoEntrega == 'recojo' || ubicacionActual != null;
-    
-    bool pagoOk = true;
-    if (metodoPago == 'efectivo') {
-      if (pagoConCuantoController.text.isEmpty) {
-        pagoOk = false;
-      } else {
-        double? pagoConCuanto = double.tryParse(pagoConCuantoController.text);
-        pagoOk = pagoConCuanto != null && pagoConCuanto >= widget.total;
-      }
+bool _puedeConfirmarPedido() {
+  double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
+  
+  bool datosCompletos = nombreController.text.isNotEmpty &&
+                       telefonoController.text.isNotEmpty &&
+                       tipoEntrega.isNotEmpty &&
+                       metodoPago.isNotEmpty;
+  
+  bool ubicacionOk = tipoEntrega == 'recojo' || ubicacionActual != null;
+  
+  bool pagoOk = true;
+  if (metodoPago == 'efectivo') {
+    if (pagoConCuantoController.text.isEmpty) {
+      pagoOk = false;
+    } else {
+      double? pagoConCuanto = double.tryParse(pagoConCuantoController.text);
+      pagoOk = pagoConCuanto != null && pagoConCuanto >= totalFinal;
     }
-    
-    return datosCompletos && ubicacionOk && pagoOk;
   }
+  
+  return datosCompletos && ubicacionOk && pagoOk;
+}
+
 
   Future<void> _obtenerUbicacion() async {
     setState(() {
