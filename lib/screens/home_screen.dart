@@ -67,14 +67,10 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       _recalcularTotalItems(); 
     });
-
-    // 🔥 MOSTRAR SNACKBAR CON INFORMACIÓN ESPECIAL USANDO EL MÉTODO CORREGIDO
-    String mensajeExtra = PizzaData.getMensajeEspecial(nombre, tamano);
-
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$nombre agregado$mensajeExtra'),
+          content: Text('$nombre agregado'),
           duration: const Duration(milliseconds: 1500),
           backgroundColor: colorPrimario,
           behavior: SnackBarBehavior.floating,

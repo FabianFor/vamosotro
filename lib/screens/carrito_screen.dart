@@ -247,7 +247,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
   }
 
   bool _esQuesoAdicional(Adicional adicional) {
-    return adicional.nombre.toLowerCase().contains('queso');
+    return adicional.nombre.toLowerCase().contains('queso adicional');
   }
 
   bool _esAdicionalEspecialGratuito(Adicional adicional) {
@@ -1206,7 +1206,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
   }
 
   bool _esQuesoAdicional() {
-    return widget.adicional.nombre.toLowerCase().contains('queso');
+    return widget.adicional.nombre.toLowerCase().contains('queso adicional');
   }
 
   bool _esAdicionalEspecialGratuito() {

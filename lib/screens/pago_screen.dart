@@ -117,7 +117,6 @@ class _PagoScreenState extends State<PagoScreen> {
     );
   }
 
-// Resumen del pedido simplificado
 Widget _buildResumenPedido() {
   final double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
   
@@ -165,61 +164,107 @@ Widget _buildResumenPedido() {
               ),
               child: Column(
                 children: [
-                  // Lista de productos
+                  // Lista de productos con ADICIONALES MEJORADOS
                   ...widget.carrito.map((item) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 3),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    padding: const EdgeInsets.symmetric(vertical: 4), // 🔥 MÁS ESPACIO
+                    child: Column( // 🔥 CAMBIADO A COLUMN PARA MEJOR DISTRIBUCIÓN
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            '${item.cantidad}x',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
+                        // 🔥 PRODUCTO PRINCIPAL
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4), // 🔥 MÁS PADDING
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '${item.cantidad}x',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12, // 🔥 TAMAÑO AUMENTADO
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
                                 '${item.nombre} (${item.tamano})',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 12,
+                                  fontSize: 14, // 🔥 TAMAÑO AUMENTADO
+                                  color: Colors.black87,
                                 ),
                               ),
-                              if (item.adicionales.isNotEmpty) ...[
-                                const SizedBox(height: 1),
-                                Text(
-                                  '+ ${item.adicionales.map((a) => '${a.icono} ${a.nombre}').join(', ')}',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.green[700],
-                                    fontWeight: FontWeight.w500,
+                            ),
+                            Text(
+                              'S/ ${item.precioTotalCarrito.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                                fontSize: 14, // 🔥 TAMAÑO AUMENTADO
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        // 🔥 ADICIONALES CON CANTIDAD VISIBLE
+                        if (item.adicionales.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16), // 🔥 INDENTACIÓN
+                            child: Column(
+                              children: item.adicionales.map((adicional) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 1),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        '  ${adicional.icono}',
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          // 🔥 MOSTRAR CANTIDAD SI ES MAYOR A 1
+                                          adicional.cantidad > 1 
+                                              ? '${adicional.cantidad}x ${adicional.nombre}'
+                                              : adicional.nombre,
+                                          style: TextStyle(
+                                            fontSize: 12, // 🔥 TAMAÑO AUMENTADO
+                                            color: Colors.green[700],
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      // 🔥 MOSTRAR PRECIO INDIVIDUAL DEL ADICIONAL
+                                      if (adicional.precio > 0)
+                                        Text(
+                                          '+S/${(adicional.precio * adicional.cantidad).toStringAsFixed(2)}',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.green[600],
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      if (adicional.precio == 0)
+                                        Text(
+                                          'GRATIS',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.blue[600],
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ],
+                                );
+                              }).toList(),
+                            ),
                           ),
-                        ),
-                        Text(
-                          'S/ ${item.precioTotalCarrito.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red,
-                            fontSize: 12,
-                          ),
-                        ),
+                        ],
                       ],
                     ),
                   )),
@@ -248,7 +293,7 @@ Widget _buildResumenPedido() {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.orange[800],
-                                  fontSize: 12,
+                                  fontSize: 13, // 🔥 TAMAÑO AUMENTADO
                                 ),
                               ),
                             ],
@@ -258,7 +303,7 @@ Widget _buildResumenPedido() {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.orange[800],
-                              fontSize: 12,
+                              fontSize: 13, // 🔥 TAMAÑO AUMENTADO
                             ),
                           ),
                         ],
@@ -287,12 +332,12 @@ Widget _buildResumenPedido() {
                         'TOTAL A PAGAR:',
                         style: TextStyle(
                           fontWeight: FontWeight.bold, 
-                          fontSize: 14,
+                          fontSize: 16, // 🔥 TAMAÑO AUMENTADO
                           color: Colors.black87,
                         )
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), // 🔥 MÁS PADDING
                         decoration: BoxDecoration(
                           color: Colors.red,
                           borderRadius: BorderRadius.circular(12),
@@ -308,7 +353,7 @@ Widget _buildResumenPedido() {
                           'S/ ${totalFinal.toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold, 
-                            fontSize: 14, 
+                            fontSize: 16, // 🔥 TAMAÑO AUMENTADO
                             color: Colors.white,
                           )
                         ),
@@ -913,7 +958,6 @@ Widget _buildSeccionDelivery() {
     );
   }
 
-// Campo efectivo corregido
 Widget _buildCampoEfectivo() {
   final double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
   
@@ -1283,77 +1327,64 @@ bool _puedeConfirmarPedido() {
     }
   }
 
-  Future<void> _enviarPedidoPorWhatsApp(String numeroPedido) async {
-    String linkUbicacion = '';
-    String infoDelivery = '';
-    
-    if (tipoEntrega == 'delivery' && ubicacionActual != null) {
-      linkUbicacion = 'https://www.google.com/maps?q=${ubicacionActual!.latitude},${ubicacionActual!.longitude}';
-      infoDelivery = '''
-
-📍 *UBICACIÓN DEL CLIENTE:*
-$linkUbicacion
-
-🚚 *DELIVERY:* Se cobrará S/2.00''';
-    }
-
-    String mensaje = '''🍕 *NUEVO PEDIDO FABICHELO* 🍕
-
-📋 *PEDIDO #$numeroPedido*
-
-👤 *DATOS DEL CLIENTE:*
-• *Nombre:* ${nombreController.text}
-• *Teléfono:* ${telefonoController.text}
-
-🛒 *PRODUCTOS:*
-${widget.carrito.map((item) {
-  String linea = '• ${item.cantidad}x ${item.nombre} (${item.tamano})';
-  if (item.adicionales.isNotEmpty) {
-    linea += ' + ${item.adicionales.map((a) => '${a.icono}${a.nombre}').join(', ')}';
+Future<void> _enviarPedidoPorWhatsApp(String numeroPedido) async {
+  // 🔥 PREPARAR INFORMACIÓN DE UBICACIÓN
+  String infoUbicacion = '';
+  if (tipoEntrega == 'delivery' && ubicacionActual != null) {
+    String linkUbicacion = 'https://www.google.com/maps?q=${ubicacionActual!.latitude},${ubicacionActual!.longitude}';
+    infoUbicacion = '\n📍 Ubicación: $linkUbicacion';
   }
-  linea += ' - S/${(item.precioTotal * item.cantidad).toStringAsFixed(2)}';
-  return linea;
-}).join('\n')}
 
-💰 *TOTAL:* S/${widget.total.toStringAsFixed(2)}
-${tipoEntrega == 'delivery' ? '🚚 *DELIVERY:* S/2.00' : ''}
+  String mensaje = '''🍕 *NUEVO PEDIDO FABICHELO* 
+📋 Pedido #$numeroPedido
 
-🚚 *TIPO DE ENTREGA:*
-${tipoEntrega == 'delivery' ? '🏠 *DELIVERY*' : '🏪 *RECOJO EN TIENDA*'}$infoDelivery
+👤 *DATOS DEL CLIENTE*
+• Nombre: ${nombreController.text}
+• Teléfono: ${telefonoController.text}
 
-💳 *MÉTODO DE PAGO:*
-${_obtenerTextoPago()}
+🚚 *TIPO DE ENTREGA*
+${tipoEntrega == 'delivery' ? '🏠 Delivery' : '🏪 Recojo en tienda'}$infoUbicacion
 
-⏰ *Hora del pedido:* ${DateTime.now().toString().substring(0, 16)}
+💳 *MÉTODO DE PAGO*
+${_obtenerTextoPagoLimpio()}
+
+🛒 *PRODUCTOS PEDIDOS*
+${widget.carrito.map((item) {
+    String linea = '• ${item.cantidad}x ${item.nombre} (${item.tamano})';
+    if (item.adicionales.isNotEmpty) {
+      linea += '\n   ${item.adicionales.map((a) => '${a.cantidad > 1 ? "${a.cantidad}x " : ""}${a.icono} ${a.nombre}').join('\n   ')}';
+    }
+    linea += '\n   S/${item.precioTotalCarrito.toStringAsFixed(2)}';
+    return linea;
+  }).join('\n\n')}${tipoEntrega == 'delivery' ? '\n\n• Delivery\n   S/2.00' : ''}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔥 *TOTAL A COBRAR: S/${(widget.total + (tipoEntrega == 'delivery' ? 2.00 : 0.00)).toStringAsFixed(2)}*
 
-✅ Cliente realizará el pago completo (${tipoEntrega == 'delivery' ? 'total + delivery S/2.00' : 'total'})
+¡Gracias por tu pedido! 🍕❤️''';
 
-¡Gracias! 🍕❤️''';
+  await PagoService.enviarWhatsApp(PagoService.numeroWhatsApp, mensaje);
+}
 
-    await PagoService.enviarWhatsApp(PagoService.numeroWhatsApp, mensaje);
-  }
-
-  String _obtenerTextoPago() {
-    switch (metodoPago) {
-      case 'efectivo':
-        if (pagoConCuantoController.text.isNotEmpty) {
-          double pagoConCuanto = double.parse(pagoConCuantoController.text);
-          double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
-          if (vuelto != null && vuelto! > 0) {
-            return '💵 *EFECTIVO*\n   • Paga con: S/${pagoConCuanto.toStringAsFixed(2)}\n   • Vuelto: S/${vuelto!.toStringAsFixed(2)}';
-          } else {
-            return '💵 *EFECTIVO* - Pago exacto: S/${totalFinal.toStringAsFixed(2)}';
-          }
+String _obtenerTextoPagoLimpio() {
+  switch (metodoPago) {
+    case 'efectivo':
+      if (pagoConCuantoController.text.isNotEmpty) {
+        double pagoConCuanto = double.parse(pagoConCuantoController.text);
+        double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
+        if (vuelto != null && vuelto! > 0) {
+          return '💵 Efectivo\n• Paga con: S/${pagoConCuanto.toStringAsFixed(2)}\n• Vuelto: S/${vuelto!.toStringAsFixed(2)}';
+        } else {
+          return '💵 Efectivo (pago exacto)';
         }
-        return '💵 *EFECTIVO*';
-      case 'yape':
-        return '🟣 *YAPE*\n   • Número: ${PagoService.numeroYape}\n   • Nombre: Carlos Alberto Huaytalla Quispe';
-      case 'plin':
-        return '🔵 *PLIN*\n   • Número: ${PagoService.numeroPlin}\n   • Nombre: Fabian Hector Huaytalla Guevara';
-      default:
-        return metodoPago.toUpperCase();
-    }
+      }
+      return '💵 Efectivo';
+    case 'yape':
+      return '🟣 Yape\n• ${PagoService.numeroYape}\n• Carlos Alberto Huaytalla Quispe';
+    case 'plin':
+      return '🔵 Plin\n• ${PagoService.numeroPlin}\n• Fabian Hector Huaytalla Guevara';
+    default:
+      return metodoPago.toUpperCase();
   }
+}
 }
