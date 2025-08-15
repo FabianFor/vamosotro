@@ -46,6 +46,9 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
   late Animation<double> _pulseAnimation;
   late Animation<Offset> _slideAnimation;
 
+  // 🔥 AQUÍ ESTÁ LA SOLUCIÓN AL totalFinal
+  double get totalFinal => widget.tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
+
   @override
   void initState() {
     super.initState();
@@ -201,25 +204,84 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
             children: [
               // Estado del pedido con animación
               _buildTarjetaEstado(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
+
+              // 🔥 ADVERTENCIA DE NO PAGAR AÚN (para pagos digitales)
+              if (widget.metodoPago != 'efectivo')
+                _buildAdvertenciaNoPagar(),
 
               // Información de pago
-              if (widget.metodoPago != 'efectivo')
+              if (widget.metodoPago != 'efectivo') ...[
+                const SizedBox(height: 12),
                 _buildTarjetaPagoDigital(),
-              if (widget.metodoPago == 'efectivo')
+              ],
+              if (widget.metodoPago == 'efectivo') ...[
+                const SizedBox(height: 12),
                 _buildTarjetaEfectivo(),
+              ],
 
-              const SizedBox(height: 15),
-              _buildTarjetaResumen(),
-              const SizedBox(height: 15),
+              const SizedBox(height: 12),
+              _buildTarjetaResumenCompacto(),
+              const SizedBox(height: 12),
               _buildTarjetaEntrega(),
-              const SizedBox(height: 30),
+              const SizedBox(height: 24),
               _buildBotonesAccion(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               _buildTarjetaConsulta(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // 🔥 NUEVA ADVERTENCIA
+  Widget _buildAdvertenciaNoPagar() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.red[100]!, Colors.orange[100]!],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.red[300]!, width: 2),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Icon(Icons.warning, color: Colors.white, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '⚠️ NO PAGUES AÚN',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Colors.red[800],
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Espera a que confirmemos tu pedido antes de realizar el pago',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.red[700],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -233,17 +295,17 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: _obtenerColorEstado().withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(30),
+        padding: const EdgeInsets.all(24),
         child: Column(
           children: [
             AnimatedBuilder(
@@ -252,7 +314,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                 return Transform.scale(
                   scale: estadoPedido == 'confirmado' ? _pulseAnimation.value : 1.0,
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       shape: BoxShape.circle,
@@ -260,50 +322,50 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                     child: Icon(
                       _obtenerIconoEstado(),
                       color: Colors.white,
-                      size: 64,
+                      size: 48,
                     ),
                   ),
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             Text(
               _obtenerEstadoTexto(),
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
                 'Pedido #${widget.numeroPedido}',
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
             if (_obtenerTiempoEstimado().isNotEmpty) ...[
-              const SizedBox(height: 15),
+              const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.access_time, color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.access_time, color: Colors.white, size: 18),
+                  const SizedBox(width: 6),
                   Text(
                     'Tiempo estimado: ${_obtenerTiempoEstimado()}',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
                 ],
@@ -325,11 +387,11 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
         : 'Fabian Hector Huaytalla Guevara';
 
     return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
             colors: [Colors.white, colorPrincipal.withOpacity(0.05)],
             begin: Alignment.topLeft,
@@ -337,30 +399,23 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              // Header
+              // Header compacto
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [colorPrincipal, colorPrincipal.withOpacity(0.8)],
                       ),
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                          color: colorPrincipal.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.payment, color: Colors.white, size: 24),
+                    child: const Icon(Icons.payment, color: Colors.white, size: 20),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,15 +424,15 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                           'Información de Pago',
                           style: TextStyle(
                             fontWeight: FontWeight.bold, 
-                            fontSize: 20,
+                            fontSize: 16,
                             color: Colors.black87,
                           ),
                         ),
                         Text(
-                          'Realiza el pago con $nombreMetodo',
+                          'Datos para $nombreMetodo',
                           style: TextStyle(
                             color: Colors.grey[600], 
-                            fontSize: 14,
+                            fontSize: 12,
                           ),
                         ),
                       ],
@@ -385,160 +440,65 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
-              // Tarjeta del método de pago
+              // Información compacta
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [colorPrincipal, colorPrincipal.withOpacity(0.8)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: colorPrincipal.withOpacity(0.4),
-                      blurRadius: 10,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
                   children: [
-                    // Logo y nombre del método
+                    // Logo y método
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
+                        _buildLogoMetodoPago(metodoPago),
+                        const SizedBox(width: 12),
+                        Text(
+                          nombreMetodo,
+                          style: const TextStyle(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _buildLogoMetodoPago(metodoPago),
-                              const SizedBox(width: 8),
-                              Text(
-                                nombreMetodo,
-                                style: TextStyle(
-                                  color: colorPrincipal,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            metodoPago == 'yape' ? Icons.account_balance_wallet : Icons.credit_card,
-                            color: Colors.white,
-                            size: 24,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-
-                    // Información del pago
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white.withOpacity(0.2)),
-                      ),
-                      child: Column(
-                        children: [
-                          _buildInfoPagoDigital('Número:', numeroTelefono, Icons.smartphone),
-                          const SizedBox(height: 12),
-                          _buildInfoPagoDigital('Titular:', nombreTitular, Icons.account_circle),
-                          const SizedBox(height: 12),
-                          _buildInfoPagoDigital(
-                            'Monto:', 
-                            widget.tipoEntrega == 'delivery' 
-                                ? 'S/ ${widget.total.toStringAsFixed(2)} + delivery'
-                                : 'S/ ${widget.total.toStringAsFixed(2)}', 
-                            Icons.account_balance_wallet
-                          ),
-                          const SizedBox(height: 12),
-                          _buildInfoPagoDigital('Concepto:', 'Pedido #${widget.numeroPedido}', Icons.shopping_cart),
-                          if (widget.tipoEntrega == 'delivery') ...[
-                            const SizedBox(height: 12),
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.orange.withOpacity(0.3)),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delivery_dining, color: Colors.white.withOpacity(0.9), size: 16),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      'Delivery: S/2.00 - S/4.00 (según ubicación)',
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.9),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
+                    const SizedBox(height: 12),
+                    
+                    // Datos compactos
+                    _buildInfoPagoDigitalCompacto('📱', numeroTelefono),
+                    const SizedBox(height: 8),
+                    _buildInfoPagoDigitalCompacto('👤', nombreTitular),
+                    const SizedBox(height: 8),
+                    _buildInfoPagoDigitalCompacto(
+                      '💰', 
+                      widget.tipoEntrega == 'delivery' 
+                          ? 'S/${totalFinal.toStringAsFixed(2)} (incluye delivery)'
+                          : 'S/${totalFinal.toStringAsFixed(2)}'
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-              // Botón de copiar número
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: colorPrincipal.withOpacity(0.3),
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
+              // Botón copiar compacto
+              ElevatedButton.icon(
+                onPressed: _copiarNumero,
+                icon: const Icon(Icons.copy, color: Colors.white, size: 16),
+                label: const Text(
+                  'Copiar Número',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                 ),
-                child: ElevatedButton.icon(
-                  onPressed: _copiarNumero,
-                  icon: const Icon(Icons.copy, color: Colors.white),
-                  label: const Text(
-                    'Copiar Número de Teléfono',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorPrincipal,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorPrincipal,
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
               ),
             ],
@@ -553,55 +513,43 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
         ? 'assets/images/logos/yape_logo.png'
         : 'assets/images/logos/plin_logo.png';
 
-    return Image.asset(
-      assetPath,
-      width: 40,
-      height: 40,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) {
-        return Icon(
-          metodo == 'yape' ? Icons.account_balance_wallet : Icons.credit_card,
-          size: 40,
-          color: metodo == 'yape' ? Colors.purple : Colors.teal,
-        );
-      },
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: Image.asset(
+          assetPath,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return Icon(
+              metodo == 'yape' ? Icons.account_balance_wallet : Icons.credit_card,
+              size: 20,
+              color: metodo == 'yape' ? Colors.purple : Colors.teal,
+            );
+          },
+        ),
+      ),
     );
   }
 
-  Widget _buildInfoPagoDigital(String label, String value, IconData icono) {
+  Widget _buildInfoPagoDigitalCompacto(String icono, String value) {
     return Row(
       children: [
-        Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icono, color: Colors.white, size: 16),
-        ),
-        const SizedBox(width: 12),
+        Text(icono, style: const TextStyle(fontSize: 16)),
+        const SizedBox(width: 8),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 2),
-              SelectableText(
-                value,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+          child: SelectableText(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],
@@ -610,147 +558,115 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
 
   Widget _buildTarjetaEfectivo() {
     return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.green.withOpacity(0.05)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.green, Colors.green.withOpacity(0.8)],
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.payments, color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Pago en Efectivo',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold, 
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.green.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                      Text(
+                        'Pago al momento de la entrega',
+                        style: TextStyle(
+                          color: Colors.grey, 
+                          fontSize: 12,
                         ),
-                      ],
-                    ),
-                    child: const Icon(Icons.payments, color: Colors.white, size: 24), 
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Pago en Efectivo',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold, 
-                            fontSize: 20,
-                            color: Colors.black87,
-                          ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: widget.vuelto != null && widget.vuelto! > 0 
+                      ? [Colors.blue[50]!, Colors.blue[100]!]
+                      : [Colors.green[50]!, Colors.green[100]!],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: widget.vuelto != null && widget.vuelto! > 0 
+                      ? Colors.blue[200]! 
+                      : Colors.green[200]!,
+                ),
+              ),
+              child: Column(
+                children: [
+                  _buildInfoPago('Total:', 'S/${totalFinal.toStringAsFixed(2)}'),
+                  if (widget.pagoConCuanto != null) ...[
+                    const SizedBox(height: 8),
+                    _buildInfoPago('Paga con:', 'S/${widget.pagoConCuanto!.toStringAsFixed(2)}'),
+                  ],
+                  if (widget.vuelto != null && widget.vuelto! > 0) ...[
+                    const SizedBox(height: 8),
+                    _buildInfoPago('Vuelto:', 'S/${widget.vuelto!.toStringAsFixed(2)}'),
+                  ] else if (widget.pagoConCuanto != null) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.green[100]!, Colors.green[200]!],
                         ),
-                        Text(
-                          'Pago al momento de la entrega',
-                          style: TextStyle(
-                            color: Colors.grey, 
-                            fontSize: 14,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green[300]!),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Icon(Icons.check_circle, color: Colors.white, size: 16),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Pago exacto ✅',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green[800],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
-              const SizedBox(height: 20),
-              
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: widget.vuelto != null && widget.vuelto! > 0 
-                        ? [Colors.blue[50]!, Colors.blue[100]!]
-                        : [Colors.green[50]!, Colors.green[100]!],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: widget.vuelto != null && widget.vuelto! > 0 
-                        ? Colors.blue[200]! 
-                        : Colors.green[200]!,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    _buildInfoPago('Subtotal:', 'S/ ${widget.total.toStringAsFixed(2)}'),
-                    if (widget.tipoEntrega == 'delivery') ...[
-                      const SizedBox(height: 8),
-                      _buildInfoPago('Delivery:', 'S/2.00 - S/4.00'),
-                    ],
-                    const SizedBox(height: 8),
-                    Container(height: 1, color: Colors.grey[300]),
-                    const SizedBox(height: 8),
-                    _buildInfoPago(
-                      widget.tipoEntrega == 'delivery' ? 'Total + delivery:' : 'Total a pagar:', 
-                      widget.tipoEntrega == 'delivery' 
-                          ? 'S/ ${widget.total.toStringAsFixed(2)} +'
-                          : 'S/ ${widget.total.toStringAsFixed(2)}'
-                    ),
-                    if (widget.pagoConCuanto != null) ...[
-                      const SizedBox(height: 8),
-                      _buildInfoPago('Paga con:', 'S/ ${widget.pagoConCuanto!.toStringAsFixed(2)}'),
-                    ],
-                    if (widget.vuelto != null && widget.vuelto! > 0) ...[
-                      const SizedBox(height: 8),
-                      _buildInfoPago('Vuelto:', 'S/ ${widget.vuelto!.toStringAsFixed(2)}'),
-                    ] else if (widget.pagoConCuanto != null) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Colors.green[100]!, Colors.green[200]!],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.green[300]!),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(Icons.check_circle, color: Colors.white, size: 20),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'Pago exacto ✅',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green[800],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -758,7 +674,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
 
   Widget _buildInfoPago(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -766,13 +682,13 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
             label, 
             style: const TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: 15,
+              fontSize: 14,
             )
           ),
           SelectableText(
             value,
             style: const TextStyle(
-              fontSize: 16, 
+              fontSize: 14, 
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
@@ -782,225 +698,155 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
     );
   }
 
-  Widget _buildTarjetaResumen() {
+  Widget _buildTarjetaResumenCompacto() {
     return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.blue.withOpacity(0.05)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Icon(Icons.receipt_long, color: Colors.white, size: 16),
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'Resumen del Pedido', 
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 16,
+                    color: Colors.black87,
+                  )
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            
+            // Lista compacta de productos
+            ...widget.carrito.map((item) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 3),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(3),
                     ),
-                    child: const Icon(Icons.receipt_long, color: Colors.white, size: 20),
+                    child: Text(
+                      '${item.cantidad}x',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Resumen del Pedido', 
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold, 
-                      fontSize: 18,
-                      color: Colors.black87,
-                    )
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${item.nombre} (${item.tamano})',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (item.adicionales.isNotEmpty) ...[
+                          const SizedBox(height: 1),
+                          Text(
+                            '+ ${item.adicionales.map((a) => '${a.icono} ${a.nombre}').join(', ')}',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.green[700],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Text(
+                    'S/${(item.precioTotal * item.cantidad).toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue[100]!),
-                ),
-                child: Column(
-                  children: [
-                    ...widget.carrito.map((item) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '${item.cantidad}x',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${item.nombre} (${item.tamano})',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                if (item.adicionales.isNotEmpty) ...[
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '+ ${item.adicionales.map((a) => '${a.icono} ${a.nombre}').join(', ')}',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.green[700],
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                          Text(
-                            'S/ ${(item.precioTotal * item.cantidad).toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )),
-                    
-                    const SizedBox(height: 12),
-                    Container(
-                      width: double.infinity,
-                      height: 1,
-                      color: Colors.grey[300],
+            )),
+            
+            if (widget.tipoEntrega == 'delivery') ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.delivery_dining, color: Colors.orange, size: 14),
+                  const SizedBox(width: 6),
+                  const Expanded(
+                    child: Text(
+                      'Delivery',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
                     ),
-                    const SizedBox(height: 8),
-                    
-                    // Subtotal
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Subtotal:', 
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600, 
-                            fontSize: 16,
-                            color: Colors.black87,
-                          )
-                        ),
-                        Text(
-                          'S/ ${widget.total.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold, 
-                            fontSize: 16, 
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
+                  ),
+                  Text(
+                    'S/2.00',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange,
+                      fontSize: 12,
                     ),
-                    
-                    // Delivery si aplica
-                    if (widget.tipoEntrega == 'delivery') ...[
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.delivery_dining, color: Colors.orange[700], size: 16),
-                              const SizedBox(width: 4),
-                              const Text(
-                                'Delivery:', 
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600, 
-                                  fontSize: 16,
-                                  color: Colors.black87,
-                                )
-                              ),
-                            ],
-                          ),
-                          Text(
-                            'S/2.00 - S/4.00',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold, 
-                              fontSize: 16, 
-                              color: Colors.orange[700],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                    
-                    const SizedBox(height: 8),
-                    Container(
-                      width: double.infinity,
-                      height: 2,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.red[300]!, Colors.red[600]!],
-                        ),
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    
-                    // Total
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          widget.tipoEntrega == 'delivery' ? 'TOTAL + DELIVERY:' : 'TOTAL:',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold, 
-                            fontSize: 16,
-                            color: Colors.black87,
-                          )
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            widget.tipoEntrega == 'delivery' 
-                                ? 'S/ ${widget.total.toStringAsFixed(2)} +'
-                                : 'S/ ${widget.total.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold, 
-                              fontSize: 16, 
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
-          ),
+            
+            const SizedBox(height: 8),
+            Container(height: 1, color: Colors.grey[300]),
+            const SizedBox(height: 8),
+            
+            // Total - USANDO totalFinal
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'TOTAL:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 14,
+                    color: Colors.black87,
+                  )
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'S/${totalFinal.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      fontSize: 14, 
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -1008,197 +854,172 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
 
   Widget _buildTarjetaEntrega() {
     return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.orange.withOpacity(0.05)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      widget.tipoEntrega == 'delivery' ? Icons.delivery_dining : Icons.store,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Información de Entrega', 
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold, 
-                      fontSize: 18,
-                      color: Colors.black87,
-                    )
+                  child: Icon(
+                    widget.tipoEntrega == 'delivery' ? Icons.delivery_dining : Icons.store,
+                    color: Colors.white,
+                    size: 16,
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'Información de Entrega', 
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 16,
+                    color: Colors.black87,
+                  )
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            
+            _buildInfoEntrega(Icons.person, widget.nombre),
+            const SizedBox(height: 6),
+            _buildInfoEntrega(Icons.phone, widget.telefono),
+            const SizedBox(height: 6),
+            _buildInfoEntrega(
+              widget.tipoEntrega == 'delivery' ? Icons.delivery_dining : Icons.store,
+              widget.tipoEntrega == 'delivery' ? 'Delivery a domicilio' : 'Recojo en tienda',
+            ),
+            
+            if (widget.tipoEntrega == 'delivery' && widget.ubicacion != null) ...[
+              const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.orange[50],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.orange[100]!),
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue[200]!),
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInfoEntrega(Icons.person, widget.nombre),
-                    const SizedBox(height: 8),
-                    _buildInfoEntrega(Icons.phone, widget.telefono),
-                    const SizedBox(height: 8),
-                    _buildInfoEntrega(
-                      widget.tipoEntrega == 'delivery' ? Icons.delivery_dining : Icons.store,
-                      widget.tipoEntrega == 'delivery' ? 'Delivery a domicilio' : 'Recojo en tienda',
+                    const Row(
+                      children: [
+                        Icon(Icons.location_on, color: Colors.red, size: 16),
+                        SizedBox(width: 6),
+                        Text(
+                          'Ubicación de entrega:', 
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                            fontSize: 12,
+                          )
+                        ),
+                      ],
                     ),
-                    
-                    if (widget.tipoEntrega == 'delivery' && widget.ubicacion != null) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Colors.blue[50]!, Colors.blue[100]!],
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.blue[200]!),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Lat: ${widget.ubicacion!.latitude.toStringAsFixed(6)}',
+                      style: const TextStyle(fontSize: 10, color: Colors.blue),
+                    ),
+                    Text(
+                      'Lng: ${widget.ubicacion!.longitude.toStringAsFixed(6)}',
+                      style: const TextStyle(fontSize: 10, color: Colors.blue),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => PagoService.abrirEnMaps(
+                          widget.ubicacion!.latitude,
+                          widget.ubicacion!.longitude,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Row(
-                              children: [
-                                Icon(Icons.location_on, color: Colors.red, size: 20),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Ubicación de entrega:', 
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue,
-                                  )
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Lat: ${widget.ubicacion!.latitude.toStringAsFixed(6)}',
-                              style: const TextStyle(fontSize: 12, color: Colors.blue),
-                            ),
-                            Text(
-                              'Lng: ${widget.ubicacion!.longitude.toStringAsFixed(6)}',
-                              style: const TextStyle(fontSize: 12, color: Colors.blue),
-                            ),
-                            const SizedBox(height: 12),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                onPressed: () => PagoService.abrirEnMaps(
-                                  widget.ubicacion!.latitude,
-                                  widget.ubicacion!.longitude,
-                                ),
-                                icon: const Icon(Icons.map, color: Colors.white),
-                                label: const Text(
-                                  'Ver en Google Maps',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                        icon: const Icon(Icons.map, color: Colors.white, size: 14),
+                        label: const Text(
+                          'Ver en Google Maps',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
                         ),
                       ),
-                    ] else if (widget.tipoEntrega == 'recojo') ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Colors.green[50]!, Colors.green[100]!],
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.green[200]!),
+                    ),
+                  ],
+                ),
+              ),
+            ] else if (widget.tipoEntrega == 'recojo') ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green[200]!),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.store, color: Colors.green, size: 16),
+                        SizedBox(width: 6),
+                        Text(
+                          'Nuestra ubicación:', 
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                            fontSize: 12,
+                          )
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Row(
-                              children: [
-                                Icon(Icons.store, color: Colors.green, size: 20),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Nuestra ubicación:', 
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green,
-                                  )
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              'Lurigancho-Chosica, Anexo 8',
-                              style: TextStyle(fontSize: 13, color: Colors.green),
-                            ),
-                            const Text(
-                              'Lat: -11.979865, Lng: -76.941701',
-                              style: TextStyle(fontSize: 11, color: Colors.grey),
-                            ),
-                            const SizedBox(height: 12),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                onPressed: () => PagoService.abrirEnMaps(-11.979865, -76.941701),
-                                icon: const Icon(Icons.map, color: Colors.white),
-                                label: const Text(
-                                  'Ver nuestra ubicación',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Lurigancho-Chosica, Anexo 8',
+                      style: TextStyle(fontSize: 11, color: Colors.green),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => PagoService.abrirEnMaps(-11.979865, -76.941701),
+                        icon: const Icon(Icons.map, color: Colors.white, size: 14),
+                        label: const Text(
+                          'Ver nuestra ubicación',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
                         ),
                       ),
-                    ],
+                    ),
                   ],
                 ),
               ),
             ],
-          ),
+          ],
         ),
       ),
     );
@@ -1208,19 +1029,19 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(6),
+          padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             color: Colors.orange,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(4),
           ),
-          child: Icon(icon, color: Colors.white, size: 16),
+          child: Icon(icon, color: Colors.white, size: 12),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
             text, 
             style: const TextStyle(
-              fontSize: 15,
+              fontSize: 13,
               fontWeight: FontWeight.w500,
               color: Colors.black87,
             )
@@ -1236,36 +1057,36 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
                 color: Colors.green.withOpacity(0.3),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
           child: ElevatedButton.icon(
             onPressed: () => PagoService.realizarLlamada(PagoService.numeroWhatsApp),
-            icon: const Icon(Icons.phone, color: Colors.white),
+            icon: const Icon(Icons.phone, color: Colors.white, size: 18),
             label: const Text(
               'Llamar a la pizzería',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: 14,
               ),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
@@ -1273,19 +1094,19 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
               MaterialPageRoute(builder: (context) => const HomeScreen()),
               (route) => false,
             ),
-            icon: const Icon(Icons.restaurant_menu, color: Colors.red),
+            icon: const Icon(Icons.restaurant_menu, color: Colors.red, size: 18),
             label: const Text(
               'Volver al menú',
               style: TextStyle(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: 14,
               ),
             ),
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
               side: const BorderSide(color: Colors.red, width: 2),
             ),
@@ -1298,32 +1119,35 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
   Widget _buildTarjetaConsulta() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.green[50],
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.green.withOpacity(0.3)),
       ),
       child: Column(
         children: [
-          const Icon(Icons.chat, color: Colors.green, size: 30),
-          const SizedBox(height: 10),
+          const Icon(Icons.chat, color: Colors.green, size: 24),
+          const SizedBox(height: 8),
           Text(
-            '¿Tienes alguna consulta adicional o quieres hacer algún cambio?',
+            '¿Tienes alguna consulta o necesitas hacer algún cambio?',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: Colors.green[800]),
+            style: TextStyle(fontSize: 12, color: Colors.green[800]),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           ElevatedButton.icon(
             onPressed: _contactarPorWhatsApp, 
-            icon: const FaIcon(FontAwesomeIcons.whatsapp),
-            label: const Text('Contactar por WhatsApp (Opcional)'),
+            icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 16),
+            label: const Text(
+              'Contactar por WhatsApp',
+              style: TextStyle(fontSize: 12),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
           ),
@@ -1345,7 +1169,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
           content: Row(
             children: [
               const Icon(Icons.check_circle, color: Colors.white),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'Número copiado: $numero ✅',
@@ -1357,7 +1181,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
           backgroundColor: Colors.blue,
           duration: const Duration(seconds: 2),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
           ),
           behavior: SnackBarBehavior.floating,
         ),
