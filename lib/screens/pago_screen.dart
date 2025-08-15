@@ -117,132 +117,132 @@ class _PagoScreenState extends State<PagoScreen> {
     );
   }
 
-  Widget _buildResumenPedidoCompacto() {
-    final double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
-    
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+Widget _buildResumenPedidoCompacto() {
+  final double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
+  
+  return Card(
+    elevation: 4,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.receipt_long, color: Colors.white, size: 16), // 🔧 TAMAÑO ICONO HEADER (+2)
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Resumen', 
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold) // 🔧 TÍTULO HEADER (+2)
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          
+          // Lista compacta de productos
+          ...widget.carrito.map((item) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(6),
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(6),
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(3),
                   ),
-                  child: const Icon(Icons.receipt_long, color: Colors.white, size: 16),
+                  child: Text(
+                    '${item.cantidad}x',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12, // 🔧 CANTIDAD PRODUCTOS (+2)
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Resumen', 
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    '${item.nombre} (${item.tamano})',
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500), // 🔧 NOMBRE PRODUCTOS (+2)
+                  ),
+                ),
+                Text(
+                  'S/${item.precioTotalCarrito.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                    fontSize: 14, // 🔧 PRECIO PRODUCTOS (+2)
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            
-            // Lista compacta de productos
-            ...widget.carrito.map((item) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    child: Text(
-                      '${item.cantidad}x',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      '${item.nombre} (${item.tamano})',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  Text(
-                    'S/${item.precioTotalCarrito.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            )),
-            
-            if (tipoEntrega == 'delivery') ...[
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(Icons.delivery_dining, color: Colors.orange, size: 14),
-                  const SizedBox(width: 6),
-                  const Expanded(
-                    child: Text(
-                      'Delivery',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  Text(
-                    'S/2.00',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            
-            const SizedBox(height: 8),
-            Container(height: 1, color: Colors.grey[300]),
-            const SizedBox(height: 8),
-            
+          )),
+          
+          if (tipoEntrega == 'delivery') ...[
+            const SizedBox(height: 4),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'TOTAL:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                Icon(Icons.delivery_dining, color: Colors.orange, size: 16), // 🔧 ICONO DELIVERY (+2)
+                const SizedBox(width: 6),
+                const Expanded(
                   child: Text(
-                    'S/${totalFinal.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold, 
-                      fontSize: 14, 
-                      color: Colors.white,
-                    ),
+                    'Delivery',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500), // 🔧 TEXTO DELIVERY (+2)
+                  ),
+                ),
+                Text(
+                  'S/2.00',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                    fontSize: 14, // 🔧 PRECIO DELIVERY (+2)
                   ),
                 ),
               ],
             ),
           ],
-        ),
+          
+          const SizedBox(height: 8),
+          Container(height: 1, color: Colors.grey[300]),
+          const SizedBox(height: 8),
+          
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'TOTAL:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16) // 🔧 LABEL TOTAL (+2)
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'S/${totalFinal.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 16, // 🔧 PRECIO TOTAL (+2)
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildDatosCliente() {
     return Card(
@@ -1117,7 +1117,8 @@ ${_obtenerTextoPagoLimpio()}
 ${widget.carrito.map((item) {
     String linea = '• ${item.cantidad}x ${item.nombre} (${item.tamano})';
     if (item.adicionales.isNotEmpty) {
-      linea += '\n   ${item.adicionales.map((a) => '${a.cantidad > 1 ? "${a.cantidad}x " : ""}${a.icono} ${a.nombre}').join('\n   ')}';
+      linea += '\n   ${item.adicionales.map((a) => '${a.cantidad}x ${a.nombre}').join('\n   ')}';
+
     }
     linea += '\n   S/${item.precioTotalCarrito.toStringAsFixed(2)}';
     return linea;

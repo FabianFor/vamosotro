@@ -569,8 +569,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
     return _buildImagenOptimizada(
       item.imagen, 
       cacheKey,
-      width: 55,
-      height: 55,
+      width: 60,
+      height: 60,
       esCircular: esCircular,
       boxFit: esCircular ? BoxFit.cover : BoxFit.contain,
     );
@@ -894,8 +894,8 @@ Widget _buildBotonAdicionalesDelgado(ItemPedido item, int index) {
     child: ElevatedButton.icon(
       onPressed: () => _toggleExpansion(index),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromARGB(255, 17, 92, 231),
-        foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: const Color.fromARGB(255, 16, 201, 139),
+        foregroundColor: const Color.fromARGB(255, 0, 0, 0),
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         elevation: 1,
@@ -1572,7 +1572,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                   decoration: BoxDecoration(
                     color: colorSecundario.withOpacity(0.04),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: colorSecundario.withOpacity(0.2)),
+                    border: Border.all(color: const Color.fromARGB(255, 37, 158, 39).withOpacity(0.2)),
                   ),
                   child: Column(
                     children: [
@@ -1580,7 +1580,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                         'Cantidad (Máx: $maximoPermitido)',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: colorSecundario,
+                          color: const Color.fromARGB(255, 40, 158, 42),
                           fontSize: 13,
                         ),
                       ),
@@ -1629,7 +1629,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                           
                           Container(
                             decoration: BoxDecoration(
-                              color: cantidad < maximoPermitido ? colorSecundario : Colors.grey,
+                              color: cantidad < maximoPermitido ? const Color.fromARGB(255, 47, 175, 49) : Colors.grey,
                               shape: BoxShape.circle,
                             ),
                             child: IconButton(
@@ -1659,7 +1659,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                     colors: [Colors.green.withOpacity(0.08), Colors.green.withOpacity(0.04)],
                   ),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.withOpacity(0.3)),
+                  border: Border.all(color: const Color.fromARGB(255, 55, 170, 59).withOpacity(0.3)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

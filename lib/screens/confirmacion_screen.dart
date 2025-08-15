@@ -766,7 +766,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                         if (item.adicionales.isNotEmpty) ...[
                           const SizedBox(height: 1),
                           Text(
-                            '+ ${item.adicionales.map((a) => '${a.icono} ${a.nombre}').join(', ')}',
+                            '+ ${item.adicionales.map((a) => '${a.cantidad}x ${a.nombre}').join(', ')}',
                             style: TextStyle(
                               fontSize: 10,
                               color: Colors.green[700],
@@ -782,7 +782,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red,
-                      fontSize: 12,
+                      fontSize: 14,
                     ),
                   ),
                 ],
@@ -806,7 +806,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.orange,
-                      fontSize: 12,
+                      fontSize: 13,
                     ),
                   ),
                 ],
@@ -839,7 +839,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                     'S/${totalFinal.toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold, 
-                      fontSize: 14, 
+                      fontSize: 16, 
                       color: Colors.white,
                     ),
                   ),
