@@ -20,8 +20,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
   // 🔥 CACHE PARA ADICIONALES Y COLORES
   late Map<String, List<Adicional>> _adicionalesCache;
   late Map<String, Color> _coloresCache;
-  // 🚀 CACHE PARA WIDGETS DE IMÁGENES
-  late Map<String, Widget> _imagenesCache;
+  // 🚀 CACHE MEJORADO PARA IMÁGENES DECODIFICADAS
+  late Map<String, ImageProvider> _imageProvidersCache;
   
   // 🔥 CACHE PARA TOTAL
   double _totalCacheado = 0.0;
@@ -36,12 +36,13 @@ class _CarritoScreenState extends State<CarritoScreen> {
     super.initState();
     carritoLocal = List.from(widget.carrito);
     _inicializarCaches();
+    _precargaImagenes(); // 🚀 PRECARGA INMEDIATA
     _calcularTotal();
   }
 
   void _inicializarCaches() {
     _adicionalesCache = {};
-    _imagenesCache = {}; // 🚀 NUEVO CACHE DE IMÁGENES
+    _imageProvidersCache = {}; // 🚀 CACHE REAL DE IMÁGENES
     
     // Inicializar cache para cada item del carrito
     for (var item in carritoLocal) {
@@ -64,6 +65,37 @@ class _CarritoScreenState extends State<CarritoScreen> {
       'Estrella': Colors.deepPurple,
       'Oferta Dúo': Colors.indigo,
     };
+  }
+
+  // 🚀 PRECARGA INTELIGENTE DE IMÁGENES
+  Future<void> _precargaImagenes() async {
+    final Set<String> imagenesUnicas = {};
+    
+    // Recopilar todas las imágenes únicas
+    for (var item in carritoLocal) {
+      imagenesUnicas.add(item.imagen);
+      
+      // Imágenes de adicionales del item
+      final adicionales = _getAdicionalesDisponibles(item.tamano, item.nombre);
+      for (var adicional in adicionales.take(5)) { // Solo los primeros 5 adicionales
+        if (adicional.imagen.isNotEmpty) {
+          imagenesUnicas.add(adicional.imagen);
+        }
+      }
+    }
+    
+    // Precargar en background sin bloquear UI
+    for (String rutaImagen in imagenesUnicas.take(15)) { // Límite de 15 imágenes
+      try {
+        final provider = AssetImage(rutaImagen);
+        _imageProvidersCache[rutaImagen] = provider;
+        if (mounted) {
+          precacheImage(provider, context);
+        }
+      } catch (e) {
+        // Ignorar errores de precarga
+      }
+    }
   }
 
   void _calcularTotal() {
@@ -94,6 +126,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
         return _DialogAdicional(
           adicional: adicional,
           itemPedido: item,
+          imageProvider: _getImageProviderOptimizado(adicional.imagen), // 🚀 PASA IMAGE PROVIDER
           onAgregar: (int cantidad, List<String> pizzasSeleccionadas) {
             _agregarAdicionalConSeleccion(itemIndex, adicional, cantidad, pizzasSeleccionadas);
           },
@@ -102,136 +135,151 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
+  // 🚀 OBTENER IMAGE PROVIDER OPTIMIZADO
+  ImageProvider _getImageProviderOptimizado(String rutaImagen) {
+    if (_imageProvidersCache.containsKey(rutaImagen)) {
+      return _imageProvidersCache[rutaImagen]!;
+    }
+    
+    final provider = AssetImage(rutaImagen);
+    _imageProvidersCache[rutaImagen] = provider;
+    return provider;
+  }
+
   // 🔥 AGREGAR ADICIONAL CON SELECCIÓN ESPECÍFICA DE PIZZAS
   void _agregarAdicionalConSeleccion(int itemIndex, Adicional adicional, int cantidad, List<String> pizzasSeleccionadas) {
-    setState(() {
-      ItemPedido item = carritoLocal[itemIndex];
-      List<Adicional> nuevosAdicionales = List.from(item.adicionales);
+    // 🚀 USAR FUNCIÓN SEPARADA PARA EVITAR REBUILDS INNECESARIOS
+    final nuevoCarrito = List<ItemPedido>.from(carritoLocal);
+    final item = nuevoCarrito[itemIndex];
+    List<Adicional> nuevosAdicionales = List.from(item.adicionales);
 
-      // 🔥 VALIDACIONES ESPECIALES
+    // 🔥 VALIDACIONES ESPECIALES
+    
+    // 1️⃣ VALIDACIÓN PARA PRIMERA GASEOSA - Solo pizzas personales
+    if (_esPrimeraGaseosa(adicional)) {
+      int primerasGaseosasActuales = _contarPrimerasGaseosas(item);
+      int maxPrimerasGaseosas = item.cantidad;
       
-      // 1️⃣ VALIDACIÓN PARA PRIMERA GASEOSA - Solo pizzas personales
-      if (_esPrimeraGaseosa(adicional)) {
-        int primerasGaseosasActuales = _contarPrimerasGaseosas(item);
-        int maxPrimerasGaseosas = item.cantidad;
-        
-        if (primerasGaseosasActuales >= maxPrimerasGaseosas) {
-          _mostrarError('Máximo ${maxPrimerasGaseosas} primera(s) gaseosa(s)');
-          return;
-        }
-        
-        if (primerasGaseosasActuales + cantidad > maxPrimerasGaseosas) {
-          cantidad = maxPrimerasGaseosas - primerasGaseosasActuales;
-          if (cantidad <= 0) return;
-        }
-        
-        // Para primera gaseosa, agregar por pizzas seleccionadas
-        for (String pizzaEspecifica in pizzasSeleccionadas) {
-          Adicional nuevoAdicional = Adicional(
-            nombre: adicional.nombre,
-            precio: adicional.precio,
-            icono: adicional.icono,
-            imagen: adicional.imagen,
-            cantidad: 1, // Siempre 1 por pizza
-            pizzaEspecifica: pizzaEspecifica,
-          );
-          
-          int indiceExistente = nuevosAdicionales.indexWhere((a) => 
-              a.nombre == nuevoAdicional.nombre && a.pizzaEspecifica == pizzaEspecifica);
-          
-          if (indiceExistente == -1) { // Solo agregar si no existe
-            nuevosAdicionales.add(nuevoAdicional);
-          }
-        }
-      } 
-      // 2️⃣ PARA CAMBIOS GRATUITOS (Solo Americana)
-      else if (_esAdicionalEspecialGratuito(adicional)) {
-        for (String pizzaEspecifica in pizzasSeleccionadas) {
-          Adicional nuevoAdicional = Adicional(
-            nombre: adicional.nombre,
-            precio: adicional.precio,
-            icono: adicional.icono,
-            imagen: adicional.imagen,
-            cantidad: 1,
-            pizzaEspecifica: _convertirNombrePizzaCambiada(pizzaEspecifica),
-          );
-
-          int indiceExistente = nuevosAdicionales.indexWhere((a) => 
-              a.nombre == nuevoAdicional.nombre && a.pizzaEspecifica == nuevoAdicional.pizzaEspecifica);
-          
-          if (indiceExistente == -1) {
-            nuevosAdicionales.add(nuevoAdicional);
-          }
-        }
+      if (primerasGaseosasActuales >= maxPrimerasGaseosas) {
+        _mostrarError('Máximo ${maxPrimerasGaseosas} primera(s) gaseosa(s)');
+        return;
       }
-      // 3️⃣ PARA OTROS ADICIONALES CON PIZZAS ESPECÍFICAS
-      else if (pizzasSeleccionadas.isNotEmpty) {
-        for (String pizzaEspecifica in pizzasSeleccionadas) {
-          // 🔥 VALIDACIÓN ESPECIAL PARA QUESO
-          if (_esQuesoAdicional(adicional)) {
-            int quesosActuales = _contarQuesosPorPizza(item, pizzaEspecifica);
-            if (quesosActuales >= 1) {
-              _mostrarError('Pizza ya tiene queso');
-              continue;
-            }
-          }
-
-          Adicional nuevoAdicional = Adicional(
-            nombre: adicional.nombre,
-            precio: adicional.precio,
-            icono: adicional.icono,
-            imagen: adicional.imagen,
-            cantidad: _esQuesoAdicional(adicional) ? 1 : cantidad,
-            pizzaEspecifica: pizzaEspecifica,
-          );
-
-          int indiceExistente = nuevosAdicionales.indexWhere((a) => 
-              a.nombre == nuevoAdicional.nombre && 
-              a.pizzaEspecifica == pizzaEspecifica);
-
-          if (indiceExistente != -1) {
-            if (!_esQuesoAdicional(adicional)) {
-              Adicional existente = nuevosAdicionales[indiceExistente];
-              nuevosAdicionales[indiceExistente] = existente.copyWith(
-                cantidad: existente.cantidad + cantidad
-              );
-            }
-          } else {
-            nuevosAdicionales.add(nuevoAdicional);
-          }
-        }
+      
+      if (primerasGaseosasActuales + cantidad > maxPrimerasGaseosas) {
+        cantidad = maxPrimerasGaseosas - primerasGaseosasActuales;
+        if (cantidad <= 0) return;
       }
-      // 4️⃣ PARA ADICIONALES SIN SELECCIÓN DE PIZZAS (CANTIDAD LIBRE)
-      else {
+      
+      // Para primera gaseosa, agregar por pizzas seleccionadas
+      for (String pizzaEspecifica in pizzasSeleccionadas) {
         Adicional nuevoAdicional = Adicional(
           nombre: adicional.nombre,
           precio: adicional.precio,
           icono: adicional.icono,
           imagen: adicional.imagen,
-          cantidad: cantidad,
-          pizzaEspecifica: null,
+          cantidad: 1, // Siempre 1 por pizza
+          pizzaEspecifica: pizzaEspecifica,
         );
         
         int indiceExistente = nuevosAdicionales.indexWhere((a) => 
-            a.nombre == nuevoAdicional.nombre && a.pizzaEspecifica == null);
+            a.nombre == nuevoAdicional.nombre && a.pizzaEspecifica == pizzaEspecifica);
         
+        if (indiceExistente == -1) { // Solo agregar si no existe
+          nuevosAdicionales.add(nuevoAdicional);
+        }
+      }
+    } 
+    // 2️⃣ PARA CAMBIOS GRATUITOS (Solo Americana)
+    else if (_esAdicionalEspecialGratuito(adicional)) {
+      for (String pizzaEspecifica in pizzasSeleccionadas) {
+        Adicional nuevoAdicional = Adicional(
+          nombre: adicional.nombre,
+          precio: adicional.precio,
+          icono: adicional.icono,
+          imagen: adicional.imagen,
+          cantidad: 1,
+          pizzaEspecifica: _convertirNombrePizzaCambiada(pizzaEspecifica),
+        );
+
+        int indiceExistente = nuevosAdicionales.indexWhere((a) => 
+            a.nombre == nuevoAdicional.nombre && a.pizzaEspecifica == nuevoAdicional.pizzaEspecifica);
+        
+        if (indiceExistente == -1) {
+          nuevosAdicionales.add(nuevoAdicional);
+        }
+      }
+    }
+    // 3️⃣ PARA OTROS ADICIONALES CON PIZZAS ESPECÍFICAS
+    else if (pizzasSeleccionadas.isNotEmpty) {
+      for (String pizzaEspecifica in pizzasSeleccionadas) {
+        // 🔥 VALIDACIÓN ESPECIAL PARA QUESO
+        if (_esQuesoAdicional(adicional)) {
+          int quesosActuales = _contarQuesosPorPizza(item, pizzaEspecifica);
+          if (quesosActuales >= 1) {
+            _mostrarError('Pizza ya tiene queso');
+            continue;
+          }
+        }
+
+        Adicional nuevoAdicional = Adicional(
+          nombre: adicional.nombre,
+          precio: adicional.precio,
+          icono: adicional.icono,
+          imagen: adicional.imagen,
+          cantidad: _esQuesoAdicional(adicional) ? 1 : cantidad,
+          pizzaEspecifica: pizzaEspecifica,
+        );
+
+        int indiceExistente = nuevosAdicionales.indexWhere((a) => 
+            a.nombre == nuevoAdicional.nombre && 
+            a.pizzaEspecifica == pizzaEspecifica);
+
         if (indiceExistente != -1) {
-          Adicional existente = nuevosAdicionales[indiceExistente];
-          nuevosAdicionales[indiceExistente] = existente.copyWith(
-            cantidad: existente.cantidad + cantidad
-          );
+          if (!_esQuesoAdicional(adicional)) {
+            Adicional existente = nuevosAdicionales[indiceExistente];
+            nuevosAdicionales[indiceExistente] = existente.copyWith(
+              cantidad: existente.cantidad + cantidad
+            );
+          }
         } else {
           nuevosAdicionales.add(nuevoAdicional);
         }
       }
+    }
+    // 4️⃣ PARA ADICIONALES SIN SELECCIÓN DE PIZZAS (CANTIDAD LIBRE)
+    else {
+      Adicional nuevoAdicional = Adicional(
+        nombre: adicional.nombre,
+        precio: adicional.precio,
+        icono: adicional.icono,
+        imagen: adicional.imagen,
+        cantidad: cantidad,
+        pizzaEspecifica: null,
+      );
+      
+      int indiceExistente = nuevosAdicionales.indexWhere((a) => 
+          a.nombre == nuevoAdicional.nombre && a.pizzaEspecifica == null);
+      
+      if (indiceExistente != -1) {
+        Adicional existente = nuevosAdicionales[indiceExistente];
+        nuevosAdicionales[indiceExistente] = existente.copyWith(
+          cantidad: existente.cantidad + cantidad
+        );
+      } else {
+        nuevosAdicionales.add(nuevoAdicional);
+      }
+    }
 
-      carritoLocal[itemIndex] = item.copyWith(adicionales: nuevosAdicionales);
+    // 🚀 ACTUALIZACIÓN OPTIMIZADA
+    nuevoCarrito[itemIndex] = item.copyWith(adicionales: nuevosAdicionales);
+    
+    setState(() {
+      carritoLocal = nuevoCarrito;
       _calcularTotal();
-      widget.onActualizar(carritoLocal);
-
-      // 🔥 MOSTRAR CONFIRMACIÓN SIMPLE
-      _mostrarExito('✅ Agregado');
     });
+    
+    widget.onActualizar(carritoLocal);
+    _mostrarExito('✅ Agregado');
   }
 
   // 🔥 NUEVA FUNCIÓN: Convertir nombre de pizza cuando se cambia a americana
@@ -275,23 +323,28 @@ class _CarritoScreenState extends State<CarritoScreen> {
 
   // 🔥 MÉTODO PARA QUITAR UNA UNIDAD DE ADICIONAL (ELIMINAMOS EL BORRAR COMPLETO)
   void _quitarAdicional(int itemIndex, int adicionalIndex) {
-    setState(() {
-      ItemPedido item = carritoLocal[itemIndex];
-      List<Adicional> nuevosAdicionales = List.from(item.adicionales);
-      
-      Adicional adicional = nuevosAdicionales[adicionalIndex];
-      if (adicional.cantidad > 1) {
-        nuevosAdicionales[adicionalIndex] = adicional.copyWith(
-          cantidad: adicional.cantidad - 1
-        );
-      } else {
-        nuevosAdicionales.removeAt(adicionalIndex);
-      }
+    // 🚀 OPTIMIZACIÓN: EVITAR REBUILD INNECESARIO
+    final nuevoCarrito = List<ItemPedido>.from(carritoLocal);
+    final item = nuevoCarrito[itemIndex];
+    List<Adicional> nuevosAdicionales = List.from(item.adicionales);
+    
+    Adicional adicional = nuevosAdicionales[adicionalIndex];
+    if (adicional.cantidad > 1) {
+      nuevosAdicionales[adicionalIndex] = adicional.copyWith(
+        cantidad: adicional.cantidad - 1
+      );
+    } else {
+      nuevosAdicionales.removeAt(adicionalIndex);
+    }
 
-      carritoLocal[itemIndex] = item.copyWith(adicionales: nuevosAdicionales);
+    nuevoCarrito[itemIndex] = item.copyWith(adicionales: nuevosAdicionales);
+    
+    setState(() {
+      carritoLocal = nuevoCarrito;
       _calcularTotal();
-      widget.onActualizar(carritoLocal);
     });
+    
+    widget.onActualizar(carritoLocal);
   }
 
   // 🔥 OBTENER ADICIONALES DISPONIBLES
@@ -339,17 +392,23 @@ class _CarritoScreenState extends State<CarritoScreen> {
 
   // 🔥 OPTIMIZAR CAMBIO DE CANTIDAD
   void _modificarCantidad(int index, int nuevaCantidad) {
+    // 🚀 OPTIMIZACIÓN: CREAR NUEVA LISTA SIN REBUILD COMPLETO
+    final nuevoCarrito = List<ItemPedido>.from(carritoLocal);
+    
+    if (nuevaCantidad <= 0) {
+      nuevoCarrito.removeAt(index);
+      itemsExpandidos.remove(index);
+      itemsExpandidos = itemsExpandidos.map((i) => i > index ? i - 1 : i).toList();
+    } else {
+      nuevoCarrito[index] = nuevoCarrito[index].copyWith(cantidad: nuevaCantidad);
+    }
+    
     setState(() {
-      if (nuevaCantidad <= 0) {
-        carritoLocal.removeAt(index);
-        itemsExpandidos.remove(index);
-        itemsExpandidos = itemsExpandidos.map((i) => i > index ? i - 1 : i).toList();
-      } else {
-        carritoLocal[index] = carritoLocal[index].copyWith(cantidad: nuevaCantidad);
-      }
+      carritoLocal = nuevoCarrito;
       _calcularTotal();
-      widget.onActualizar(carritoLocal);
     });
+    
+    widget.onActualizar(carritoLocal);
   }
 
   // 🔥 TOGGLE DE EXPANSIÓN
@@ -388,20 +447,14 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🚀 NUEVA FUNCIÓN: Crear widget de imagen optimizado con cache
-  Widget _buildImagenOptimizada(String rutaImagen, String cacheKey, {
+  // 🚀 NUEVA FUNCIÓN: Crear widget de imagen optimizado REAL
+  Widget _buildImagenOptimizada(String rutaImagen, {
     required double width,
     required double height,
     required bool esCircular,
     required BoxFit boxFit,
   }) {
-    // Verificar si ya está en cache
-    if (_imagenesCache.containsKey(cacheKey)) {
-      return _imagenesCache[cacheKey]!;
-    }
-
-    // Crear widget de imagen optimizado
-    Widget imagenWidget = Container(
+    return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
@@ -423,12 +476,10 @@ class _CarritoScreenState extends State<CarritoScreen> {
         child: Padding(
           // 🔥 AÑADIR PADDING SOLO PARA PRODUCTOS NO CIRCULARES (combos, mostritos, etc.)
           padding: esCircular ? EdgeInsets.zero : const EdgeInsets.all(4),
-          child: Image.asset(
-            rutaImagen,
+          child: Image(
+            image: _getImageProviderOptimizado(rutaImagen), // 🚀 USA PROVIDER CACHEADO
             fit: boxFit,
-            // 🚀 OPTIMIZACIONES DE IMAGEN CRÍTICAS
-            cacheWidth: (width * MediaQuery.of(context).devicePixelRatio).round(),
-            cacheHeight: (height * MediaQuery.of(context).devicePixelRatio).round(),
+            gaplessPlayback: true, // 🚀 EVITA PARPADEOS
             filterQuality: FilterQuality.low, // Reduce calidad para mejor rendimiento
             errorBuilder: (context, error, stackTrace) {
               return Container(
@@ -438,7 +489,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                   border: Border.all(color: colorPrimario, width: 2),
                 ),
                 child: Icon(
-                  _getIconoProducto(cacheKey.split('_').last),
+                  _getIconoProducto(rutaImagen.split('/').last),
                   size: width * 0.5,
                   color: colorPrimario,
                 ),
@@ -448,10 +499,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
         ),
       ),
     );
-
-    // Guardar en cache
-    _imagenesCache[cacheKey] = imagenWidget;
-    return imagenWidget;
   }
 
   @override
@@ -494,10 +541,24 @@ class _CarritoScreenState extends State<CarritoScreen> {
                     padding: const EdgeInsets.all(12),
                     itemCount: carritoLocal.length,
                     // 🚀 OPTIMIZACIONES CRÍTICAS DEL LISTVIEW
-                    cacheExtent: 200, // Reducido para mejor memoria
-                    addAutomaticKeepAlives: false, // Evita mantener widgets en memoria
-                    addRepaintBoundaries: false, // Reduce complejidad de repaint
-                    itemBuilder: (context, index) => _buildCarritoItemOptimizado(index),
+                    cacheExtent: 100, // Reducido para mejor memoria
+                    addAutomaticKeepAlives: true, // 🚀 CAMBIO: Mantener items complejos
+                    addRepaintBoundaries: true, // 🚀 CAMBIO: Ayuda con rendimiento
+                    itemBuilder: (context, index) => _CarritoItemWidget(
+                      key: ValueKey('${carritoLocal[index].nombre}_${carritoLocal[index].tamano}_$index'), // 🚀 KEY ÚNICO
+                      item: carritoLocal[index],
+                      index: index,
+                      isExpanded: itemsExpandidos.contains(index),
+                      onModificarCantidad: _modificarCantidad,
+                      onToggleExpansion: _toggleExpansion,
+                      onQuitarAdicional: _quitarAdicional,
+                      onMostrarDialogAdicional: _mostrarDialogAdicional,
+                      getAdicionalesDisponibles: _getAdicionalesDisponibles,
+                      getTamanoColor: _getTamanoColor,
+                      getCantidadActualAdicional: _getCantidadActualAdicional,
+                      buildImagenOptimizada: _buildImagenOptimizada,
+                      getIconoProducto: _getIconoProducto,
+                    ),
                   ),
                 ),
                 _buildFooterCarrito(),
@@ -506,591 +567,11 @@ class _CarritoScreenState extends State<CarritoScreen> {
     );
   }
 
-  // 🚀 VERSIÓN OPTIMIZADA DEL ITEM DEL CARRITO
-  Widget _buildCarritoItemOptimizado(int index) {
-    final item = carritoLocal[index];
-    final isExpanded = itemsExpandidos.contains(index);
-    final esPersonalizable = item.tamano != 'Combo Broaster';
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.12),
-            spreadRadius: 1,
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-        border: Border.all(
-          color: colorSecundario.withOpacity(0.1),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          // INFORMACIÓN PRINCIPAL
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              children: [
-                _buildImagenItemOptimizada(item),
-                const SizedBox(width: 14),
-                Expanded(child: _buildInfoItem(item)),
-                _buildControlesItem(item, index),
-              ],
-            ),
-          ),
-
-          // 🔥 ADICIONALES AGREGADOS (CON CONTROLES SIMPLIFICADOS)
-          if (item.adicionales.isNotEmpty)
-            _buildAdicionalesActuales(item, index),
-
-          // 🚀 BOTÓN DELGADO PARA AGREGAR ADICIONALES
-          if (esPersonalizable)
-            _buildBotonAdicionalesDelgado(item, index),
-
-          // 🔥 SECCIÓN EXPANDIBLE DE ADICIONALES DISPONIBLES - COMO ESTABA ANTES
-          if (isExpanded && esPersonalizable) 
-            _buildSeccionAdicionales(item, index),
-        ],
-      ),
-    );
-  }
-
-  // 🚀 VERSIÓN OPTIMIZADA DE LA IMAGEN DEL ITEM
-  Widget _buildImagenItemOptimizada(ItemPedido item) {
-    final esCircular = 
-        item.tamano == 'Familiar' || 
-        item.tamano == 'Personal' || 
-        item.tamano == 'Extra Grande';
-    
-    String cacheKey = '${item.nombre}_${item.tamano}_${item.imagen}';
-    
-    // 🔥 USAR BoxFit.contain PARA PRODUCTOS NO CIRCULARES (combos, mostritos, etc.)
-    BoxFit boxFitOptimizado = esCircular ? BoxFit.cover : BoxFit.contain;
-    
-    return _buildImagenOptimizada(
-      item.imagen, 
-      cacheKey,
-      width: 60,
-      height: 60,
-      esCircular: esCircular,
-      boxFit: boxFitOptimizado,
-    );
-  }
-
   IconData _getIconoProducto(String tamano) {
     if (tamano.contains('Combo')) return Icons.restaurant_menu;
     if (tamano == 'Mostrito') return Icons.restaurant_menu;
     if (tamano == 'Fusión') return Icons.auto_awesome;
     return Icons.local_pizza;
-  }
-
-  Widget _buildInfoItem(ItemPedido item) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          item.nombre,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-            color: Colors.black87,
-          ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 4),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: _getTamanoColor(item.tamano).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(
-              color: _getTamanoColor(item.tamano).withOpacity(0.3),
-            ),
-          ),
-          child: Text(
-            item.tamano,
-            style: TextStyle(
-              color: _getTamanoColor(item.tamano),
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'S/${item.precioTotalCarrito.toStringAsFixed(2)}',
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: Colors.green,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // 🔥 SECCIÓN DE ADICIONALES SIMPLIFICADA - SIN BOTÓN BORRAR COMPLETO
-  Widget _buildAdicionalesActuales(ItemPedido item, int index) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 8, left: 14, right: 14),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: colorSecundario.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colorSecundario.withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.add_circle_outline, color: colorSecundario, size: 14),
-              const SizedBox(width: 4),
-              Text(
-                'Adicionales (${item.adicionales.length})',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: colorSecundario,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          // 🚀 USAR LISTVIEW.BUILDER PARA ADICIONALES SI HAY MUCHOS
-          ...item.adicionales.asMap().entries.map((entry) {
-            int adicionalIndex = entry.key;
-            Adicional adicional = entry.value;
-            
-            return _buildAdicionalActualOptimizado(adicional, adicionalIndex, index);
-          }).toList(),
-        ],
-      ),
-    );
-  }
-
-  // 🚀 WIDGET OPTIMIZADO PARA ADICIONAL ACTUAL
-  Widget _buildAdicionalActualOptimizado(Adicional adicional, int adicionalIndex, int itemIndex) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Row(
-        children: [
-          // 🚀 IMAGEN OPTIMIZADA MÁS PEQUEÑA
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: Colors.grey[300]!),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(2),
-              child: adicional.imagen.isNotEmpty
-                  ? Image.asset(
-                      adicional.imagen,
-                      fit: BoxFit.contain,
-                      // 🚀 OPTIMIZACIÓN DE IMAGEN PEQUEÑA
-                      cacheWidth: 56, // 28 * 2 (devicePixelRatio promedio)
-                      cacheHeight: 56,
-                      filterQuality: FilterQuality.low,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Center(
-                          child: Text(adicional.icono, style: const TextStyle(fontSize: 11)),
-                        );
-                      },
-                    )
-                  : Center(
-                      child: Text(adicional.icono, style: const TextStyle(fontSize: 11)),
-                    ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          
-          // 🔥 INFO DEL ADICIONAL COMPACTA
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  adicional.nombre,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (adicional.pizzaEspecifica != null) ...[
-                  const SizedBox(height: 1),
-                  Text(
-                    adicional.pizzaEspecifica!.length > 20 
-                        ? '${adicional.pizzaEspecifica!.substring(0, 17)}...'
-                        : adicional.pizzaEspecifica!,
-                    style: TextStyle(
-                      fontSize: 8,
-                      color: Colors.blue[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          
-          // 🔥 CONTROLES SIMPLIFICADOS - SOLO CANTIDAD Y QUITAR
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // CANTIDAD
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: colorAcento,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  'x${adicional.cantidad}',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Color.fromARGB(255, 0, 0, 0),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 4),
-              
-              // PRECIO
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: Colors.green.withOpacity(0.3)),
-                ),
-                child: Text(
-                  adicional.precio == 0.0 
-                      ? 'GRATIS'
-                      : '+S/${(adicional.precio * adicional.cantidad).toStringAsFixed(1)}',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.green[700],
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 4),
-              
-              // 🔥 SOLO BOTÓN QUITAR (-1) - YA NO HAY BORRAR COMPLETO
-              GestureDetector(
-                onTap: () => _quitarAdicional(itemIndex, adicionalIndex),
-                child: Container(
-                  width: 22,
-                  height: 22,
-                  decoration: BoxDecoration(
-                    color: adicional.cantidad > 1 ? const Color.fromARGB(255, 255, 0, 0) : Colors.red,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Icon(
-                    adicional.cantidad > 1 ? Icons.remove : Icons.delete,
-                    size: 12,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildControlesItem(ItemPedido item, int index) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: item.cantidad > 1 ? colorPrimario : Colors.red,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: (item.cantidad > 1 ? colorPrimario : Colors.red).withOpacity(0.3),
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: IconButton(
-            icon: Icon(
-              item.cantidad > 1 ? Icons.remove : Icons.delete,
-              color: Colors.white,
-              size: 12,
-            ),
-            padding: EdgeInsets.zero,
-            onPressed: () => _modificarCantidad(index, item.cantidad - 1),
-          ),
-        ),
-        
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 6),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [colorAcento.withOpacity(0.2), Colors.white],
-            ),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: colorAcento.withOpacity(0.3)),
-          ),
-          child: Text(
-            '${item.cantidad}',
-            style: TextStyle(
-              fontSize: 12, 
-              fontWeight: FontWeight.bold,
-              color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.8),
-            ),
-          ),
-        ),
-        
-        Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: colorSecundario,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: colorSecundario.withOpacity(0.3),
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.add, color: Colors.white, size: 12),
-            padding: EdgeInsets.zero,
-            onPressed: () => _modificarCantidad(index, item.cantidad + 1),
-          ),
-        ),
-      ],
-    );
-  }
-
-Widget _buildBotonAdicionalesDelgado(ItemPedido item, int index) {
-  final isExpanded = itemsExpandidos.contains(index);
-  
-  return Container(
-    width: double.infinity,
-    margin: const EdgeInsets.only(left: 14, right: 14, bottom: 8),
-    child: ElevatedButton.icon(
-      onPressed: () => _toggleExpansion(index),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color.fromARGB(255, 16, 201, 139),
-        foregroundColor: const Color.fromARGB(255, 0, 0, 0),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        elevation: 1,
-      ),
-      icon: Icon(
-        isExpanded ? Icons.keyboard_arrow_up : Icons.add_circle_outline, 
-        size: 16
-      ),
-      label: Text(
-        isExpanded ? 'Ocultar' : 'Agregar adicional',
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    ),
-  );
-}
-
-  Widget _buildSeccionAdicionales(ItemPedido item, int index) {
-    final adicionalesDisponibles = _getAdicionalesDisponibles(item.tamano, item.nombre);
-    
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            colorAcento.withOpacity(0.08),
-            Colors.white,
-          ],
-        ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(14),
-          bottomRight: Radius.circular(14),
-        ),
-      ),
-      padding: const EdgeInsets.all(14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: colorAcento,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: const Icon(Icons.restaurant, color: Colors.white, size: 14),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'Agregar adicionales',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(255, 0, 0, 0),
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          
-          // 🔥 MOSTRAR TODOS LOS ADICIONALES SIN CORTAR - COMO ESTABA ANTES
-          ...adicionalesDisponibles.map((adicional) => _buildAdicionalDisponible(adicional, item, index)),
-        ],
-      ),
-    );
-  }
-
-  // 🔥 WIDGET PARA ADICIONAL DISPONIBLE - COMO ESTABA ANTES
-  Widget _buildAdicionalDisponible(Adicional adicional, ItemPedido item, int index) {
-    int cantidadActual = _getCantidadActualAdicional(item, adicional);
-    
-    return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey[300]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            // 🚀 IMAGEN OPTIMIZADA DEL ADICIONAL
-            Container(
-              width: 35,
-              height: 35,
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.grey[300]!),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: adicional.imagen.isNotEmpty
-                    ? Image.asset(
-                        adicional.imagen,
-                        fit: BoxFit.contain,
-                        // 🚀 OPTIMIZACIÓN ESPECÍFICA PARA ADICIONALES
-                        cacheWidth: 70, // 35 * 2
-                        cacheHeight: 70,
-                        filterQuality: FilterQuality.low,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Center(
-                            child: Text(adicional.icono, style: const TextStyle(fontSize: 14)),
-                          );
-                        },
-                      )
-                    : Center(
-                        child: Text(adicional.icono, style: const TextStyle(fontSize: 14)),
-                      ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    adicional.nombre,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                    ),
-                  ),
-                  if (cantidadActual > 0)
-                    Text(
-                      'Ya tienes: $cantidadActual',
-                      style: const TextStyle(
-                        fontSize: 10,
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-              decoration: BoxDecoration(
-                color: colorAcento,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                adicional.precio == 0.0 ? 'GRATIS' : '+S/${adicional.precio.toStringAsFixed(0)}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 0, 0, 0),
-                  fontSize: 9,
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-            GestureDetector(
-              onTap: () => _mostrarDialogAdicional(index, adicional),
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: colorSecundario,
-                  borderRadius: BorderRadius.circular(6),
-                  boxShadow: [
-                    BoxShadow(
-                      color: colorSecundario.withOpacity(0.3),
-                      blurRadius: 2,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                  size: 14,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   // 🔥 OBTENER CANTIDAD ACTUAL DE UN ADICIONAL
@@ -1212,15 +693,635 @@ Widget _buildBotonAdicionalesDelgado(ItemPedido item, int index) {
   }
 }
 
+// 🚀 WIDGET SEPARADO PARA ITEM DEL CARRITO (MEJOR RENDIMIENTO)
+class _CarritoItemWidget extends StatefulWidget {
+  final ItemPedido item;
+  final int index;
+  final bool isExpanded;
+  final Function(int, int) onModificarCantidad;
+  final Function(int) onToggleExpansion;
+  final Function(int, int) onQuitarAdicional;
+  final Function(int, Adicional) onMostrarDialogAdicional;
+  final List<Adicional> Function(String, String) getAdicionalesDisponibles;
+  final Color Function(String) getTamanoColor;
+  final int Function(ItemPedido, Adicional) getCantidadActualAdicional;
+  final Widget Function(String, {required double width, required double height, required bool esCircular, required BoxFit boxFit}) buildImagenOptimizada;
+  final IconData Function(String) getIconoProducto;
+
+  const _CarritoItemWidget({
+    required Key key,
+    required this.item,
+    required this.index,
+    required this.isExpanded,
+    required this.onModificarCantidad,
+    required this.onToggleExpansion,
+    required this.onQuitarAdicional,
+    required this.onMostrarDialogAdicional,
+    required this.getAdicionalesDisponibles,
+    required this.getTamanoColor,
+    required this.getCantidadActualAdicional,
+    required this.buildImagenOptimizada,
+    required this.getIconoProducto,
+  }) : super(key: key);
+
+  @override
+  State<_CarritoItemWidget> createState() => _CarritoItemWidgetState();
+}
+
+// 🚀 MANTENER ESTADO DEL ITEM PARA EVITAR REBUILDS
+class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKeepAliveClientMixin {
+  
+  // 🚀 MANTENER VIVO SOLO SI ESTÁ EXPANDIDO
+  @override
+  bool get wantKeepAlive => widget.isExpanded;
+
+  static const Color colorPrimario = Color(0xFFD4332A);
+  static const Color colorSecundario = Color.fromARGB(255, 35, 139, 37);
+  static const Color colorAcento = Color(0xFFF4B942);
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // 🚀 NECESARIO PARA AutomaticKeepAliveClientMixin
+    
+    final esPersonalizable = widget.item.tamano != 'Combo Broaster';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.12),
+            spreadRadius: 1,
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+        border: Border.all(
+          color: colorSecundario.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          // INFORMACIÓN PRINCIPAL
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: [
+                _buildImagenItemOptimizada(),
+                const SizedBox(width: 14),
+                Expanded(child: _buildInfoItem()),
+                _buildControlesItem(),
+              ],
+            ),
+          ),
+
+          // 🔥 ADICIONALES AGREGADOS (CON CONTROLES SIMPLIFICADOS)
+          if (widget.item.adicionales.isNotEmpty)
+            _buildAdicionalesActuales(),
+
+          // 🚀 BOTÓN DELGADO PARA AGREGAR ADICIONALES
+          if (esPersonalizable)
+            _buildBotonAdicionalesDelgado(),
+
+          // 🔥 SECCIÓN EXPANDIBLE DE ADICIONALES DISPONIBLES - COMO ESTABA ANTES
+          if (widget.isExpanded && esPersonalizable) 
+            _buildSeccionAdicionales(),
+        ],
+      ),
+    );
+  }
+
+  // 🚀 VERSIÓN OPTIMIZADA DE LA IMAGEN DEL ITEM
+  Widget _buildImagenItemOptimizada() {
+    final esCircular = 
+        widget.item.tamano == 'Familiar' || 
+        widget.item.tamano == 'Personal' || 
+        widget.item.tamano == 'Extra Grande';
+    
+    // 🔥 USAR BoxFit.contain PARA PRODUCTOS NO CIRCULARES (combos, mostritos, etc.)
+    BoxFit boxFitOptimizado = esCircular ? BoxFit.cover : BoxFit.contain;
+    
+    return widget.buildImagenOptimizada(
+      widget.item.imagen,
+      width: 60,
+      height: 60,
+      esCircular: esCircular,
+      boxFit: boxFitOptimizado,
+    );
+  }
+
+  Widget _buildInfoItem() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.item.nombre,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            color: Colors.black87,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: widget.getTamanoColor(widget.item.tamano).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(
+              color: widget.getTamanoColor(widget.item.tamano).withOpacity(0.3),
+            ),
+          ),
+          child: Text(
+            widget.item.tamano,
+            style: TextStyle(
+              color: widget.getTamanoColor(widget.item.tamano),
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'S/${widget.item.precioTotalCarrito.toStringAsFixed(2)}',
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: Colors.green,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 🔥 SECCIÓN DE ADICIONALES SIMPLIFICADA - SIN BOTÓN BORRAR COMPLETO
+  Widget _buildAdicionalesActuales() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8, left: 14, right: 14),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: colorSecundario.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: colorSecundario.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.add_circle_outline, color: colorSecundario, size: 14),
+              const SizedBox(width: 4),
+              Text(
+                'Adicionales (${widget.item.adicionales.length})',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: colorSecundario,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          // 🚀 LISTA OPTIMIZADA DE ADICIONALES
+          ...widget.item.adicionales.asMap().entries.map((entry) {
+            int adicionalIndex = entry.key;
+            Adicional adicional = entry.value;
+            
+            return _buildAdicionalActualOptimizado(adicional, adicionalIndex);
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  // 🚀 WIDGET OPTIMIZADO PARA ADICIONAL ACTUAL
+  Widget _buildAdicionalActualOptimizado(Adicional adicional, int adicionalIndex) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Row(
+        children: [
+          // 🚀 IMAGEN OPTIMIZADA MÁS PEQUEÑA
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(2),
+              child: adicional.imagen.isNotEmpty
+                  ? Image.asset(
+                      adicional.imagen,
+                      fit: BoxFit.contain,
+                      gaplessPlayback: true,
+                      filterQuality: FilterQuality.low,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(
+                          child: Text(adicional.icono, style: const TextStyle(fontSize: 11)),
+                        );
+                      },
+                    )
+                  : Center(
+                      child: Text(adicional.icono, style: const TextStyle(fontSize: 11)),
+                    ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          
+          // 🔥 INFO DEL ADICIONAL COMPACTA
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  adicional.nombre,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (adicional.pizzaEspecifica != null) ...[
+                  const SizedBox(height: 1),
+                  Text(
+                    adicional.pizzaEspecifica!.length > 20 
+                        ? '${adicional.pizzaEspecifica!.substring(0, 17)}...'
+                        : adicional.pizzaEspecifica!,
+                    style: TextStyle(
+                      fontSize: 8,
+                      color: Colors.blue[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          
+          // 🔥 CONTROLES SIMPLIFICADOS - SOLO CANTIDAD Y QUITAR
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // CANTIDAD
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: colorAcento,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  'x${adicional.cantidad}',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color.fromARGB(255, 0, 0, 0),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+              
+              // PRECIO
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Colors.green.withOpacity(0.3)),
+                ),
+                child: Text(
+                  adicional.precio == 0.0 
+                      ? 'GRATIS'
+                      : '+S/${(adicional.precio * adicional.cantidad).toStringAsFixed(1)}',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.green[700],
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+              
+              // 🔥 SOLO BOTÓN QUITAR (-1) - YA NO HAY BORRAR COMPLETO
+              GestureDetector(
+                onTap: () => widget.onQuitarAdicional(widget.index, adicionalIndex),
+                child: Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: adicional.cantidad > 1 ? const Color.fromARGB(255, 255, 0, 0) : Colors.red,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Icon(
+                    adicional.cantidad > 1 ? Icons.remove : Icons.delete,
+                    size: 12,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildControlesItem() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: widget.item.cantidad > 1 ? colorPrimario : Colors.red,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: (widget.item.cantidad > 1 ? colorPrimario : Colors.red).withOpacity(0.3),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: IconButton(
+            icon: Icon(
+              widget.item.cantidad > 1 ? Icons.remove : Icons.delete,
+              color: Colors.white,
+              size: 12,
+            ),
+            padding: EdgeInsets.zero,
+            onPressed: () => widget.onModificarCantidad(widget.index, widget.item.cantidad - 1),
+          ),
+        ),
+        
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [colorAcento.withOpacity(0.2), Colors.white],
+            ),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: colorAcento.withOpacity(0.3)),
+          ),
+          child: Text(
+            '${widget.item.cantidad}',
+            style: TextStyle(
+              fontSize: 12, 
+              fontWeight: FontWeight.bold,
+              color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.8),
+            ),
+          ),
+        ),
+        
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: colorSecundario,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: colorSecundario.withOpacity(0.3),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.add, color: Colors.white, size: 12),
+            padding: EdgeInsets.zero,
+            onPressed: () => widget.onModificarCantidad(widget.index, widget.item.cantidad + 1),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBotonAdicionalesDelgado() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(left: 14, right: 14, bottom: 8),
+      child: ElevatedButton.icon(
+        onPressed: () => widget.onToggleExpansion(widget.index),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromARGB(255, 16, 201, 139),
+          foregroundColor: const Color.fromARGB(255, 0, 0, 0),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          elevation: 1,
+        ),
+        icon: Icon(
+          widget.isExpanded ? Icons.keyboard_arrow_up : Icons.add_circle_outline, 
+          size: 16
+        ),
+        label: Text(
+          widget.isExpanded ? 'Ocultar' : 'Agregar adicional',
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSeccionAdicionales() {
+    final adicionalesDisponibles = widget.getAdicionalesDisponibles(widget.item.tamano, widget.item.nombre);
+    
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            colorAcento.withOpacity(0.08),
+            Colors.white,
+          ],
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(14),
+          bottomRight: Radius.circular(14),
+        ),
+      ),
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: colorAcento,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.restaurant, color: Colors.white, size: 14),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Agregar adicionales',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromARGB(255, 0, 0, 0),
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          
+          // 🔥 MOSTRAR TODOS LOS ADICIONALES SIN CORTAR - COMO ESTABA ANTES
+          ...adicionalesDisponibles.map((adicional) => _buildAdicionalDisponible(adicional)),
+        ],
+      ),
+    );
+  }
+
+  // 🔥 WIDGET PARA ADICIONAL DISPONIBLE - COMO ESTABA ANTES
+  Widget _buildAdicionalDisponible(Adicional adicional) {
+    int cantidadActual = widget.getCantidadActualAdicional(widget.item, adicional);
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey[300]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.08),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            // 🚀 IMAGEN OPTIMIZADA DEL ADICIONAL
+            Container(
+              width: 35,
+              height: 35,
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: adicional.imagen.isNotEmpty
+                    ? Image.asset(
+                        adicional.imagen,
+                        fit: BoxFit.contain,
+                        gaplessPlayback: true,
+                        filterQuality: FilterQuality.low,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Center(
+                            child: Text(adicional.icono, style: const TextStyle(fontSize: 14)),
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Text(adicional.icono, style: const TextStyle(fontSize: 14)),
+                      ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    adicional.nombre,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                    ),
+                  ),
+                  if (cantidadActual > 0)
+                    Text(
+                      'Ya tienes: $cantidadActual',
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+              decoration: BoxDecoration(
+                color: colorAcento,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                adicional.precio == 0.0 ? 'GRATIS' : '+S/${adicional.precio.toStringAsFixed(0)}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 0, 0, 0),
+                  fontSize: 9,
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            GestureDetector(
+              onTap: () => widget.onMostrarDialogAdicional(widget.index, adicional),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: colorSecundario,
+                  borderRadius: BorderRadius.circular(6),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorSecundario.withOpacity(0.3),
+                      blurRadius: 2,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 // 🔥 DIALOG SIMPLIFICADO CON MENOS ADVERTENCIAS - VERSIÓN OPTIMIZADA
 class _DialogAdicional extends StatefulWidget {
   final Adicional adicional;
   final ItemPedido itemPedido;
+  final ImageProvider? imageProvider; // 🚀 RECIBE IMAGE PROVIDER OPTIMIZADO
   final Function(int cantidad, List<String> pizzasSeleccionadas) onAgregar;
 
   const _DialogAdicional({
     required this.adicional,
     required this.itemPedido,
+    this.imageProvider,
     required this.onAgregar,
   });
 
@@ -1387,13 +1488,11 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(6),
-                    child: widget.adicional.imagen.isNotEmpty
-                        ? Image.asset(
-                            widget.adicional.imagen,
+                    child: widget.imageProvider != null && widget.adicional.imagen.isNotEmpty
+                        ? Image(
+                            image: widget.imageProvider!, // 🚀 USA IMAGE PROVIDER OPTIMIZADO
                             fit: BoxFit.contain,
-                            // 🚀 OPTIMIZACIÓN DE IMAGEN DEL DIALOG
-                            cacheWidth: 80, // 40 * 2
-                            cacheHeight: 80,
+                            gaplessPlayback: true,
                             filterQuality: FilterQuality.low,
                             errorBuilder: (context, error, stackTrace) {
                               return Center(
@@ -1495,7 +1594,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                           // 🚀 OPTIMIZACIONES PARA LISTA DE PIZZAS
                           shrinkWrap: true,
                           itemCount: pizzasDisponibles.length,
-                          cacheExtent: 100,
+                          cacheExtent: 50, // 🚀 REDUCIDO AÚN MÁS
                           addAutomaticKeepAlives: false,
                           addRepaintBoundaries: false,
                           itemBuilder: (context, index) {

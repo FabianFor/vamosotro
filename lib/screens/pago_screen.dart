@@ -151,6 +151,7 @@ Widget _buildResumenPedidoCompacto() {
           ...widget.carrito.map((item) => Padding(
             padding: const EdgeInsets.symmetric(vertical: 2),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -169,9 +170,25 @@ Widget _buildResumenPedidoCompacto() {
                 ),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(
-                    '${item.nombre} (${item.tamano})',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500), // 🔧 NOMBRE PRODUCTOS (+2)
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${item.nombre} (${item.tamano})',
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500), // 🔧 NOMBRE PRODUCTOS (+2)
+                      ),
+                      if (item.adicionales.isNotEmpty) ...[
+                        const SizedBox(height: 1),
+                        Text(
+                          '+ ${item.adicionales.map((a) => '${a.cantidad}x ${a.nombre}').join(', ')}',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.green[700],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 Text(
