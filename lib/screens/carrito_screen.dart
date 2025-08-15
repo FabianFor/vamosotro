@@ -420,27 +420,31 @@ class _CarritoScreenState extends State<CarritoScreen> {
       ),
       child: ClipRRect(
         borderRadius: esCircular ? BorderRadius.circular(width / 2) : BorderRadius.circular(10),
-        child: Image.asset(
-          rutaImagen,
-          fit: boxFit,
-          // 🚀 OPTIMIZACIONES DE IMAGEN CRÍTICAS
-          cacheWidth: (width * MediaQuery.of(context).devicePixelRatio).round(),
-          cacheHeight: (height * MediaQuery.of(context).devicePixelRatio).round(),
-          filterQuality: FilterQuality.low, // Reduce calidad para mejor rendimiento
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F5),
-                borderRadius: esCircular ? BorderRadius.circular(width / 2) : BorderRadius.circular(10),
-                border: Border.all(color: colorPrimario, width: 2),
-              ),
-              child: Icon(
-                _getIconoProducto(cacheKey.split('_').last),
-                size: width * 0.5,
-                color: colorPrimario,
-              ),
-            );
-          },
+        child: Padding(
+          // 🔥 AÑADIR PADDING SOLO PARA PRODUCTOS NO CIRCULARES (combos, mostritos, etc.)
+          padding: esCircular ? EdgeInsets.zero : const EdgeInsets.all(4),
+          child: Image.asset(
+            rutaImagen,
+            fit: boxFit,
+            // 🚀 OPTIMIZACIONES DE IMAGEN CRÍTICAS
+            cacheWidth: (width * MediaQuery.of(context).devicePixelRatio).round(),
+            cacheHeight: (height * MediaQuery.of(context).devicePixelRatio).round(),
+            filterQuality: FilterQuality.low, // Reduce calidad para mejor rendimiento
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F5F5),
+                  borderRadius: esCircular ? BorderRadius.circular(width / 2) : BorderRadius.circular(10),
+                  border: Border.all(color: colorPrimario, width: 2),
+                ),
+                child: Icon(
+                  _getIconoProducto(cacheKey.split('_').last),
+                  size: width * 0.5,
+                  color: colorPrimario,
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -566,13 +570,16 @@ class _CarritoScreenState extends State<CarritoScreen> {
     
     String cacheKey = '${item.nombre}_${item.tamano}_${item.imagen}';
     
+    // 🔥 USAR BoxFit.contain PARA PRODUCTOS NO CIRCULARES (combos, mostritos, etc.)
+    BoxFit boxFitOptimizado = esCircular ? BoxFit.cover : BoxFit.contain;
+    
     return _buildImagenOptimizada(
       item.imagen, 
       cacheKey,
       width: 60,
       height: 60,
       esCircular: esCircular,
-      boxFit: esCircular ? BoxFit.cover : BoxFit.contain,
+      boxFit: boxFitOptimizado,
     );
   }
 
@@ -914,6 +921,7 @@ Widget _buildBotonAdicionalesDelgado(ItemPedido item, int index) {
     ),
   );
 }
+
   Widget _buildSeccionAdicionales(ItemPedido item, int index) {
     final adicionalesDisponibles = _getAdicionalesDisponibles(item.tamano, item.nombre);
     
