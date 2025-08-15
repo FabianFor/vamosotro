@@ -1117,7 +1117,7 @@ ${_obtenerTextoPagoLimpio()}
 ${widget.carrito.map((item) {
     String linea = '• ${item.cantidad}x ${item.nombre} (${item.tamano})';
     if (item.adicionales.isNotEmpty) {
-      linea += '\n   ${item.adicionales.map((a) => '${a.cantidad}x ${a.nombre}').join('\n   ')}';
+      linea += '\n   ${item.adicionales.map((a) => '${a.cantidad}x - ${a.nombre}').join('\n   ')}';
 
     }
     linea += '\n   S/${item.precioTotalCarrito.toStringAsFixed(2)}';

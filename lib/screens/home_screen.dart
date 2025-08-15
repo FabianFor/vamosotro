@@ -16,7 +16,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<ItemPedido> carrito = [];
-  String categoriaSeleccionada = 'Pizza Familiar (30cm)';
+  String categoriaSeleccionada = 'Pizza Familiar';
 
   // 🎨 PALETA DE COLORES INSPIRADA EN EL LOGO  
   static const Color colorPrimario = Color(0xFFD4332A); 
@@ -27,9 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 🔥 CATEGORÍAS ACTUALIZADAS EN HOME SCREEN
   static const List<Map<String, dynamic>> categorias = [
-    {'nombre': 'Pizza Personal (18cm)', 'icono': Icons.local_pizza_outlined},
-    {'nombre': 'Pizza Familiar (30cm)', 'icono': Icons.local_pizza},
-    {'nombre': 'Pizza Extra Grande (45cm)', 'icono': Icons.local_pizza}, // 🔥 NUEVA CATEGORÍA
+    {'nombre': 'Pizza Personal', 'icono': Icons.local_pizza_outlined},
+    {'nombre': 'Pizza Familiar', 'icono': Icons.local_pizza},
+    {'nombre': 'Pizza Extra Grande', 'icono': Icons.local_pizza}, // 🔥 NUEVA CATEGORÍA
     {'nombre': 'Combo Pizza', 'icono': Icons.local_pizza},
     {'nombre': 'Pizza 2 sabores', 'icono': Icons.star},
     {'nombre': 'Fusión', 'icono': Icons.auto_awesome},
@@ -327,11 +327,11 @@ class _HomeScreenState extends State<HomeScreen> {
   // 🔥 MÉTODO ACTUALIZADO PARA CONTENIDO POR CATEGORÍA
   List<Widget> _buildContenidoPorCategoria() {
     switch (categoriaSeleccionada) {
-      case 'Pizza Personal (18cm)':
+      case 'Pizza Personal':
         return _buildPizzasPersonales();
-      case 'Pizza Familiar (30cm)':
+      case 'Pizza Familiar':
         return _buildPizzasFamiliares();
-      case 'Pizza Extra Grande (45cm)': 
+      case 'Pizza Extra Grande': 
         return _buildPizzasExtraGrandes();
       case 'Combo Pizza':
         return _buildCombosPizza();
@@ -352,7 +352,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Widget> _buildPizzasFamiliares() {
     return [
       _buildSliverSectionHeader(
-        'Familiares',
+        'Familiares (30cm)',
         'Porque en familia sabe mejor',
         Icons.local_pizza,
         colorPrimario,
@@ -388,7 +388,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Widget> _buildPizzasPersonales() {
     return [
       _buildSliverSectionHeader(
-        'Personales',
+        'Personales (18cm)',
         'Ideales para disfrutar solo',
         Icons.local_pizza_outlined,
         colorSecundario,
@@ -425,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Widget> _buildPizzasExtraGrandes() {
     return [
       _buildSliverSectionHeader(
-        'Extra Grandes',
+        'Extra Grandes(45cm)',
         'Lista para conquistar tu hambre',
         Icons.local_pizza,
         const Color.fromARGB(255, 255, 191, 0), // Morado eléctrico

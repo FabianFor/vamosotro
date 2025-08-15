@@ -132,7 +132,7 @@ class PizzaCard extends StatelessWidget {
                               const Text(
                                 '1ra gaseosa +S/1',
                                 style: TextStyle(
-                                  fontSize: 8, // TAMAÑO PEQUEÑO
+                                  fontSize: 9, // TAMAÑO PEQUEÑO
                                   color: Colors.green,
                                   fontWeight: FontWeight.w500,
                                 ),
