@@ -491,22 +491,10 @@ class PizzaData {
     // 🍞 Panes al ajo
     adicionales.addAll([
       Adicional(
-        nombre: '3 panes al ajo clásico', 
-        precio: 3.0, 
-        icono: '🍞',
-        imagen: 'assets/images/adicionales/pan_ajo_clasico_3.png'
-      ),
-      Adicional(
         nombre: '5 panes al ajo clásico', 
         precio: 5.0, 
         icono: '🍞',
         imagen: 'assets/images/adicionales/pan_ajo_clasico_5.png'
-      ),
-      Adicional(
-        nombre: '3 panes al ajo con queso', 
-        precio: 5.0, 
-        icono: '🧄',
-        imagen: 'assets/images/adicionales/pan_ajo_queso_3.png'
       ),
     ]);
 
@@ -543,12 +531,6 @@ class PizzaData {
         precio: 9.0, 
         icono: '🍗',
         imagen: 'assets/images/adicionales/alas_extra.png'
-      ),
-      Adicional(
-        nombre: '1 pieza de pollo extra', 
-        precio: 10.0, 
-        icono: '🍗',
-        imagen: 'assets/images/adicionales/pollo_extra.png'
       ),
     ]);
 

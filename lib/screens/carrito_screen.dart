@@ -850,7 +850,7 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
         Text(
           'S/${widget.item.precioTotalCarrito.toStringAsFixed(2)}',
           style: const TextStyle(
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: Colors.green,
           ),
@@ -880,7 +880,7 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
               Text(
                 'Adicionales (${widget.item.adicionales.length})',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: colorSecundario,
                 ),
@@ -950,7 +950,7 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
                 Text(
                   adicional.nombre,
                   style: const TextStyle(
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                   maxLines: 1,
@@ -1008,7 +1008,7 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
                       ? 'GRATIS'
                       : '+S/${(adicional.precio * adicional.cantidad).toStringAsFixed(1)}',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                     color: Colors.green[700],
                     fontWeight: FontWeight.bold,
                   ),
@@ -1251,14 +1251,14 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
                     adicional.nombre,
                     style: const TextStyle(
                       fontWeight: FontWeight.w500,
-                      fontSize: 12,
+                      fontSize: 13,
                     ),
                   ),
                   if (cantidadActual > 0)
                     Text(
                       'Ya tienes: $cantidadActual',
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 12,
                         color: Colors.blue,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1277,7 +1277,7 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Color.fromARGB(255, 0, 0, 0),
-                  fontSize: 9,
+                  fontSize: 13,
                 ),
               ),
             ),
@@ -1521,7 +1521,7 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: const Color.fromARGB(255, 11, 216, 14),
+                          color: const Color.fromARGB(255, 37, 161, 39),
                         ),
                       ),
                       Text(

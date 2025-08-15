@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
         SnackBar(
           content: Text('$nombre agregado'),
           duration: const Duration(milliseconds: 1500),
-          backgroundColor: colorPrimario,
+          backgroundColor: const Color.fromARGB(255, 41, 114, 41),
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
