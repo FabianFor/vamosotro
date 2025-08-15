@@ -512,7 +512,7 @@ class _PagoScreenState extends State<PagoScreen> {
                       style: TextStyle(
                         color: Colors.green, 
                         fontWeight: FontWeight.bold,
-                        fontSize: 12,
+                        fontSize: 13,
                       )
                     ),
                   ),
@@ -844,92 +844,57 @@ class _PagoScreenState extends State<PagoScreen> {
     );
   }
 
-Widget _buildBotonConfirmar() {
-  bool puedeConfirmar = _puedeConfirmarPedido();
-
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      // Texto descriptivo
-      Padding(
-        padding: const EdgeInsets.only(bottom: 8),
+  Widget _buildBotonConfirmar() {
+    bool puedeConfirmar = _puedeConfirmarPedido();
+    
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: puedeConfirmar 
+              ? [Colors.red[600]!, Colors.red[700]!]
+              : [Colors.grey[400]!, Colors.grey[500]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: puedeConfirmar ? [
+          BoxShadow(
+            color: Colors.red.withOpacity(0.4),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ] : null,
+      ),
+      child: ElevatedButton(
+        onPressed: puedeConfirmar ? _confirmarPedido : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.info_outline, size: 18, color: Colors.white70),
-            const SizedBox(width: 6),
-            const Flexible(
-              child: Text(
-                'Al presionar este botón se registrará su pedido\n'
-                'y se enviará por WhatsApp.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.white70,
-                ),
+            const Icon(Icons.check_circle, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              puedeConfirmar ? 'CONFIRMAR PEDIDO' : 'COMPLETE TODOS LOS DATOS',
+              style: const TextStyle(
+                fontSize: 14, 
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1,
               ),
             ),
           ],
         ),
       ),
-
-      // Botón
-      Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: puedeConfirmar
-                ? [Colors.red[600]!, Colors.red[700]!]
-                : [Colors.grey[400]!, Colors.grey[500]!],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: puedeConfirmar
-              ? [
-                  BoxShadow(
-                    color: Colors.red.withOpacity(0.4),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: ElevatedButton(
-          onPressed: puedeConfirmar ? _confirmarPedido : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            foregroundColor: Colors.white,
-            shadowColor: Colors.transparent,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.check_circle, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                puedeConfirmar
-                    ? 'CONFIRMAR PEDIDO'
-                    : 'COMPLETE TODOS LOS DATOS',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-
+    );
+  }
 
 bool _puedeConfirmarPedido() {
   double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;

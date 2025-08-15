@@ -28,7 +28,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
 
   // 🎨 COLORES ACTUALIZADOS
   static const Color colorPrimario = Color(0xFFD4332A);
-  static const Color colorSecundario = Color(0xFF2C5F2D);
+  static const Color colorSecundario = Color.fromARGB(255, 35, 139, 37);
   static const Color colorAcento = Color(0xFFF4B942);
 
   @override
@@ -51,7 +51,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
     
     // Cache de colores
     _coloresCache = {
-      'Personal': colorSecundario,
+      'Personal': const Color.fromARGB(255, 28, 130, 138),
       'Familiar': colorPrimario,
       'Extra Grande': const Color.fromARGB(255, 225, 0, 255),
       'Mostrito': Colors.orange,
@@ -380,7 +380,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(mensaje, style: const TextStyle(fontSize: 13)),
-        backgroundColor: colorSecundario,
+        backgroundColor: const Color.fromARGB(255, 43, 163, 89),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -545,7 +545,11 @@ class _CarritoScreenState extends State<CarritoScreen> {
           if (item.adicionales.isNotEmpty)
             _buildAdicionalesActuales(item, index),
 
-          // 🔥 SECCIÓN EXPANDIBLE DE ADICIONALES DISPONIBLES
+          // 🚀 BOTÓN DELGADO PARA AGREGAR ADICIONALES
+          if (esPersonalizable)
+            _buildBotonAdicionalesDelgado(item, index),
+
+          // 🔥 SECCIÓN EXPANDIBLE DE ADICIONALES DISPONIBLES - COMO ESTABA ANTES
           if (isExpanded && esPersonalizable) 
             _buildSeccionAdicionales(item, index),
         ],
@@ -569,53 +573,6 @@ class _CarritoScreenState extends State<CarritoScreen> {
       height: 55,
       esCircular: esCircular,
       boxFit: esCircular ? BoxFit.cover : BoxFit.contain,
-    );
-  }
-
-  Widget _buildImagenItem(ItemPedido item) {
-    final esCircular = 
-        item.tamano == 'Familiar' || 
-        item.tamano == 'Personal' || 
-        item.tamano == 'Extra Grande';
-    
-    return Container(
-      width: 55,
-      height: 55,
-      decoration: BoxDecoration(
-        shape: esCircular ? BoxShape.circle : BoxShape.rectangle,
-        borderRadius: esCircular ? null : BorderRadius.circular(10),
-        gradient: LinearGradient(
-          colors: [
-            colorSecundario.withOpacity(0.1),
-            colorPrimario.withOpacity(0.1),
-          ],
-        ),
-        border: Border.all(
-          color: colorSecundario.withOpacity(0.3),
-          width: 2,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: esCircular ? BorderRadius.circular(27.5) : BorderRadius.circular(10),
-        child: Image.asset(
-          item.imagen,
-          fit: esCircular ? BoxFit.cover : BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F5),
-                borderRadius: esCircular ? BorderRadius.circular(27.5) : BorderRadius.circular(10),
-                border: Border.all(color: colorPrimario, width: 2),
-              ),
-              child: Icon(
-                _getIconoProducto(item.tamano),
-                size: 26,
-                color: colorPrimario,
-              ),
-            );
-          },
-        ),
-      ),
     );
   }
 
@@ -762,7 +719,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                                  Text(
+                Text(
                   adicional.nombre,
                   style: const TextStyle(
                     fontSize: 11,
@@ -856,127 +813,107 @@ class _CarritoScreenState extends State<CarritoScreen> {
   }
 
   Widget _buildControlesItem(ItemPedido item, int index) {
-    final isExpanded = itemsExpandidos.contains(index);
-    final esPersonalizable = item.tamano != 'Combo Broaster';
-
-    return Column(
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: item.cantidad > 1 ? colorPrimario : Colors.red,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: (item.cantidad > 1 ? colorPrimario : Colors.red).withOpacity(0.3),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: item.cantidad > 1 ? colorPrimario : Colors.red,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: (item.cantidad > 1 ? colorPrimario : Colors.red).withOpacity(0.3),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
               ),
-              child: IconButton(
-                icon: Icon(
-                  item.cantidad > 1 ? Icons.remove : Icons.delete,
-                  color: Colors.white,
-                  size: 12,
-                ),
-                padding: EdgeInsets.zero,
-                onPressed: () => _modificarCantidad(index, item.cantidad - 1),
-              ),
+            ],
+          ),
+          child: IconButton(
+            icon: Icon(
+              item.cantidad > 1 ? Icons.remove : Icons.delete,
+              color: Colors.white,
+              size: 12,
             ),
-            
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [colorAcento.withOpacity(0.2), Colors.white],
-                ),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: colorAcento.withOpacity(0.3)),
-              ),
-              child: Text(
-                '${item.cantidad}',
-                style: TextStyle(
-                  fontSize: 12, 
-                  fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.8),
-                ),
-              ),
-            ),
-            
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: colorSecundario,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: colorSecundario.withOpacity(0.3),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.add, color: Colors.white, size: 12),
-                padding: EdgeInsets.zero,
-                onPressed: () => _modificarCantidad(index, item.cantidad + 1),
-              ),
-            ),
-          ],
+            padding: EdgeInsets.zero,
+            onPressed: () => _modificarCantidad(index, item.cantidad - 1),
+          ),
         ),
         
-        const SizedBox(height: 4),
-        
-        if (esPersonalizable)
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  colorAcento.withOpacity(0.1),
-                  Colors.transparent,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: colorAcento.withOpacity(0.3)),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [colorAcento.withOpacity(0.2), Colors.white],
             ),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(6),
-              onTap: () => _toggleExpansion(index),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                      color: const Color.fromARGB(255, 0, 0, 0),
-                      size: 14,
-                    ),
-                    const SizedBox(width: 2),
-                    Text(
-                      isExpanded ? 'Ocultar' : 'Adicionales',
-                      style: TextStyle(
-                        color: const Color.fromARGB(255, 0, 0, 0),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: colorAcento.withOpacity(0.3)),
+          ),
+          child: Text(
+            '${item.cantidad}',
+            style: TextStyle(
+              fontSize: 12, 
+              fontWeight: FontWeight.bold,
+              color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.8),
             ),
           ),
+        ),
+        
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: colorSecundario,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: colorSecundario.withOpacity(0.3),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.add, color: Colors.white, size: 12),
+            padding: EdgeInsets.zero,
+            onPressed: () => _modificarCantidad(index, item.cantidad + 1),
+          ),
+        ),
       ],
     );
   }
 
+Widget _buildBotonAdicionalesDelgado(ItemPedido item, int index) {
+  final isExpanded = itemsExpandidos.contains(index);
+  
+  return Container(
+    width: double.infinity,
+    margin: const EdgeInsets.only(left: 14, right: 14, bottom: 8),
+    child: ElevatedButton.icon(
+      onPressed: () => _toggleExpansion(index),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color.fromARGB(255, 17, 92, 231),
+        foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        elevation: 1,
+      ),
+      icon: Icon(
+        isExpanded ? Icons.keyboard_arrow_up : Icons.add_circle_outline, 
+        size: 16
+      ),
+      label: Text(
+        isExpanded ? 'Ocultar' : 'Agregar adicional',
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ),
+  );
+}
   Widget _buildSeccionAdicionales(ItemPedido item, int index) {
     final adicionalesDisponibles = _getAdicionalesDisponibles(item.tamano, item.nombre);
     
@@ -1021,25 +958,14 @@ class _CarritoScreenState extends State<CarritoScreen> {
           ),
           const SizedBox(height: 10),
           
-          // 🚀 OPTIMIZACIÓN: Usar ListView.builder si hay muchos adicionales
-          if (adicionalesDisponibles.length > 6) ...[
-            SizedBox(
-              height: 200,
-              child: ListView.builder(
-                itemCount: adicionalesDisponibles.length,
-                itemBuilder: (context, adicionalIndex) => 
-                    _buildAdicionalDisponible(adicionalesDisponibles[adicionalIndex], item, index),
-              ),
-            ),
-          ] else ...[
-            ...adicionalesDisponibles.map((adicional) => _buildAdicionalDisponible(adicional, item, index)),
-          ],
+          // 🔥 MOSTRAR TODOS LOS ADICIONALES SIN CORTAR - COMO ESTABA ANTES
+          ...adicionalesDisponibles.map((adicional) => _buildAdicionalDisponible(adicional, item, index)),
         ],
       ),
     );
   }
 
-  // 🔥 WIDGET PARA ADICIONAL DISPONIBLE - COMPACTO Y OPTIMIZADO
+  // 🔥 WIDGET PARA ADICIONAL DISPONIBLE - COMO ESTABA ANTES
   Widget _buildAdicionalDisponible(Adicional adicional, ItemPedido item, int index) {
     int cantidadActual = _getCantidadActualAdicional(item, adicional);
     
@@ -1107,7 +1033,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
                     Text(
                       'Ya tienes: $cantidadActual',
                       style: const TextStyle(
-                        fontSize: 8,
+                        fontSize: 10,
                         color: Colors.blue,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1553,7 +1479,6 @@ class _DialogAdicionalState extends State<_DialogAdicional> {
                           fontSize: 12,
                         ),
                       ),
-                      const SizedBox(height: 8),
                       
                       // 🚀 LISTA OPTIMIZADA CON VIEWPORT LIMITADO
                       ConstrainedBox(

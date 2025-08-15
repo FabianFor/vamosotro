@@ -9,9 +9,14 @@ class DialogUtils {
       builder: (context) => AlertDialog(
         title: const Row(
           children: [
-            Icon(Icons.location_off, color: Colors.red),
-            SizedBox(width: 10),
-            Text('Ubicación Desactivada'),
+            Icon(Icons.location_off, color: Colors.red, size: 20),
+            SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                'Ubicación Desactivada',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
           ],
         ),
         content: const Column(
@@ -20,79 +25,114 @@ class DialogUtils {
           children: [
             Text(
               'Para el delivery necesitamos tu ubicación exacta.',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
             ),
-            SizedBox(height: 10),
-            Text('Por favor activa su ubicacion en tu dispositivo para continuar.'),
+            SizedBox(height: 8),
+            Text(
+              'Por favor activa tu ubicación en tu dispositivo para continuar.',
+              style: TextStyle(fontSize: 12),
+            ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: const Text(
+              'Cancelar',
+              style: TextStyle(fontSize: 12),
+            ),
           ),
           ElevatedButton.icon(
             onPressed: () async {
               Navigator.pop(context);
               await UbicacionService.openLocationSettings();
             },
-            icon: const Icon(Icons.settings),
-            label: const Text('Ir a Configuración'),
+            icon: const Icon(Icons.settings, size: 16),
+            label: const Text(
+              'Ir a Configuración',
+              style: TextStyle(fontSize: 12),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
           ),
         ],
+        contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+        actionsPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       ),
     );
   }
 
-  static Future<void> mostrarDialogoPermisosDenegados(BuildContext context) async {
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.location_disabled, color: Colors.orange),
-            SizedBox(width: 10),
-            Text('Permisos Requeridos'),
-          ],
-        ),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Para el delivery necesitamos acceso a tu ubicación.',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text('Los permisos han sido denegados permanentemente. Ve a configuración de la app para habilitarlos.'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton.icon(
-            onPressed: () async {
-              Navigator.pop(context);
-              await UbicacionService.openAppSettings();
-            },
-            icon: const Icon(Icons.settings_applications),
-            label: const Text('Configuración App'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              foregroundColor: Colors.white,
+static Future<void> mostrarDialogoPermisosDenegados(BuildContext context) async {
+  return showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => AlertDialog(
+      title: const Row(
+        children: [
+          Icon(Icons.location_disabled, color: Colors.orange, size: 20),
+          SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              'Permisos Requeridos',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
         ],
       ),
-    );
-  }
+      content: const Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Para el delivery necesitamos acceso a tu ubicación.',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Los permisos han sido denegados. Ve a configuración de la app para habilitarlos.',
+            style: TextStyle(fontSize: 12),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text(
+            'Cancelar',
+            style: TextStyle(fontSize: 12),
+          ),
+        ),
+        ElevatedButton.icon(
+          onPressed: () async {
+            Navigator.pop(context);
+            await UbicacionService.openAppSettings();
+          },
+          icon: const Icon(Icons.settings_applications, size: 16),
+          label: const Text(
+            'Configuración App',
+            style: TextStyle(fontSize: 12),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orange,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          ),
+        ),
+      ],
+      contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+      actionsPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+    ),
+  );
+}
 
   static Future<void> mostrarDialogoReintentar(
     BuildContext context,
