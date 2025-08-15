@@ -1045,8 +1045,8 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 28,
-          height: 28,
+          width: 33,
+          height: 33,
           decoration: BoxDecoration(
             color: widget.item.cantidad > 1 ? colorPrimario : Colors.red,
             shape: BoxShape.circle,
@@ -1062,7 +1062,7 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
             icon: Icon(
               widget.item.cantidad > 1 ? Icons.remove : Icons.delete,
               color: Colors.white,
-              size: 12,
+              size: 15,
             ),
             padding: EdgeInsets.zero,
             onPressed: () => widget.onModificarCantidad(widget.index, widget.item.cantidad - 1),
@@ -1082,7 +1082,7 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
           child: Text(
             '${widget.item.cantidad}',
             style: TextStyle(
-              fontSize: 12, 
+              fontSize: 16, 
               fontWeight: FontWeight.bold,
               color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.8),
             ),
@@ -1090,8 +1090,8 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
         ),
         
         Container(
-          width: 28,
-          height: 28,
+          width: 33,
+          height: 33,
           decoration: BoxDecoration(
             color: colorSecundario,
             shape: BoxShape.circle,
@@ -1104,7 +1104,7 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
             ],
           ),
           child: IconButton(
-            icon: const Icon(Icons.add, color: Colors.white, size: 12),
+            icon: const Icon(Icons.add, color: Colors.white, size: 17),
             padding: EdgeInsets.zero,
             onPressed: () => widget.onModificarCantidad(widget.index, widget.item.cantidad + 1),
           ),
