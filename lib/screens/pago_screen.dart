@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // 🔥 AGREGADO PARA CLIPBOARD
 import 'package:geolocator/geolocator.dart';
 import '../models/models.dart';
 import '../services/services.dart';
@@ -382,7 +383,7 @@ Widget _buildResumenPedidoCompacto() {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: tipoEntrega == 'delivery' ? Colors.white : Colors.grey[600],
-                              fontSize: 12,
+                              fontSize: 14,
                             ),
                           ),
                         ],
@@ -419,7 +420,7 @@ Widget _buildResumenPedidoCompacto() {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: tipoEntrega == 'recojo' ? Colors.white : Colors.grey[600],
-                              fontSize: 12,
+                              fontSize: 14,
                             ),
                           ),
                         ],
@@ -469,11 +470,11 @@ Widget _buildResumenPedidoCompacto() {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Delivery S/2.00 - NO PAGUE HASTA QUE NUESTRO PERSONAL CONFIRME SI PUEDE LLEGAR A SU UBICACION',
+                    'Delivery S/2.00',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: Colors.orange[800],
-                      fontSize: 11,
+                      fontSize: 14,
                     ),
                   ),
                 ),
@@ -486,7 +487,7 @@ Widget _buildResumenPedidoCompacto() {
           if (ubicacionActual == null) ...[
             const Text(
               'Necesitamos tu ubicación',
-              style: TextStyle(color: Colors.blue, fontSize: 12),
+              style: TextStyle(color: Colors.blue, fontSize: 14),
             ),
             const SizedBox(height: 8),
             SizedBox(
@@ -502,7 +503,7 @@ Widget _buildResumenPedidoCompacto() {
                     : const Icon(Icons.location_on, color: Colors.white, size: 16),
                 label: Text(
                   cargandoUbicacion ? 'Obteniendo...' : 'Obtener ubicación',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
@@ -573,7 +574,7 @@ Widget _buildResumenPedidoCompacto() {
                 'Lurigancho-Chosica, Anexo 8', 
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 12,
+                  fontSize: 14,
                   color: Colors.green,
                 )
               ),
@@ -587,7 +588,7 @@ Widget _buildResumenPedidoCompacto() {
               icon: const Icon(Icons.map, color: Colors.white, size: 14),
               label: const Text(
                 'Ver ubicación',
-                style: TextStyle(color: Colors.white, fontSize: 12),
+                style: TextStyle(color: Colors.white, fontSize: 14),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
@@ -601,6 +602,7 @@ Widget _buildResumenPedidoCompacto() {
     );
   }
 
+  // 🔥 MÉTODO DE PAGO ACTUALIZADO CON TARJETAS YAPE/PLIN
   Widget _buildMetodoPago() {
     return Card(
       elevation: 4,
@@ -629,6 +631,58 @@ Widget _buildResumenPedidoCompacto() {
             ),
             const SizedBox(height: 12),
 
+            // 🔥 ADVERTENCIA ARRIBA (para pagos digitales)
+            if (metodoPago == 'yape' || metodoPago == 'plin') ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.red[100]!, Colors.orange[100]!],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red[300]!, width: 2),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: const Icon(Icons.warning, color: Colors.white, size: 16),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '⚠️ NO REALIZE EL PAGO',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.red[800],
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Espera a que nuestro personal confirme la ubicacion para llevar su pedido',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.red[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+
             // YAPE
             _buildOpcionPago('yape', 'Yape', Colors.purple, 'assets/images/logos/yape_logo.png'),
             const SizedBox(height: 8),
@@ -640,7 +694,13 @@ Widget _buildResumenPedidoCompacto() {
             // EFECTIVO
             _buildOpcionPago('efectivo', 'Efectivo', Colors.green, null),
 
-            // 🔥 RECORDATORIO YAPE/PLIN
+            // 🔥 TARJETA DE PAGO DIGITAL (cuando se seleccione Yape o Plin)
+            if (metodoPago == 'yape' || metodoPago == 'plin') ...[
+              const SizedBox(height: 12),
+              _buildTarjetaPagoDigital(),
+            ],
+
+            // 🔥 RECORDATORIO WHATSAPP (solo para pagos digitales - más pequeño)
             if (metodoPago == 'yape' || metodoPago == 'plin') ...[
               const SizedBox(height: 12),
               Container(
@@ -652,15 +712,29 @@ Widget _buildResumenPedidoCompacto() {
                 ),
                 child: Row(
                   children: [
-                    const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green, size: 14),
-                    const SizedBox(width: 6),
                     Expanded(
-                      child: Text(
-                        'Recuerda enviar foto del ${metodoPago.toUpperCase()} por WhatsApp',
-                        style: TextStyle(
-                          color: Colors.blue[800],
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            color: Colors.blue[800],
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          children: [
+                            const TextSpan(text: 'Cuando se acepte el pedido y su ubicación realice el pago del '),
+                            TextSpan(
+                              text: metodoPago.toUpperCase(),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const TextSpan(text: ' y mande captura al WhatsApp '),
+                            const WidgetSpan(
+                              child: FaIcon(
+                                FontAwesomeIcons.whatsapp,
+                                color: Colors.green,
+                                size: 14,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -677,6 +751,225 @@ Widget _buildResumenPedidoCompacto() {
           ],
         ),
       ),
+    );
+  }
+
+  // 🔥 TARJETA DE PAGO DIGITAL (copiada y adaptada de confirmacion_screen)
+  Widget _buildTarjetaPagoDigital() {
+    final metodoPagoLower = metodoPago.toLowerCase();
+    final colorPrincipal = metodoPagoLower == 'yape' ? Colors.purple : Colors.teal;
+    final nombreMetodo = metodoPagoLower == 'yape' ? 'Yape' : 'Plin';
+    final numeroTelefono = metodoPagoLower == 'yape' ? PagoService.numeroYape : PagoService.numeroPlin;
+    final nombreTitular = metodoPagoLower == 'yape' 
+        ? 'Carlos Alberto Huaytalla Quispe' 
+        : 'Fabian Hector Huaytalla Guevara';
+
+    // Calcular total final
+    final double totalFinal = tipoEntrega == 'delivery' ? widget.total + 2.00 : widget.total;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: [Colors.white, colorPrincipal.withOpacity(0.05)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(color: colorPrincipal.withOpacity(0.3)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Header
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [colorPrincipal, colorPrincipal.withOpacity(0.8)],
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.payment, color: Colors.white, size: 16),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Datos para $nombreMetodo',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold, 
+                          fontSize: 15,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      Text(
+                        'Información de pago',
+                        style: TextStyle(
+                          color: Colors.grey[600], 
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Información de pago
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [colorPrincipal, colorPrincipal.withOpacity(0.8)],
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                children: [
+                  // Logo y método
+                  Row(
+                    children: [
+                      _buildLogoMetodoPago(metodoPagoLower),
+                      const SizedBox(width: 10),
+                      Text(
+                        nombreMetodo,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  
+                  // Datos
+                  _buildInfoPagoDigitalCompacto('📱', numeroTelefono),
+                  const SizedBox(height: 6),
+                  _buildInfoPagoDigitalCompacto('👤', nombreTitular),
+                  const SizedBox(height: 6),
+                  _buildInfoPagoDigitalCompacto(
+                    '💵', 
+                    tipoEntrega == 'delivery' 
+                        ? 'S/${totalFinal.toStringAsFixed(2)} (incluye delivery)'
+                        : 'S/${totalFinal.toStringAsFixed(2)}'
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Botón copiar
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _copiarNumero,
+                icon: const Icon(Icons.copy, color: Colors.white, size: 16),
+                label: const Text(
+                  'Copiar Número',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorPrincipal,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 🔥 COPIAR NÚMERO - MÉTODO INDEPENDIENTE
+  Future<void> _copiarNumero() async {
+    final numero = metodoPago.toLowerCase() == 'yape' 
+        ? PagoService.numeroYape 
+        : PagoService.numeroPlin;
+    
+    await Clipboard.setData(ClipboardData(text: numero));
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Número copiado: $numero ✅',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.blue,
+          duration: const Duration(seconds: 2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  // 🔥 LOGO MÉTODO DE PAGO
+  Widget _buildLogoMetodoPago(String metodo) {
+    final assetPath = metodo == 'yape' 
+        ? 'assets/images/logos/yape_logo.png'
+        : 'assets/images/logos/plin_logo.png';
+
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Image.asset(
+          assetPath,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return Icon(
+              metodo == 'yape' ? Icons.account_balance_wallet : Icons.credit_card,
+              size: 16,
+              color: metodo == 'yape' ? Colors.purple : Colors.teal,
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  // 🔥 INFO PAGO DIGITAL COMPACTO
+  Widget _buildInfoPagoDigitalCompacto(String icono, String value) {
+    return Row(
+      children: [
+        Text(icono, style: const TextStyle(fontSize: 14)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: SelectableText(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -761,7 +1054,7 @@ Widget _buildResumenPedidoCompacto() {
         children: [
           const Text(
             'Pago en Efectivo', 
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.green)
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.green)
           ),
           const SizedBox(height: 8),
           TextField(

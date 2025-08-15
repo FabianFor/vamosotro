@@ -274,7 +274,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
                 Text(
                   'Espera a que confirmemos tu pedido antes de realizar el pago',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 14,
                     color: Colors.red[700],
                   ),
                 ),
