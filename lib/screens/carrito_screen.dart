@@ -885,7 +885,7 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Colors.green,
+            color: Color.fromARGB(255, 241, 4, 4),
           ),
         ),
       ],
@@ -1020,7 +1020,7 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
                 child: Text(
                   'x${adicional.cantidad}',
                   style: const TextStyle(
-                    fontSize: 11,
+                    fontSize: 13,
                     color: Color.fromARGB(255, 0, 0, 0),
                     fontWeight: FontWeight.bold,
                   ),
@@ -1039,10 +1039,10 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
                 child: Text(
                   adicional.precio == 0.0 
                       ? 'GRATIS'
-                      : '+S/${(adicional.precio * adicional.cantidad).toStringAsFixed(1)}',
+                      : 'S/.${(adicional.precio * adicional.cantidad).toStringAsFixed(0)}',
                   style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.green[700],
+                    fontSize: 13,
+                    color: const Color.fromARGB(255, 0, 0, 0),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -1309,7 +1309,7 @@ class _CarritoItemWidgetState extends State<_CarritoItemWidget> with AutomaticKe
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  adicional.precio == 0.0 ? 'GRATIS' : '+S/${adicional.precio.toStringAsFixed(0)}',
+                  adicional.precio == 0.0 ? 'GRATIS' : 'S/.${adicional.precio.toStringAsFixed(0)}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Color.fromARGB(255, 0, 0, 0),

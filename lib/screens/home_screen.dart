@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$nombre agregado'),
+          content: Text('✅ $nombre agregado'),
           duration: const Duration(milliseconds: 1500),
           backgroundColor: const Color.fromARGB(255, 41, 114, 41),
           behavior: SnackBarBehavior.floating,
@@ -109,148 +109,169 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSliverAppBar() {
-    return SliverAppBar(
-      expandedHeight: 90,
-      floating: false,
-      pinned: true,
-      backgroundColor: colorPrimario,
-      elevation: 0,
-      automaticallyImplyLeading: false,
-      toolbarHeight: 90,
+Widget _buildSliverAppBar() {
+  return SliverAppBar(
+    expandedHeight: 90,
+    floating: false,
+    pinned: true,
+    backgroundColor: colorPrimario,
+    elevation: 0,
+    automaticallyImplyLeading: false,
+    toolbarHeight: 90,
 
-      title: Container(
-        height: 70, // 🔥 ALTURA AUMENTADA PARA CENTRAR MEJOR
-        padding: const EdgeInsets.only(top: 10), // 🔥 PADDING SUPERIOR PARA BAJAR EL CONTENIDO
-        child: Row(
-          children: [
-            // 🍕 LOGO DE IMAGEN MÁS COMPACTO
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 6,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: ClipOval(
-                child: Image.asset(
-                  'assets/images/logo/pizza_fabichelo_logo.png',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.local_pizza,
-                      color: colorSecundario,
-                      size: 20,
-                    );
-                  },
+    title: Container(
+      height: 70, // 🔥 ALTURA AUMENTADA PARA CENTRAR MEJOR
+      padding: const EdgeInsets.only(top: 10), // 🔥 PADDING SUPERIOR PARA BAJAR EL CONTENIDO
+      child: Row(
+        children: [
+          // 🍕 LOGO DE IMAGEN MÁS COMPACTO
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 6,
+                  offset: const Offset(0, 1),
                 ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            
-            // 📝 INFORMACIÓN MÁS COMPACTA
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'FABICHELO',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 16,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                  SizedBox(height: 1),
-                  Text(
-                    'Deliciosas pizzas artesanales',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 10,
-                      height: 1.2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            // 🛒 CARRITO INTEGRADO EN EL TÍTULO - SIEMPRE VISIBLE
-            Stack(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.shopping_cart, color: Colors.white, size: 22),
-                    onPressed: () => _mostrarCarrito(context),
-                    padding: EdgeInsets.zero,
-                  ),
-                ),
-                if (_totalItems > 0)
-                  Positioned(
-                    right: 4,
-                    top: 4,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 40, 180, 43),
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: colorSecundario.withOpacity(0.3),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 18,
-                        minHeight: 18,
-                      ),
-                      child: Text(
-                        '$_totalItems',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
               ],
             ),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/images/logo/pizza_fabichelo_logo.png',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.local_pizza,
+                    color: colorSecundario,
+                    size: 20,
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          
+          // 📝 INFORMACIÓN MÁS COMPACTA
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'FABICHELO',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 16,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                SizedBox(height: 1),
+                Text(
+                  'Deliciosas pizzas artesanales',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 10,
+                    height: 1.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // 🛒 CARRITO MEJORADO - ÁREA DE TOQUE MÁS GRANDE Y CÓMODA
+          GestureDetector(
+            onTap: () => _mostrarCarrito(context),
+            behavior: HitTestBehavior.opaque, // 🔥 DETECTA TOQUES EN TODA EL ÁREA
+            child: Container(
+              width: 65, // 🔥 ÁREA MÁS GRANDE (antes era 44)
+              height: 65, // 🔥 ÁREA MÁS GRANDE (antes era 44)  
+              padding: const EdgeInsets.all(10), // 🔥 PADDING PARA HACER EL ÁREA AÚN MÁS GRANDE
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // 🔥 CONTENEDOR DEL BOTÓN VISUAL
+                  Container(
+                    width: 45,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                      // 🔥 BORDE SUTIL PARA MEJOR VISIBILIDAD
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.shopping_cart, 
+                      color: Colors.white, 
+                      size: 24 // 🔥 ICONO LIGERAMENTE MÁS GRANDE
+                    ),
+                  ),
+                  
+                  // 🔥 BADGE MEJORADO - MÁS VISIBLE Y RESPONSIVE
+                  if (_totalItems > 0)
+                    Positioned(
+                      right: 5, // 🔥 AJUSTADO PARA LA NUEVA ÁREA
+                      top: 5,   // 🔥 AJUSTADO PARA LA NUEVA ÁREA
+                      child: Container(
+                        padding: const EdgeInsets.all(5), // 🔥 PADDING MÁS GRANDE
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 40, 180, 43),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color.fromARGB(255, 35, 139, 37).withOpacity(0.4),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                          // 🔥 BORDE BLANCO PARA MAYOR CONTRASTE
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 22, // 🔥 MÁS GRANDE PARA MEJOR VISIBILIDAD
+                          minHeight: 22,
+                        ),
+                        child: Text(
+                          _totalItems > 99 ? '99+' : '$_totalItems', // 🔥 LIMITAR NÚMEROS GRANDES
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9, // 🔥 FONT MÁS GRANDE
+                            fontWeight: FontWeight.bold,
+                            height: 1.0,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+    // 🎨 FONDO CON GRADIENTE
+    flexibleSpace: Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colorPrimario,
+            colorPrimario.withOpacity(0.8),
           ],
         ),
       ),
-      // 🎨 FONDO CON GRADIENTE
-      flexibleSpace: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              colorPrimario,
-              colorPrimario.withOpacity(0.8),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+    ),
+  );
+}
 
   // 🏷️ CATEGORÍAS COMO SLIVER
   Widget _buildSliverCategorias() {
