@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/models.dart';
-import '../data/pizza_data.dart'; // ✅ IMPORT CORRECTO
+import '../data/pizza_data.dart'; 
 import '../widgets/pizza_card.dart';
 import '../widgets/combo_card.dart';
 import '../widgets/mostrito_card.dart';
@@ -737,137 +737,122 @@ Widget _buildSliverAppBar() {
     );
   }
 
-  // 📞 FOOTER COMO SLIVER
-  Widget _buildSliverFooter() {
-    return SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.only(top: 20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              colorPrimario,
-              colorPrimario.withOpacity(0.9),
-            ],
+// 🔴 FOOTER ROJO RECTANGULAR SIMPLE
+// 🔴 FOOTER ROJO RECTANGULAR SIMPLE
+Widget _buildSliverFooter() {
+  return SliverToBoxAdapter(
+    child: Container(
+      margin: const EdgeInsets.only(top: 20),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFD4332A), // Color primario del app
+        borderRadius: BorderRadius.zero, // ⬛️ Recto
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 6,
+            offset: const Offset(0, -3),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
-                ),
-                child: Column(
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.phone, color: Colors.white, size: 18),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            '933 214 908 | 01 6723 711',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    const Row(
-                      children: [
-                        Icon(Icons.location_on, color: Colors.white, size: 18),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Paradero la posta subiendo una cuadra',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.purple,
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.purple.withOpacity(0.3),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: const Text(
-                            'Yape',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.teal,
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.teal.withOpacity(0.3),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: const Text(
-                            'Plin',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              Text(
-                '© 2024 Pizza Fabichelo',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 11,
-                ),
-              ),
-            ],
-          ),
-        ),
+        ],
       ),
-    );
-  }
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 📍 UBICACIÓN
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.location_on, color: Colors.black87, size: 16),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  "Paradero la posta, subiendo una cuadra",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    height: 1.3,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // 🌐 FACEBOOK CON ICONO
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.facebook, color: Colors.blueAccent, size: 16),
+              const SizedBox(width: 6),
+              const Text(
+                "facebook.com/pizzafabichelo",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+// 📞 TELÉFONOS
+Row(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    const Icon(Icons.phone, color: Colors.greenAccent, size: 16), // Celular
+    const SizedBox(width: 4),
+    const Text(
+      "933 214 908",
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+    const SizedBox(width: 16),
+    const Icon(Icons.phone_in_talk, color: Colors.blueAccent, size: 16), // Fijo
+    const SizedBox(width: 4),
+    const Text(
+      "01 6723 711",
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  ],
+),
+const SizedBox(height: 14),
+
+
+          // 👇 Copyright
+          const SizedBox(height: 8),
+          RichText(
+            text: const TextSpan(
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 10,
+                fontWeight: FontWeight.w400,
+              ),
+              children: [
+                TextSpan(text: "© 2024 "),
+                TextSpan(
+                  text: "Pizza Fabichelo",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   void _mostrarCarrito(BuildContext context) {
     showModalBottomSheet(
