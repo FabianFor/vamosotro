@@ -41,6 +41,14 @@ class _HomeScreenState extends State<HomeScreen> {
       'descuento': '10%',
     },
     {
+      'nombre': 'Combo brother',
+      'descripcionOriginal': '3 pizzas personales pepperoni, hawaiana y americana + pepsi 750ml',
+      'precioOriginal': 32.0,
+      'precioOferta': 28.0,
+      'imagen': 'assets/images/combos/combo_brother.png',
+      'descuento': '13%',
+    },
+        {
       'nombre': 'Familiar + broaster',
       'descripcionOriginal': 'Pizza familiar + 6 brazitos de pollo + Pepsi 750ml',
       'precioOriginal': 35.0,
@@ -56,14 +64,6 @@ class _HomeScreenState extends State<HomeScreen> {
       'imagen': 'assets/images/combos/combo_estrella.png',
       'descuento': '10%',
     },
-    {
-      'nombre': 'Combo brother',
-      'descripcionOriginal': '3 pizzas personales pepperoni, hawaiana y americana + pepsi 750ml',
-      'precioOriginal': 32.0,
-      'precioOferta': 28.0,
-      'imagen': 'assets/images/combos/combo_brother.png',
-      'descuento': '13%',
-    },
   ];
 
   // 🔥 CATEGORÍAS DINÁMICAS SIMPLIFICADAS
@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
     List<Map<String, dynamic>> cats = [
       // 🔥 CATEGORÍA ESPECIAL DE MIÉRCOLES (SOLO LOS MIÉRCOLES)
       if (esMiercoles) {
-        'nombre': '🔥 Ofertas Miércoles',
+        'nombre': 'Ofertas Miércoles',
         'icono': Icons.local_fire_department,
         'esEspecial': true,
         'color': colorOfertaMiercoles,
@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // 🔥 SI ES MIÉRCOLES Y NO HAY CATEGORÍA ESPECIAL SELECCIONADA, SELECCIONAR OFERTAS
     if (esMiercoles && !categoriaSeleccionada.contains('Ofertas Miércoles')) {
-      categoriaSeleccionada = '🔥 Ofertas Miércoles';
+      categoriaSeleccionada = 'Ofertas Miércoles';
     }
 
     return cats;
@@ -131,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Color colorMensaje = const Color.fromARGB(255, 41, 114, 41);
     
     if (esMiercoles && _esOfertaMiercoles(nombre)) {
-      mensaje = '🔥 ¡Oferta Miércoles agregada! $nombre';
+      mensaje = 'Oferta Miércoles agregada $nombre';
       colorMensaje = colorOfertaMiercoles;
     }
 
@@ -497,7 +497,7 @@ Widget _buildSliverCategorias() {
   // 🔥 MÉTODO ACTUALIZADO PARA CONTENIDO POR CATEGORÍA
   List<Widget> _buildContenidoPorCategoria() {
     switch (categoriaSeleccionada) {
-      case '🔥 Ofertas Miércoles':
+      case 'Ofertas Miércoles':
         return _buildOfertasMiercoles();
       case 'Pizza Personal':
         return _buildPizzasPersonales();

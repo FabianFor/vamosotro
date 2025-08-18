@@ -95,7 +95,7 @@ class OfertaMiercolesCard extends StatelessWidget {
               ),
             ),
 
-            // 🔥 BADGE DESCUENTO EN LA ESQUINA SUPERIOR DERECHA
+            // 🔥 BADGE AHORRO EN LA PARTE SUPERIOR (MOVIDO AQUÍ)
             Positioned(
               top: 0,
               right: 0,
@@ -116,10 +116,10 @@ class OfertaMiercolesCard extends StatelessWidget {
                   ],
                 ),
                 child: Text(
-                  '-$descuento',
+                  'Ahorras S/${ahorro.toStringAsFixed(2)}',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 10,
+                    fontSize: 9,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -194,108 +194,93 @@ class OfertaMiercolesCard extends StatelessWidget {
 
                           const SizedBox(height: 8),
 
-                          // PRECIO Y BOTÓN
+                          // PRECIO Y BOTÓN - REORGANIZADO
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              // PRECIOS
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  // PRECIO ORIGINAL TACHADO
-                                  Text(
-                                    'S/ ${precioOriginal.toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[500],
-                                      decoration: TextDecoration.lineThrough,
-                                      decorationColor: Colors.red,
-                                      decorationThickness: 2,
+                              // PRECIOS - MÁS COMPACTOS
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // PRECIO ORIGINAL TACHADO
+                                    Text(
+                                      'Antes: S/ ${precioOriginal.toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey[500],
+                                        decoration: TextDecoration.lineThrough,
+                                        decorationColor: Colors.red,
+                                        decorationThickness: 2,
+                                      ),
                                     ),
-                                  ),
-                                  // PRECIO OFERTA
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'S/ ${precioOferta.toStringAsFixed(2)}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
-                                          color: colorDescuento,
-                                        ),
+                                    const SizedBox(height: 2),
+                                    // PRECIO OFERTA
+                                    Text(
+                                      'S/ ${precioOferta.toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                        color: colorDescuento,
                                       ),
-                                      const SizedBox(width: 4),
-                                      // BADGE AHORRO
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                        decoration: BoxDecoration(
-                                          color: Colors.green,
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Text(
-                                          'Ahorras S/${ahorro.toStringAsFixed(2)}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 8,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-
-                              // BOTÓN ESPECIAL DE OFERTA
-                              Container(
-                                margin: const EdgeInsets.only(right: 8),
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      colorOferta,
-                                      colorDescuento,
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: colorOferta.withOpacity(0.4),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 3),
                                     ),
                                   ],
                                 ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
+                              ),
+
+                              // BOTÓN ESPECIAL DE OFERTA - MÁS COMPACTO
+                              Expanded(
+                                flex: 2,
+                                child: Container(
+                                  margin: const EdgeInsets.only(right: 4),
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        colorOferta,
+                                        colorDescuento,
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
                                     borderRadius: BorderRadius.circular(20),
-                                    onTap: onAgregarAlCarrito,
-                                    child: const Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.local_fire_department,
-                                            size: 16,
-                                            color: Colors.white,
-                                          ),
-                                          SizedBox(width: 6),
-                                          Text(
-                                            '¡AGREGAR!',
-                                            style: TextStyle(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: colorOferta.withOpacity(0.4),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(20),
+                                      onTap: onAgregarAlCarrito,
+                                      child: const Center(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.local_fire_department,
+                                              size: 14,
                                               color: Colors.white,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 0.5,
                                             ),
-                                          ),
-                                        ],
+                                            SizedBox(width: 4),
+                                            Text(
+                                              '¡AGREGAR!',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: 0.5,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
