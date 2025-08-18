@@ -52,8 +52,8 @@ class _CarritoScreenState extends State<CarritoScreen> {
     
     // Cache de colores
     _coloresCache = {
-      'Personal': const Color.fromARGB(255, 28, 130, 138),
-      'Familiar': colorPrimario,
+      'Personal': const Color.fromARGB(255, 255, 123, 0),
+      'Familiar': const Color.fromARGB(255, 42, 150, 212),
       'Extra Grande': const Color.fromARGB(255, 225, 0, 255),
       'Mostrito': Colors.orange,
       'Broaster': Colors.brown,
@@ -64,6 +64,7 @@ class _CarritoScreenState extends State<CarritoScreen> {
       'Combo': Colors.indigo,
       'Estrella': Colors.deepPurple,
       'Oferta Dúo': Colors.indigo,
+      'Oferta Miércoles': const Color.fromARGB(255, 255, 0, 0),
     };
   }
 

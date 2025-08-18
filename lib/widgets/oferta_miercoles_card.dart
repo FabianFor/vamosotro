@@ -20,7 +20,7 @@ class OfertaMiercolesCard extends StatelessWidget {
     required this.onAgregarAlCarrito,
   });
 
-  static const Color colorOferta = Color(0xFFFF6B35); // Naranja vibrante
+  static const Color colorOferta = Color.fromARGB(255, 255, 0, 0); // Naranja vibrante
   static const Color colorDescuento = Color(0xFFE60026); // Rojo intenso
 
   @override
@@ -119,7 +119,7 @@ class OfertaMiercolesCard extends StatelessWidget {
                   'Ahorras S/${ahorro.toStringAsFixed(2)}',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 9,
+                    fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -239,7 +239,7 @@ class OfertaMiercolesCard extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
-                                        colorOferta,
+                                        const Color.fromARGB(255, 255, 0, 0),
                                         colorDescuento,
                                       ],
                                       begin: Alignment.topLeft,
@@ -248,7 +248,7 @@ class OfertaMiercolesCard extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(20),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: colorOferta.withOpacity(0.4),
+                                        color: const Color.fromARGB(255, 255, 53, 53).withOpacity(0.4),
                                         blurRadius: 8,
                                         offset: const Offset(0, 3),
                                       ),

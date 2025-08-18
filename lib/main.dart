@@ -29,7 +29,7 @@ class PizzeriaApp extends StatelessWidget {
         final mediaQueryData = MediaQuery.of(context);
         return MediaQuery(
           data: mediaQueryData.copyWith(
-            textScaler: TextScaler.linear(1.0),
+            textScaleFactor: 1.0, // Corrige el error y evita cambios de tamaño de texto
           ),
           child: child ?? const SizedBox.shrink(),
         );

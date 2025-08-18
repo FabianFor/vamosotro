@@ -179,7 +179,7 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
       case 'preparando':
       case 'listo':
       case 'en_camino':
-        return widget.tipoEntrega == 'delivery' ? '30-45 minutos' : '25-35 minutos';
+        return widget.tipoEntrega == 'delivery' ? '25-35 minutos' : '25-35 minutos';
       default:
         return '';
     }

@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color colorAcento = Color(0xFFF4B942); 
   static const Color colorFondo = Color(0xFFF8F9FA);
   static const Color colorTarjeta = Colors.white;
-  static const Color colorOfertaMiercoles = Color(0xFFFF6B35);
+  static const Color colorOfertaMiercoles = Color.fromARGB(255, 255, 0, 0);
 
   // 🔥 VERIFICAR SI HOY ES MIÉRCOLES - FORZADO PARA TESTING
 bool get esMiercoles => DateTime.now().weekday == DateTime.wednesday;
@@ -70,7 +70,7 @@ bool get esMiercoles => DateTime.now().weekday == DateTime.wednesday;
     List<Map<String, dynamic>> cats = [
       // 🔥 CATEGORÍA ESPECIAL DE MIÉRCOLES (SOLO LOS MIÉRCOLES)
       if (esMiercoles) {
-        'nombre': 'Ofertas Miércoles',
+        'nombre': 'Ofertas los Miércoles',
         'icono': Icons.local_fire_department,
         'esEspecial': true,
         'color': colorOfertaMiercoles,
@@ -126,7 +126,7 @@ bool get esMiercoles => DateTime.now().weekday == DateTime.wednesday;
     
     if (esMiercoles && _esOfertaMiercoles(nombre)) {
       mensaje = 'Oferta Miércoles agregada $nombre';
-      colorMensaje = colorOfertaMiercoles;
+      colorMensaje = const Color.fromARGB(255, 255, 0, 0);
     }
 
     if (mounted) {
@@ -191,7 +191,7 @@ Widget _buildSliverAppBar() {
     expandedHeight: 90,
     floating: false,
     pinned: true,
-    backgroundColor: colorPrimario,
+    backgroundColor: const Color(0xFFD4332A), // 🔥 mismo rojo que abajo,
     elevation: 0,
     automaticallyImplyLeading: false,
     toolbarHeight: 90,
@@ -255,14 +255,14 @@ Widget _buildSliverAppBar() {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.orange,
+                          color: const Color.fromARGB(255, 0, 0, 0),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text(
                           '🔥 OFERTAS',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 8,
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -363,14 +363,14 @@ Widget _buildSliverAppBar() {
   );
 }
 
-// 🔥 CATEGORÍAS SIMPLIFICADAS - SIN ANIMACIONES NI EFECTOS RAROS
+// 🔥 CATEGORÍAS SIMPLIFICADAS - BADGE "HOY" ARRIBA CENTRADO VISIBLE
 Widget _buildSliverCategorias() {
   return SliverToBoxAdapter(
     child: Container(
       color: colorTarjeta,
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: SizedBox(
-        height: 70,
+        height: 85, // ⬅️ más alto para que el badge no se corte
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -382,103 +382,119 @@ Widget _buildSliverCategorias() {
 
             return GestureDetector(
               onTap: () => setState(() => categoriaSeleccionada = categoria['nombre']),
-              child: Container(
-                margin: const EdgeInsets.only(right: 10),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                width: esEspecial ? 110 : 90,
-                decoration: BoxDecoration(
-                  gradient: isSelected
-                      ? (esEspecial
-                          ? LinearGradient(
-                              colors: [
-                                colorOfertaMiercoles,
-                                colorOfertaMiercoles.withOpacity(0.8)
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // Contenedor principal de la categoría
+                  Container(
+                    margin: const EdgeInsets.only(right: 10, top: 10), // ⬅️ bajamos un poco para que quede espacio arriba
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    width: esEspecial ? 110 : 90,
+                    decoration: BoxDecoration(
+                      gradient: isSelected
+                          ? (esEspecial
+                              ? LinearGradient(
+                                  colors: [
+                                    const Color.fromARGB(255, 255, 0, 0),
+                                    const Color.fromARGB(255, 255, 0, 0).withOpacity(0.8)
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                )
+                              : LinearGradient(
+                                  colors: [colorPrimario, colorPrimario.withOpacity(0.8)],
+                                ))
+                          : null,
+                      color: isSelected
+                          ? null
+                          : (esEspecial
+                              ? const Color.fromARGB(255, 255, 0, 0).withOpacity(0.1)
+                              : Colors.grey[100]),
+                      borderRadius: BorderRadius.circular(esEspecial ? 18 : 14),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: (esEspecial ? colorOfertaMiercoles : colorPrimario)
+                                    .withOpacity(0.4),
+                                spreadRadius: 2,
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ]
+                          : null,
+                      border: !isSelected
+                          ? Border.all(
+                              color: esEspecial
+                                  ? const Color.fromARGB(255, 255, 0, 0).withOpacity(0.3)
+                                  : Colors.grey[300]!,
+                              width: esEspecial ? 2 : 1,
                             )
-                          : LinearGradient(
-                              colors: [colorPrimario, colorPrimario.withOpacity(0.8)],
-                            ))
-                      : null,
-                  color: isSelected
-                      ? null
-                      : (esEspecial
-                          ? colorOfertaMiercoles.withOpacity(0.1)
-                          : Colors.grey[100]),
-                  borderRadius: BorderRadius.circular(esEspecial ? 18 : 14),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: (esEspecial ? colorOfertaMiercoles : colorPrimario)
-                                .withOpacity(0.4),
-                            spreadRadius: 2,
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ]
-                      : null,
-                  border: !isSelected
-                      ? Border.all(
-                          color: esEspecial
-                              ? colorOfertaMiercoles.withOpacity(0.3)
-                              : Colors.grey[300]!,
-                          width: esEspecial ? 2 : 1,
-                        )
-                      : null,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // ICONO SIN ANIMACIONES
-                    Icon(
-                      categoria['icono'],
-                      color: isSelected ? Colors.white : (esEspecial ? colorOfertaMiercoles : colorPrimario),
-                      size: esEspecial ? 24 : 20,
+                          : null,
                     ),
-
-                    const SizedBox(height: 4),
-
-                    Text(
-                      categoria['nombre'],
-                      style: TextStyle(
-                        color: isSelected
-                            ? Colors.white
-                            : (esEspecial ? colorOfertaMiercoles : colorPrimario),
-                        fontWeight: isSelected
-                            ? FontWeight.bold
-                            : (esEspecial ? FontWeight.bold : FontWeight.w500),
-                        fontSize: esEspecial ? 10 : 9,
-                        height: 1.1,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                    // BADGE "HOY" SIN ANIMACIÓN
-                    if (esEspecial) ...[
-                      const SizedBox(height: 2),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                        decoration: BoxDecoration(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          categoria['icono'],
                           color: isSelected
-                              ? Colors.white.withOpacity(0.9)
-                              : colorOfertaMiercoles,
-                          borderRadius: BorderRadius.circular(8),
+                              ? Colors.white
+                              : (esEspecial ? const Color.fromARGB(255, 255, 0, 0) : colorPrimario),
+                          size: esEspecial ? 24 : 20,
                         ),
-                        child: Text(
-                          'HOY',
+                        const SizedBox(height: 4),
+                        Text(
+                          categoria['nombre'],
                           style: TextStyle(
-                            color: isSelected ? colorOfertaMiercoles : Colors.white,
-                            fontSize: 7,
-                            fontWeight: FontWeight.bold,
+                            color: isSelected
+                                ? Colors.white
+                                : (esEspecial ? const Color.fromARGB(255, 255, 0, 0) : colorPrimario),
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : (esEspecial ? FontWeight.bold : FontWeight.w500),
+                            fontSize: esEspecial ? 10 : 9,
+                            height: 1.1,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // BADGE "HOY" arriba centrado
+                  if (esEspecial)
+                    Positioned(
+                      top: 3,
+                      left: -8,
+                      right: 0,
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isSelected ? Colors.white : const Color.fromARGB(255, 255, 0, 0),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.25),
+                                blurRadius: 4,
+                                offset: const Offset(0, 0),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            'HOY',
+                            style: TextStyle(
+                              color: isSelected ? const Color.fromARGB(255, 255, 0, 0) : Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
-                    ],
-                  ],
-                ),
+                    ),
+                ],
               ),
             );
           },
@@ -488,10 +504,12 @@ Widget _buildSliverCategorias() {
   );
 }
 
+
+
   // 🔥 MÉTODO ACTUALIZADO PARA CONTENIDO POR CATEGORÍA
   List<Widget> _buildContenidoPorCategoria() {
     switch (categoriaSeleccionada) {
-      case 'Ofertas Miércoles':
+      case 'Ofertas los Miércoles':
         return _buildOfertasMiercoles();
       case 'Pizza Personal':
         return _buildPizzasPersonales();
@@ -548,101 +566,129 @@ Widget _buildSliverCategorias() {
   }
 
   // 🔥 HEADER ESPECIAL PARA OFERTAS DE MIÉRCOLES - SIN ANIMACIONES
-  Widget _buildSliverOfertasHeader() {
-    return SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              colorOfertaMiercoles.withOpacity(0.1),
-              Colors.red.withOpacity(0.05),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colorOfertaMiercoles.withOpacity(0.3), width: 2),
-        ),
-        child: Row(
-          children: [
-            // ICONO SIN ANIMACIÓN
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: colorOfertaMiercoles,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.local_fire_department, 
-                color: Colors.white, 
-                size: 20
-              ),
-            ),
-            
-            const SizedBox(width: 12),
-            
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '🔥 Ofertas Especiales Miércoles',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  const Text(
-                    'Solo por hoy - Descuentos increíbles',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Text(
-                      '⏰ Solo 24 horas',
-                      style: TextStyle(
-                        fontSize: 9,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+Widget _buildSliverOfertasHeader() {
+  return SliverToBoxAdapter(
+    child: Container(
+      margin: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+      child: Column(
+        children: [
+          // 🔥 HEADER PRINCIPAL MÁS COMPACTO
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color.fromARGB(255, 255, 0, 0),
+                  const Color.fromARGB(255, 255, 0, 0).withOpacity(0.8),
                 ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-            ),
-            
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: colorOfertaMiercoles.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                '${ofertasMiercoles.length} ofertas',
-                style: TextStyle(
-                  fontSize: 9,
-                  color: colorOfertaMiercoles,
-                  fontWeight: FontWeight.w600,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: colorOfertaMiercoles.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
                 ),
+              ],
+            ),
+            child: Row(
+              children: [
+                // ICONO LLAMATIVO
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.local_fire_department,
+                    color: const Color.fromARGB(255, 255, 0, 0),
+                    size: 24,
+                  ),
+                ),
+                
+                const SizedBox(width: 16),
+                
+                // TEXTO PRINCIPAL
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'OFERTAS DE MIERCOLES',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+Text(
+  'Solo los miércoles - Descuentos increíbles',
+  style: TextStyle(
+    fontSize: 13,
+    color: Colors.white.withOpacity(0.9),
+    height: 1.2,
+  ),
+),
+
+                    ],
+                  ),
+                ),
+                
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // 🎯 BANNER INFORMATIVO MÁS ELEGANTE
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color.fromARGB(255, 255, 0, 0),
+                width: 1.5,
               ),
             ),
-          ],
-        ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.access_time,
+                  color: Colors.red.shade600,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Válido solo por 24 horas - ¡No te lo pierdas!',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red.shade700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   // 🔥 COMBOS PIZZA FILTRADOS (SIN LOS QUE ESTÁN EN OFERTA)
   List<Widget> _buildCombosPizza() {
@@ -696,7 +742,7 @@ Widget _buildSliverCategorias() {
             child: const Text(
               '🔥 Todos los combos están en ofertas especiales hoy.\n¡Ve a la sección "Ofertas Miércoles"!',
               style: TextStyle(
-                color: Colors.orange,
+                color: Color.fromARGB(255, 255, 0, 0),
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),
@@ -1067,10 +1113,10 @@ Widget _buildSliverCategorias() {
                 const SizedBox(width: 6),
                 Flexible(
                   child: Text(
-                    "Paradero la posta, subiendo una cuadra",
+                    "A media cuadra de la curva",
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 12,
+                      fontSize: 13,
                       height: 1.3,
                     ),
                     textAlign: TextAlign.center,
@@ -1090,7 +1136,7 @@ Widget _buildSliverCategorias() {
                   "facebook.com/pizzafabichelo",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -1133,7 +1179,7 @@ Widget _buildSliverCategorias() {
               text: const TextSpan(
                 style: TextStyle(
                   color: Colors.white70,
-                  fontSize: 10,
+                  fontSize: 12,
                   fontWeight: FontWeight.w400,
                 ),
                 children: [
