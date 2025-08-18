@@ -5,6 +5,7 @@ import '../widgets/pizza_card.dart';
 import '../widgets/combo_card.dart';
 import '../widgets/mostrito_card.dart';
 import '../widgets/pizza_especial_card.dart';
+import '../widgets/oferta_miercoles_card.dart';
 import 'carrito_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,18 +25,76 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color colorAcento = Color(0xFFF4B942); 
   static const Color colorFondo = Color(0xFFF8F9FA);
   static const Color colorTarjeta = Colors.white;
+  static const Color colorOfertaMiercoles = Color(0xFFFF6B35);
 
-  // 🔥 CATEGORÍAS ACTUALIZADAS EN HOME SCREEN
-  static const List<Map<String, dynamic>> categorias = [
-    {'nombre': 'Pizza Personal', 'icono': Icons.local_pizza_outlined},
-    {'nombre': 'Pizza Familiar', 'icono': Icons.local_pizza},
-    {'nombre': 'Pizza Extra Grande', 'icono': Icons.local_pizza}, // 🔥 NUEVA CATEGORÍA
-    {'nombre': 'Combo Pizza', 'icono': Icons.local_pizza},
-    {'nombre': 'Pizza 2 sabores', 'icono': Icons.star},
-    {'nombre': 'Fusión', 'icono': Icons.auto_awesome},
-    {'nombre': 'Combo Broaster', 'icono': Icons.restaurant},
-    {'nombre': 'Mostritos', 'icono': Icons.restaurant_menu}, 
+  // 🔥 VERIFICAR SI HOY ES MIÉRCOLES - FORZADO PARA TESTING
+  bool get esMiercoles => true; // Cambiar a: DateTime.now().weekday == DateTime.wednesday cuando esté listo
+
+  // 🔥 OFERTAS ESPECIALES MIÉRCOLES
+  static final List<Map<String, dynamic>> ofertasMiercoles = [
+    {
+      'nombre': 'Combo familiar',
+      'descripcionOriginal': 'Americana + pepsi 750ml + 3 porciones de pan al ajo',
+      'precioOriginal': 29.0,
+      'precioOferta': 26.0,
+      'imagen': 'assets/images/combos/combo_familiar_pizza.png',
+      'descuento': '10%',
+    },
+    {
+      'nombre': 'Familiar + broaster',
+      'descripcionOriginal': 'Pizza familiar + 6 brazitos de pollo + Pepsi 750ml',
+      'precioOriginal': 35.0,
+      'precioOferta': 31.0,
+      'imagen': 'assets/images/combos/familiar_broaster.png',
+      'descuento': '11%',
+    },
+    {
+      'nombre': 'Combo estrella',
+      'descripcionOriginal': 'Pizza familiar 2 sabores + 6 Bracitos + Porción de papas + Pepsi 750ml',
+      'precioOriginal': 42.0,
+      'precioOferta': 38.0,
+      'imagen': 'assets/images/combos/combo_estrella.png',
+      'descuento': '10%',
+    },
+    {
+      'nombre': 'Combo brother',
+      'descripcionOriginal': '3 pizzas personales pepperoni, hawaiana y americana + pepsi 750ml',
+      'precioOriginal': 32.0,
+      'precioOferta': 28.0,
+      'imagen': 'assets/images/combos/combo_brother.png',
+      'descuento': '13%',
+    },
   ];
+
+  // 🔥 CATEGORÍAS DINÁMICAS SIMPLIFICADAS
+  List<Map<String, dynamic>> get categoriasDinamicas {
+    List<Map<String, dynamic>> cats = [
+      // 🔥 CATEGORÍA ESPECIAL DE MIÉRCOLES (SOLO LOS MIÉRCOLES)
+      if (esMiercoles) {
+        'nombre': '🔥 Ofertas Miércoles',
+        'icono': Icons.local_fire_department,
+        'esEspecial': true,
+        'color': colorOfertaMiercoles,
+      },
+      
+      // CATEGORÍAS NORMALES
+      {'nombre': 'Pizza Personal', 'icono': Icons.local_pizza_outlined},
+      {'nombre': 'Pizza Familiar', 'icono': Icons.local_pizza},
+      {'nombre': 'Pizza Extra Grande', 'icono': Icons.local_pizza},
+      {'nombre': 'Combo Pizza', 'icono': Icons.local_pizza},
+      {'nombre': 'Pizza 2 sabores', 'icono': Icons.star},
+      {'nombre': 'Fusión', 'icono': Icons.auto_awesome},
+      {'nombre': 'Combo Broaster', 'icono': Icons.restaurant},
+      {'nombre': 'Mostritos', 'icono': Icons.restaurant_menu}, 
+    ];
+
+    // 🔥 SI ES MIÉRCOLES Y NO HAY CATEGORÍA ESPECIAL SELECCIONADA, SELECCIONAR OFERTAS
+    if (esMiercoles && !categoriaSeleccionada.contains('Ofertas Miércoles')) {
+      categoriaSeleccionada = '🔥 Ofertas Miércoles';
+    }
+
+    return cats;
+  }
 
   int _totalItems = 0;
 
@@ -43,7 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _totalItems = carrito.fold(0, (sum, item) => sum + item.cantidad);
   }
 
-  // 🔥 MÉTODO CORREGIDO PARA AGREGAR AL CARRITO CON LÓGICAS ESPECIALES
   void agregarAlCarrito(String nombre, double precio, String tamano, String imagen) {
     setState(() {
       // 🔥 VERIFICAR SI YA EXISTE EL ITEM EXACTO
@@ -67,18 +125,44 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       _recalcularTotalItems(); 
     });
+
+    // 🔥 MENSAJE ESPECIAL PARA OFERTAS DE MIÉRCOLES
+    String mensaje = '✅ $nombre agregado';
+    Color colorMensaje = const Color.fromARGB(255, 41, 114, 41);
+    
+    if (esMiercoles && _esOfertaMiercoles(nombre)) {
+      mensaje = '🔥 ¡Oferta Miércoles agregada! $nombre';
+      colorMensaje = colorOfertaMiercoles;
+    }
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✅ $nombre agregado'),
-          duration: const Duration(milliseconds: 1500),
-          backgroundColor: const Color.fromARGB(255, 41, 114, 41),
+          content: Text(mensaje),
+          duration: const Duration(milliseconds: 2000),
+          backgroundColor: colorMensaje,
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
+  }
+
+  // 🔥 VERIFICAR SI UN PRODUCTO ES OFERTA DE MIÉRCOLES
+  bool _esOfertaMiercoles(String nombre) {
+    return ofertasMiercoles.any((oferta) => 
+      nombre.toLowerCase().contains(oferta['nombre'].toLowerCase()));
+  }
+
+  // 🔥 FILTRAR COMBOS NORMALES EN MIÉRCOLES
+  List<Combo> _filtrarCombosSiEsMiercoles(List<Combo> combos) {
+    if (!esMiercoles) return combos;
+    
+    // Remover combos que están en oferta especial
+    return combos.where((combo) => 
+      !ofertasMiercoles.any((oferta) => 
+        combo.nombre.toLowerCase().contains(oferta['nombre'].toLowerCase()))).toList();
   }
 
   @override
@@ -97,7 +181,6 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         backgroundColor: colorFondo,
         body: CustomScrollView(
-          cacheExtent: 500, 
           slivers: [
             _buildSliverAppBar(),
             _buildSliverCategorias(),
@@ -120,8 +203,8 @@ Widget _buildSliverAppBar() {
     toolbarHeight: 90,
 
     title: Container(
-      height: 70, // 🔥 ALTURA AUMENTADA PARA CENTRAR MEJOR
-      padding: const EdgeInsets.only(top: 10), // 🔥 PADDING SUPERIOR PARA BAJAR EL CONTENIDO
+      height: 70,
+      padding: const EdgeInsets.only(top: 10),
       child: Row(
         children: [
           // 🍕 LOGO DE IMAGEN MÁS COMPACTO
@@ -155,25 +238,50 @@ Widget _buildSliverAppBar() {
           ),
           const SizedBox(width: 10),
           
-          // 📝 INFORMACIÓN MÁS COMPACTA
-          const Expanded(
+          // 📝 INFORMACIÓN MÁS COMPACTA CON INDICADOR DE MIÉRCOLES
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'FABICHELO',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 16,
-                    letterSpacing: 0.8,
-                  ),
+                Row(
+                  children: [
+                    const Text(
+                      'FABICHELO',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 16,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    // 🔥 INDICADOR ESPECIAL MIÉRCOLES (SIN ANIMACIÓN)
+                    if (esMiercoles) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          '🔥 OFERTAS',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                SizedBox(height: 1),
+                const SizedBox(height: 1),
                 Text(
-                  'Deliciosas pizzas artesanales',
-                  style: TextStyle(
+                  esMiercoles 
+                    ? '¡Miércoles de ofertas especiales!'
+                    : 'Deliciosas pizzas artesanales',
+                  style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 10,
                     height: 1.2,
@@ -183,25 +291,23 @@ Widget _buildSliverAppBar() {
             ),
           ),
           
-          // 🛒 CARRITO MEJORADO - ÁREA DE TOQUE MÁS GRANDE Y CÓMODA
+          // 🛒 CARRITO MEJORADO
           GestureDetector(
             onTap: () => _mostrarCarrito(context),
-            behavior: HitTestBehavior.opaque, // 🔥 DETECTA TOQUES EN TODA EL ÁREA
+            behavior: HitTestBehavior.opaque,
             child: Container(
-              width: 65, // 🔥 ÁREA MÁS GRANDE (antes era 44)
-              height: 65, // 🔥 ÁREA MÁS GRANDE (antes era 44)  
-              padding: const EdgeInsets.all(10), // 🔥 PADDING PARA HACER EL ÁREA AÚN MÁS GRANDE
+              width: 65,
+              height: 65,
+              padding: const EdgeInsets.all(10),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // 🔥 CONTENEDOR DEL BOTÓN VISUAL
                   Container(
                     width: 45,
                     height: 45,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
-                      // 🔥 BORDE SUTIL PARA MEJOR VISIBILIDAD
                       border: Border.all(
                         color: Colors.white.withOpacity(0.3),
                         width: 1,
@@ -210,39 +316,30 @@ Widget _buildSliverAppBar() {
                     child: const Icon(
                       Icons.shopping_cart, 
                       color: Colors.white, 
-                      size: 24 // 🔥 ICONO LIGERAMENTE MÁS GRANDE
+                      size: 24
                     ),
                   ),
                   
-                  // 🔥 BADGE MEJORADO - MÁS VISIBLE Y RESPONSIVE
                   if (_totalItems > 0)
                     Positioned(
-                      right: 5, // 🔥 AJUSTADO PARA LA NUEVA ÁREA
-                      top: 5,   // 🔥 AJUSTADO PARA LA NUEVA ÁREA
+                      right: 5,
+                      top: 5,
                       child: Container(
-                        padding: const EdgeInsets.all(5), // 🔥 PADDING MÁS GRANDE
+                        padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 40, 180, 43),
                           borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color.fromARGB(255, 35, 139, 37).withOpacity(0.4),
-                              blurRadius: 6,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                          // 🔥 BORDE BLANCO PARA MAYOR CONTRASTE
                           border: Border.all(color: Colors.white, width: 2),
                         ),
                         constraints: const BoxConstraints(
-                          minWidth: 22, // 🔥 MÁS GRANDE PARA MEJOR VISIBILIDAD
+                          minWidth: 22,
                           minHeight: 22,
                         ),
                         child: Text(
-                          _totalItems > 99 ? '99+' : '$_totalItems', // 🔥 LIMITAR NÚMEROS GRANDES
+                          _totalItems > 99 ? '99+' : '$_totalItems',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 9, // 🔥 FONT MÁS GRANDE
+                            fontSize: 9,
                             fontWeight: FontWeight.bold,
                             height: 1.0,
                           ),
@@ -257,7 +354,6 @@ Widget _buildSliverAppBar() {
         ],
       ),
     ),
-    // 🎨 FONDO CON GRADIENTE
     flexibleSpace: Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -273,81 +369,136 @@ Widget _buildSliverAppBar() {
   );
 }
 
-  // 🏷️ CATEGORÍAS COMO SLIVER
-  Widget _buildSliverCategorias() {
-    return SliverToBoxAdapter(
-      child: Container(
-        color: colorTarjeta,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: SizedBox(
-          height: 70,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: categorias.length,
-            // 🔥 CACHE PARA PERFORMANCE
-            addAutomaticKeepAlives: true,
-            itemBuilder: (context, index) {
-              final categoria = categorias[index];
-              final isSelected = categoriaSeleccionada == categoria['nombre'];
-              
-              return GestureDetector(
-                onTap: () => setState(() => categoriaSeleccionada = categoria['nombre']),
-                child: Container(
-                  margin: const EdgeInsets.only(right: 10),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  width: 90,
-                  decoration: BoxDecoration(
-                    gradient: isSelected ? LinearGradient(
-                      colors: [colorPrimario, colorPrimario.withOpacity(0.8)],
-                    ) : null,
-                    color: isSelected ? null : Colors.grey[100],
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: isSelected ? [
-                      BoxShadow(
-                        color: colorPrimario.withOpacity(0.3),
-                        spreadRadius: 1,
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
+// 🔥 CATEGORÍAS SIMPLIFICADAS - SIN ANIMACIONES NI EFECTOS RAROS
+Widget _buildSliverCategorias() {
+  return SliverToBoxAdapter(
+    child: Container(
+      color: colorTarjeta,
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: SizedBox(
+        height: 70,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: categoriasDinamicas.length,
+          itemBuilder: (context, index) {
+            final categoria = categoriasDinamicas[index];
+            final isSelected = categoriaSeleccionada == categoria['nombre'];
+            final esEspecial = categoria['esEspecial'] == true;
+
+            return GestureDetector(
+              onTap: () => setState(() => categoriaSeleccionada = categoria['nombre']),
+              child: Container(
+                margin: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                width: esEspecial ? 110 : 90,
+                decoration: BoxDecoration(
+                  gradient: isSelected
+                      ? (esEspecial
+                          ? LinearGradient(
+                              colors: [
+                                colorOfertaMiercoles,
+                                colorOfertaMiercoles.withOpacity(0.8)
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            )
+                          : LinearGradient(
+                              colors: [colorPrimario, colorPrimario.withOpacity(0.8)],
+                            ))
+                      : null,
+                  color: isSelected
+                      ? null
+                      : (esEspecial
+                          ? colorOfertaMiercoles.withOpacity(0.1)
+                          : Colors.grey[100]),
+                  borderRadius: BorderRadius.circular(esEspecial ? 18 : 14),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: (esEspecial ? colorOfertaMiercoles : colorPrimario)
+                                .withOpacity(0.4),
+                            spreadRadius: 2,
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ]
+                      : null,
+                  border: !isSelected
+                      ? Border.all(
+                          color: esEspecial
+                              ? colorOfertaMiercoles.withOpacity(0.3)
+                              : Colors.grey[300]!,
+                          width: esEspecial ? 2 : 1,
+                        )
+                      : null,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // ICONO SIN ANIMACIONES
+                    Icon(
+                      categoria['icono'],
+                      color: isSelected ? Colors.white : (esEspecial ? colorOfertaMiercoles : colorPrimario),
+                      size: esEspecial ? 24 : 20,
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      categoria['nombre'],
+                      style: TextStyle(
+                        color: isSelected
+                            ? Colors.white
+                            : (esEspecial ? colorOfertaMiercoles : colorPrimario),
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : (esEspecial ? FontWeight.bold : FontWeight.w500),
+                        fontSize: esEspecial ? 10 : 9,
+                        height: 1.1,
                       ),
-                    ] : null,
-                    border: !isSelected ? Border.all(color: Colors.grey[300]!) : null,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        categoria['icono'],
-                        color: isSelected ? Colors.white : colorPrimario,
-                        size: 20,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        categoria['nombre'],
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : colorPrimario,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                          fontSize: 9,
-                          height: 1.1,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    // BADGE "HOY" SIN ANIMACIÓN
+                    if (esEspecial) ...[
+                      const SizedBox(height: 2),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Colors.white.withOpacity(0.9)
+                              : colorOfertaMiercoles,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        child: Text(
+                          'HOY',
+                          style: TextStyle(
+                            color: isSelected ? colorOfertaMiercoles : Colors.white,
+                            fontSize: 7,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
-                  ),
+                  ],
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   // 🔥 MÉTODO ACTUALIZADO PARA CONTENIDO POR CATEGORÍA
   List<Widget> _buildContenidoPorCategoria() {
     switch (categoriaSeleccionada) {
+      case '🔥 Ofertas Miércoles':
+        return _buildOfertasMiercoles();
       case 'Pizza Personal':
         return _buildPizzasPersonales();
       case 'Pizza Familiar':
@@ -369,7 +520,261 @@ Widget _buildSliverAppBar() {
     }
   }
 
-  // 🍕 PIZZAS FAMILIARES CON SLIVER LIST
+  // 🔥 NUEVO MÉTODO PARA OFERTAS DE MIÉRCOLES
+  List<Widget> _buildOfertasMiercoles() {
+    return [
+      _buildSliverOfertasHeader(),
+      
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final oferta = ofertasMiercoles[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: OfertaMiercolesCard(
+                nombre: oferta['nombre'],
+                descripcion: oferta['descripcionOriginal'],
+                precioOriginal: oferta['precioOriginal'],
+                precioOferta: oferta['precioOferta'],
+                imagen: oferta['imagen'],
+                descuento: oferta['descuento'],
+                onAgregarAlCarrito: () => agregarAlCarrito(
+                  oferta['nombre'],
+                  oferta['precioOferta'],
+                  'Oferta Miércoles',
+                  oferta['imagen'],
+                ),
+              ),
+            );
+          },
+          childCount: ofertasMiercoles.length,
+        ),
+      ),
+    ];
+  }
+
+  // 🔥 HEADER ESPECIAL PARA OFERTAS DE MIÉRCOLES - SIN ANIMACIONES
+  Widget _buildSliverOfertasHeader() {
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              colorOfertaMiercoles.withOpacity(0.1),
+              Colors.red.withOpacity(0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: colorOfertaMiercoles.withOpacity(0.3), width: 2),
+        ),
+        child: Row(
+          children: [
+            // ICONO SIN ANIMACIÓN
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: colorOfertaMiercoles,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.local_fire_department, 
+                color: Colors.white, 
+                size: 20
+              ),
+            ),
+            
+            const SizedBox(width: 12),
+            
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '🔥 Ofertas Especiales Miércoles',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    'Solo por hoy - Descuentos increíbles',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      '⏰ Solo 24 horas',
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: colorOfertaMiercoles.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '${ofertasMiercoles.length} ofertas',
+                style: TextStyle(
+                  fontSize: 9,
+                  color: colorOfertaMiercoles,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 🔥 COMBOS PIZZA FILTRADOS (SIN LOS QUE ESTÁN EN OFERTA)
+  List<Widget> _buildCombosPizza() {
+    final combosFiltrados = _filtrarCombosSiEsMiercoles(PizzaData.combosPizzaOrdenados);
+    
+    return [
+      _buildSliverSectionHeader(
+        'Combo Pizza',
+        esMiercoles ? 'Otras combinaciones disponibles' : 'Combinaciones especiales',
+        Icons.local_pizza,
+        Colors.indigo,
+        combosFiltrados.length,
+      ),
+      
+      if (combosFiltrados.isNotEmpty)
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final comboPizza = combosFiltrados[index];
+              String tamanoEspecial = 'Combo';
+              if (comboPizza.nombre.toLowerCase().contains('oferta dúo')) {
+                tamanoEspecial = 'Oferta Dúo';
+              }
+              
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ComboCard(
+                  combo: comboPizza,
+                  onAgregarAlCarrito: () => agregarAlCarrito(
+                    comboPizza.nombre,
+                    comboPizza.precio,
+                    tamanoEspecial,
+                    comboPizza.imagen,
+                  ),
+                ),
+              );
+            },
+            childCount: combosFiltrados.length,
+          ),
+        )
+      else
+        SliverToBoxAdapter(
+          child: Container(
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.orange.withOpacity(0.3)),
+            ),
+            child: const Text(
+              '🔥 Todos los combos están en ofertas especiales hoy.\n¡Ve a la sección "Ofertas Miércoles"!',
+              style: TextStyle(
+                color: Colors.orange,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+    ];
+  }
+
+  List<Widget> _buildFusiones() {
+    final fusionesFiltradas = _filtrarCombosSiEsMiercoles(PizzaData.fusionesOrdenadas);
+    
+    return [
+      _buildSliverSectionHeader(
+        'Fusiones',
+        esMiercoles ? 'Otras fusiones disponibles' : 'Pizza y broaster juntos',
+        Icons.auto_awesome,
+        Colors.deepPurple,
+        fusionesFiltradas.length,
+      ),
+      
+      if (fusionesFiltradas.isNotEmpty)
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final fusion = fusionesFiltradas[index];
+              String tamanoEspecial = 'Fusión';
+              if (fusion.nombre.toLowerCase().contains('combo estrella')) {
+                tamanoEspecial = 'Estrella';
+              }
+              
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ComboCard(
+                  combo: fusion,
+                  onAgregarAlCarrito: () => agregarAlCarrito(
+                    fusion.nombre,
+                    fusion.precio,
+                    tamanoEspecial,
+                    fusion.imagen,
+                  ),
+                ),
+              );
+            },
+            childCount: fusionesFiltradas.length,
+          ),
+        )
+      else
+        SliverToBoxAdapter(
+          child: Container(
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.orange.withOpacity(0.3)),
+            ),
+            child: const Text(
+              '🔥 Algunas fusiones están en ofertas especiales hoy.\n¡Revisa "Ofertas Miércoles"!',
+              style: TextStyle(
+                color: Colors.orange,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+    ];
+  }
+
   List<Widget> _buildPizzasFamiliares() {
     return [
       _buildSliverSectionHeader(
@@ -400,7 +805,6 @@ Widget _buildSliverAppBar() {
             );
           },
           childCount: PizzaData.pizzasFamiliaresOrdenadas.length,
-          addAutomaticKeepAlives: true, // 🔥 MANTENER WIDGETS EN MEMORIA
         ),
       ),
     ];
@@ -436,20 +840,18 @@ Widget _buildSliverAppBar() {
             );
           },
           childCount: PizzaData.pizzasPersonalesOrdenadas.length,
-          addAutomaticKeepAlives: true,
         ),
       ),
     ];
   }
 
-  // 🔥 NUEVO MÉTODO PARA PIZZAS EXTRA GRANDES
   List<Widget> _buildPizzasExtraGrandes() {
     return [
       _buildSliverSectionHeader(
         'Extra Grandes(45cm)',
         'Lista para conquistar tu hambre',
         Icons.local_pizza,
-        const Color.fromARGB(255, 255, 191, 0), // Morado eléctrico
+        const Color.fromARGB(255, 255, 191, 0),
         PizzaData.pizzasExtraGrandesOrdenadas.length,
       ),
       
@@ -473,7 +875,6 @@ Widget _buildSliverAppBar() {
             );
           },
           childCount: PizzaData.pizzasExtraGrandesOrdenadas.length,
-          addAutomaticKeepAlives: true,
         ),
       ),
     ];
@@ -507,7 +908,6 @@ Widget _buildSliverAppBar() {
             );
           },
           childCount: PizzaData.mostritosOrdenados.length,
-          addAutomaticKeepAlives: true,
         ),
       ),
     ];
@@ -541,13 +941,11 @@ Widget _buildSliverAppBar() {
             );
           },
           childCount: PizzaData.pizzasEspecialesOrdenadas.length,
-          addAutomaticKeepAlives: true,
         ),
       ),
     ];
   }
 
-  // 🔥 MÉTODO ACTUALIZADO PARA COMBOS BROASTER CON TAMANO CORRECTO
   List<Widget> _buildCombosBroaster() {
     return [
       _buildSliverSectionHeader(
@@ -569,102 +967,19 @@ Widget _buildSliverAppBar() {
                 onAgregarAlCarrito: () => agregarAlCarrito(
                   combo.nombre,
                   combo.precio,
-                  'Broaster', // 🔥 CAMBIAR A 'Broaster' para que use adicionales correctos
+                  'Broaster',
                   combo.imagen,
                 ),
               ),
             );
           },
           childCount: PizzaData.combosBroasterOrdenados.length,
-          addAutomaticKeepAlives: true,
         ),
       ),
     ];
   }
 
-  // 🔥 MÉTODO ACTUALIZADO PARA FUSIONES CON LÓGICAS ESPECIALES
-  List<Widget> _buildFusiones() {
-    return [
-      _buildSliverSectionHeader(
-        'Fusiones',
-        'Pizza y broaster juntos',
-        Icons.auto_awesome,
-        Colors.deepPurple,
-        PizzaData.fusionesOrdenadas.length,
-      ),
-      
-      SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final fusion = PizzaData.fusionesOrdenadas[index];
-            // 🔥 DETERMINAR TAMAÑO ESPECIAL PARA COMBOS ESPECIALES
-            String tamanoEspecial = 'Fusión';
-            if (fusion.nombre.toLowerCase().contains('combo estrella')) {
-              tamanoEspecial = 'Estrella';
-            }
-            
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ComboCard(
-                combo: fusion,
-                onAgregarAlCarrito: () => agregarAlCarrito(
-                  fusion.nombre,
-                  fusion.precio,
-                  tamanoEspecial, // 🔥 USAR TAMAÑO ESPECIAL
-                  fusion.imagen,
-                ),
-              ),
-            );
-          },
-          childCount: PizzaData.fusionesOrdenadas.length,
-          addAutomaticKeepAlives: true,
-        ),
-      ),
-    ];
-  }
-
-  // 🔥 MÉTODO ACTUALIZADO PARA COMBOS PIZZA CON LÓGICAS ESPECIALES
-  List<Widget> _buildCombosPizza() {
-    return [
-      _buildSliverSectionHeader(
-        'Combo Pizza',
-        'Combinaciones especiales',
-        Icons.local_pizza,
-        Colors.indigo,
-        PizzaData.combosPizzaOrdenados.length,
-      ),
-      
-      SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final comboPizza = PizzaData.combosPizzaOrdenados[index];
-            // 🔥 DETERMINAR TAMAÑO ESPECIAL PARA COMBOS ESPECIALES
-            String tamanoEspecial = 'Combo';
-            if (comboPizza.nombre.toLowerCase().contains('oferta dúo')) {
-              tamanoEspecial = 'Oferta Dúo';
-            }
-            
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ComboCard(
-                combo: comboPizza,
-                onAgregarAlCarrito: () => agregarAlCarrito(
-                  comboPizza.nombre,
-                  comboPizza.precio,
-                  tamanoEspecial, // 🔥 USAR TAMAÑO ESPECIAL
-                  comboPizza.imagen,
-                ),
-              ),
-            );
-          },
-          childCount: PizzaData.combosPizzaOrdenados.length,
-          addAutomaticKeepAlives: true,
-        ),
-      ),
-    ];
-  }
-
-  // 🎨 HEADER DE SECCIÓN COMO SLIVER
+  // HEADER DE SECCIÓN SIMPLE SIN ANIMACIONES
   Widget _buildSliverSectionHeader(String titulo, String subtitulo, IconData icono, Color color, int cantidad) {
     return SliverToBoxAdapter(
       child: Container(
@@ -737,122 +1052,113 @@ Widget _buildSliverAppBar() {
     );
   }
 
-// 🔴 FOOTER ROJO RECTANGULAR SIMPLE
-// 🔴 FOOTER ROJO RECTANGULAR SIMPLE
-Widget _buildSliverFooter() {
-  return SliverToBoxAdapter(
-    child: Container(
-      margin: const EdgeInsets.only(top: 20),
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFD4332A), // Color primario del app
-        borderRadius: BorderRadius.zero, // ⬛️ Recto
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 6,
-            offset: const Offset(0, -3),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 📍 UBICACIÓN
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.location_on, color: Colors.black87, size: 16),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  "Paradero la posta, subiendo una cuadra",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    height: 1.3,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // 🌐 FACEBOOK CON ICONO
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.facebook, color: Colors.blueAccent, size: 16),
-              const SizedBox(width: 6),
-              const Text(
-                "facebook.com/pizzafabichelo",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-// 📞 TELÉFONOS
-Row(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [
-    const Icon(Icons.phone, color: Colors.greenAccent, size: 16), // Celular
-    const SizedBox(width: 4),
-    const Text(
-      "933 214 908",
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
-    const SizedBox(width: 16),
-    const Icon(Icons.phone_in_talk, color: Colors.blueAccent, size: 16), // Fijo
-    const SizedBox(width: 4),
-    const Text(
-      "01 6723 711",
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
-  ],
-),
-const SizedBox(height: 14),
-
-
-          // 👇 Copyright
-          const SizedBox(height: 8),
-          RichText(
-            text: const TextSpan(
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 10,
-                fontWeight: FontWeight.w400,
-              ),
+  // FOOTER SIMPLE SIN EFECTOS
+  Widget _buildSliverFooter() {
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: const EdgeInsets.only(top: 20),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: const BoxDecoration(
+          color: Color(0xFFD4332A),
+          borderRadius: BorderRadius.zero,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 📍 UBICACIÓN
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextSpan(text: "© 2024 "),
-                TextSpan(
-                  text: "Pizza Fabichelo",
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontWeight: FontWeight.bold,
+                const Icon(Icons.location_on, color: Colors.black87, size: 16),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    "Paradero la posta, subiendo una cuadra",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      height: 1.3,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+
+            // 🌐 FACEBOOK CON ICONO
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.facebook, color: Colors.blueAccent, size: 16),
+                const SizedBox(width: 6),
+                const Text(
+                  "facebook.com/pizzafabichelo",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // 📞 TELÉFONOS
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.phone, color: Colors.greenAccent, size: 16),
+                const SizedBox(width: 4),
+                const Text(
+                  "933 214 908",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const Icon(Icons.phone_in_talk, color: Colors.blueAccent, size: 16),
+                const SizedBox(width: 4),
+                const Text(
+                  "01 6723 711",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+
+            // Copyright
+            const SizedBox(height: 8),
+            RichText(
+              text: const TextSpan(
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w400,
+                ),
+                children: [
+                  TextSpan(text: "© 2024 "),
+                  TextSpan(
+                    text: "Pizza Fabichelo",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   void _mostrarCarrito(BuildContext context) {
     showModalBottomSheet(
