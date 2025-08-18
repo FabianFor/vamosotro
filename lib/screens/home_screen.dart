@@ -28,8 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color colorOfertaMiercoles = Color(0xFFFF6B35);
 
   // 🔥 VERIFICAR SI HOY ES MIÉRCOLES - FORZADO PARA TESTING
-  bool get esMiercoles => true; // Cambiar a: DateTime.now().weekday == DateTime.wednesday cuando esté listo
-
+bool get esMiercoles => DateTime.now().weekday == DateTime.wednesday;
   // 🔥 OFERTAS ESPECIALES MIÉRCOLES
   static final List<Map<String, dynamic>> ofertasMiercoles = [
     {
@@ -87,11 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
       {'nombre': 'Combo Broaster', 'icono': Icons.restaurant},
       {'nombre': 'Mostritos', 'icono': Icons.restaurant_menu}, 
     ];
-
-    // 🔥 SI ES MIÉRCOLES Y NO HAY CATEGORÍA ESPECIAL SELECCIONADA, SELECCIONAR OFERTAS
-    if (esMiercoles && !categoriaSeleccionada.contains('Ofertas Miércoles')) {
-      categoriaSeleccionada = 'Ofertas Miércoles';
-    }
 
     return cats;
   }

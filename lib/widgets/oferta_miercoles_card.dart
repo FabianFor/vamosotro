@@ -31,7 +31,7 @@ class OfertaMiercolesCard extends StatelessWidget {
       data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        height: 155, // Un poco más alto que las cards normales
+        height: 160, // Un poco más alto que las cards normales
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(18), // Más redondeado
@@ -128,7 +128,7 @@ class OfertaMiercolesCard extends StatelessWidget {
 
             // CONTENIDO PRINCIPAL
             Padding(
-              padding: const EdgeInsets.only(top: 24), // Espacio para los badges
+              padding: const EdgeInsets.only(top: 17), // Espacio para los badges
               child: Row(
                 children: [
                   // IMAGEN
@@ -176,7 +176,7 @@ class OfertaMiercolesCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
 
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 1),
 
                           // DESCRIPCIÓN
                           Expanded(
@@ -187,12 +187,12 @@ class OfertaMiercolesCard extends StatelessWidget {
                                 fontSize: 12,
                                 height: 1.3,
                               ),
-                              maxLines: 3,
+                              maxLines: 4,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
 
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 1),
 
                           // PRECIO Y BOTÓN - REORGANIZADO
                           Row(
@@ -207,9 +207,9 @@ class OfertaMiercolesCard extends StatelessWidget {
                                   children: [
                                     // PRECIO ORIGINAL TACHADO
                                     Text(
-                                      'Antes: S/ ${precioOriginal.toStringAsFixed(2)}',
+                                      'S/ ${precioOriginal.toStringAsFixed(2)}',
                                       style: TextStyle(
-                                        fontSize: 10,
+                                        fontSize: 12,
                                         color: Colors.grey[500],
                                         decoration: TextDecoration.lineThrough,
                                         decorationColor: Colors.red,
